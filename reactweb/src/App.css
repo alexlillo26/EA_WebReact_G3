@@ -1,0 +1,91 @@
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f9;
+  color: #333;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  background-color: #222;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.app-nav {
+  margin-top: 10px;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 15px;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.app-main {
+  flex: 1;
+  padding: 20px;
+  text-align: center;
+}
+
+.home-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.home-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+.home-container p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.home-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.action-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: #0056b3;
+}
+
+.app-footer {
+  background-color: #222;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.9rem;
+}
