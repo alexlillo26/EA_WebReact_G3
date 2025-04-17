@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { loginUser } from '../../services/userService'; // Importar el servicio
+import { loginUser } from '../../services/userService';
 import './login.css';
 
 const Login: React.FC = () => {
@@ -10,7 +10,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null); // Limpiar mensajes de error previos
+    setErrorMessage(null);
 
     try {
       const user = await loginUser(email, password);
@@ -30,7 +30,7 @@ const Login: React.FC = () => {
     <div className="login-container">
       <form onSubmit={handleSubmit}>
         <h2>Iniciar Sesión</h2>
-        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        {errorMessage && <p style={{ color: '#ff4d4d', marginBottom: '15px' }}>{errorMessage}</p>}
         <input
           type="email"
           placeholder="Correo Electrónico"
@@ -48,8 +48,7 @@ const Login: React.FC = () => {
         <button type="submit">Ingresar</button>
       </form>
       <p>
-        ¿No tienes cuenta?{' '}
-        <Link to="/register">Regístrate</Link>
+        ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
       </p>
     </div>
   );

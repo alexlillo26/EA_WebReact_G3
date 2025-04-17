@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { registerUser } from '../../services/userService'; // Importar el servicio
+import { registerUser } from '../../services/userService';
 import './register.css';
 
 const Register: React.FC = () => {
@@ -11,10 +11,15 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null); // Limpiar mensajes de error previos
+    setErrorMessage(null);
 
     try {
-      const user = await registerUser({ name, birthDate: new Date(birthDate), email, password });
+      const user = await registerUser({
+        name,
+        birthDate: new Date(birthDate),
+        email,
+        password
+      });
 
       if (user) {
         alert('Registro exitoso');
@@ -30,7 +35,7 @@ const Register: React.FC = () => {
     <div className="register-container">
       <form onSubmit={handleSubmit}>
         <h2>Registro</h2>
-        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        {errorMessage && <p style={{ color: '#ff4d4d', marginBottom: '15px' }}>{errorMessage}</p>}
         <input
           type="text"
           placeholder="Nombre"

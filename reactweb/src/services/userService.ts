@@ -1,10 +1,11 @@
 import { Usuario } from '../models/Usuario'; // Importar el modelo de usuario
 
+
 // Definir las rutas de la API
 const API_BASE_URL = 'http://localhost:9000/api'; // Asegúrate de que coincida con el backend
-const LOGIN_URL = `${API_BASE_URL}/login`;
-const REGISTER_URL = `${API_BASE_URL}/register`;
-const GET_USER_BY_ID_URL = (id: string) => `${API_BASE_URL}/${id}`;
+const LOGIN_URL = `${API_BASE_URL}/users/login`; // Cambiar a /users/login
+const REGISTER_URL = `${API_BASE_URL}/users/register`; // Cambiar a /users/register
+const GET_USER_BY_ID_URL = (id: string) => `${API_BASE_URL}/users/${id}`; // Cambiar a /users/:id
 
 // Servicio para iniciar sesión
 export const loginUser = async (email: string, password: string): Promise<Usuario | null> => {

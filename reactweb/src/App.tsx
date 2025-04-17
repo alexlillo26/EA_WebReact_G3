@@ -9,7 +9,7 @@ function App() {
     <Router>
       <div className="app-container">
         <header className="app-header">
-          <h1>Gestión de Combates de Boxeo</h1>
+          <h1>Face2Face</h1>
           <nav className="app-nav">
             <Link to="/" className="nav-link">Inicio</Link>
             <Link to="/login" className="nav-link">Iniciar Sesión</Link>
@@ -26,7 +26,7 @@ function App() {
         </main>
 
         <footer className="app-footer">
-          <p>© 2025 Gestión de Combates de Boxeo. Todos los derechos reservados.</p>
+          <p>© 2025 Face2Face. Todos los derechos reservados.</p>
         </footer>
       </div>
     </Router>
@@ -35,10 +35,9 @@ function App() {
 
 const Home: React.FC = () => (
   <div className="home-container">
-    <h2>Bienvenido a la Plataforma de Gestión de Combates de Boxeo</h2>
+    <h2>Bienvenido a Face2Face</h2>
     <p>
-      Aquí puedes gestionar tus combates, registrar nuevos usuarios y acceder a toda la información
-      relacionada con el mundo del boxeo.
+     Inicia tu sesión o regístrate y forma parte de nuestra comunidad de campeones !
     </p>
     <div className="home-actions">
       <Link to="/login" className="action-button">Iniciar Sesión</Link>
