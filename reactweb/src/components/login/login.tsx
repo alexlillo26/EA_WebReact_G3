@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../../services/userService';
 import './login.css';
 
-const Login: React.FC = () => {
+const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,8 +17,8 @@ const Login: React.FC = () => {
       const user = await loginUser(email, password);
 
       if (user) {
-        alert('Login exitoso');
-        console.log(user);
+        onLogin(user.name); // Pasar el nombre del usuario al componente principal
+        navigate('/'); // Redirigir a la página principal
       } else {
         setErrorMessage('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
       }
