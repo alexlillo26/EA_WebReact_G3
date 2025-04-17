@@ -1,0 +1,80 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: rgba(31, 31, 31, 0.8);
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+  }
+  
+  .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .nav {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-link {
+    color: #fff;
+    font-weight: bold;
+    transition: color 0.3s;
+  }
+  
+  .nav-link:hover {
+    color: #FF3B30;
+  }
+  
+  .gym-button {
+    background-color: #FF3B30;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+  
+  .gym-button:hover {
+    background-color: #D32F2F;
+  }
+  
+  /* User Menu */
+  .user-menu {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .user-name {
+    cursor: pointer;
+  }
+  
+  .dropdown {
+    display: none;
+    position: absolute;
+    background-color: #1f1f1f;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+  }
+  
+  .user-menu:hover .dropdown {
+    display: block;
+  }
+  
+  .dropdown-item {
+    color: white;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+    border-radius: 4px;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #FF3B30;
+  }
