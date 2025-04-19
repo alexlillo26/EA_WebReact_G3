@@ -1,80 +1,62 @@
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    background-color: rgba(31, 31, 31, 0.8);
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-  }
-  
-  .logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #fff;
-  }
-  
-  .nav {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .nav-link {
-    color: #fff;
-    font-weight: bold;
-    transition: color 0.3s;
-  }
-  
-  .nav-link:hover {
-    color: #FF3B30;
-  }
-  
-  .gym-button {
-    background-color: #FF3B30;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-  }
-  
-  .gym-button:hover {
-    background-color: #D32F2F;
-  }
-  
-  /* User Menu */
-  .user-menu {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .user-name {
-    cursor: pointer;
-  }
-  
-  .dropdown {
-    display: none;
-    position: absolute;
-    background-color: #1f1f1f;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    padding: 10px;
-    border-radius: 5px;
-    z-index: 1000;
-  }
-  
-  .user-menu:hover .dropdown {
-    display: block;
-  }
-  
-  .dropdown-item {
-    color: white;
-    padding: 8px 12px;
-    text-decoration: none;
-    display: block;
-    border-radius: 4px;
-  }
-  
-  .dropdown-item:hover {
-    background-color: #FF3B30;
-  }
+.nav-link {
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.3s;
+  padding: 10px 20px; /* Ajusta el padding para alinearlo con los demás elementos */
+  font-size: 16px; /* Asegúrate de que el tamaño de fuente sea consistente */
+  line-height: 1.5; /* Ajusta la altura de línea */
+}
+
+.nav-link:hover {
+  color: #FF3B30;
+}
+
+.gym-button {
+  background-color: #FF3B30;
+  color: #fff;
+  padding: 10px 15px; /* Igual padding que los enlaces */
+  border-radius: 5px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 16px; /* Igual tamaño de fuente que los enlaces */
+  line-height: 1.5; /* Ajusta la altura de línea */
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center; /* Centra el texto verticalmente */
+}
+
+.gym-button:hover {
+  background-color: #D32F2F;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre el mensaje de bienvenida y el botón de cerrar sesión */
+}
+
+.welcome-message {
+  color: #fff;
+  font-weight: bold;
+  padding: 10px 15px; /* Igual padding que los enlaces */
+  font-size: 16px; /* Igual tamaño de fuente que los enlaces */
+  line-height: 1.5; /* Ajusta la altura de línea */
+}
+
+.logout-button {
+  background-color: transparent;
+  text-decoration: none;
+  color: #FF3B30;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+  padding: 10px 15px; /* Igual padding que los enlaces */
+  font-size: 16px; /* Igual tamaño de fuente que los enlaces */
+  line-height: 1.5; /* Ajusta la altura de línea */
+}
+
+.logout-button:hover {
+  color: #D32F2F;
+}

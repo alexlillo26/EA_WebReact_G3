@@ -5,10 +5,13 @@ import Home from './components/home/Home';
 import Login from './components/login/login';
 import Register from './components/register/register';
 import Profile from './components/profile/Profile';
+import GymRegistration from './components/gyms/GymRegistration';
 import './App.css';
+import EditProfile from './EditProfile/EditProfile';
 
 function App() {
   const [user, setUser] = useState<{ name: string } | null>(null);
+
 
   return (
     <Router>
@@ -19,6 +22,11 @@ function App() {
           <Route path="/login" element={<Login onLogin={(name) => setUser({ name })} />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile user={user} />} />
+          <Route
+            path="/edit-profile"
+            element={<EditProfile user={user} onUpdateUser={(updatedUser) => setUser(updatedUser)} />}
+          />
+          <Route path="/gym-registration" element={<GymRegistration />} />
         </Routes>
       </div>
     </Router>

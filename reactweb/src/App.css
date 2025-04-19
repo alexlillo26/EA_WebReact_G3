@@ -20,10 +20,9 @@ a {
   min-height: 100vh;
 }
 
-/* Header */
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around; /* Coloca el logo a la izquierda y los botones a la derecha */
   align-items: center;
   padding: 20px 40px;
   background-color: rgba(31, 31, 31, 0.8);
@@ -32,15 +31,20 @@ a {
   z-index: 1000;
 }
 
+.nav {
+  display: flex;
+  gap: 20px; /* Espacio entre los botones */
+  justify-content: flex-end; /* Alinea los botones al final */
+  flex-shrink: 0; /* Evita que el contenedor se reduzca */
+  max-width: calc(50%); /* Limita el ancho del contenedor para evitar desbordes */
+  overflow: hidden; /* Evita que el contenido se salga del contenedor */
+  white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+}
+
 .logo {
   font-size: 24px;
   font-weight: bold;
   color: #fff;
-}
-
-.nav {
-  display: flex;
-  gap: 20px;
 }
 
 .nav-link {
