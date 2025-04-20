@@ -6,8 +6,8 @@ import Login from './components/login/login';
 import Register from './components/register/register';
 import Profile from './components/profile/Profile';
 import GymRegistration from './components/gyms/GymRegistration';
+import GymList from './components/gyms/GymList';
 import './App.css';
-import EditProfile from './EditProfile/EditProfile';
 
 interface User {
   name: string;
@@ -15,7 +15,6 @@ interface User {
 
 function App() {
   const [user, setUser] = useState<{ name: string } | null>(null);
-
 
   return (
     <Router>
@@ -36,11 +35,8 @@ function App() {
           />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile user={user} />} />
-          <Route
-            path="/edit-profile"
-            element={<EditProfile user={user} onUpdateUser={(updatedUser) => setUser(updatedUser)} />}
-          />
           <Route path="/gym-registration" element={<GymRegistration />} />
+          <Route path="/gyms" element={<GymList />} />
         </Routes>
       </div>
     </Router>

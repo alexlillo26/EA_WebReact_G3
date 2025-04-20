@@ -1,0 +1,55 @@
+.gym-list {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 20px auto;
+  }
+  
+  .gym-list h2 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .gym-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .gym-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .gym-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagination button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .pagination button:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
