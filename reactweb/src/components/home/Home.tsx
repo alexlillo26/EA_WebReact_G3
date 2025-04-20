@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { getGyms } from '../../services/gymService';
 import { Gym } from '../../models/Gym';
+import StepsSection from '../StepsSection/SteptsSection';
+import AboutSection from '../AboutSection/AboutSection'; // Importa el nuevo componente
 import './Home.css';
 
 const Home: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
-  const [suggestions, setSuggestions] = useState<Gym[]>([]); // Estado para las sugerencias de gimnasios
+  const [searchTerm, setSearchTerm] = useState('');
+  const [suggestions, setSuggestions] = useState<Gym[]>([]);
 
   useEffect(() => {
     const fetchGyms = async () => {
       try {
-        const { gyms } = await getGyms(); // Llama al servicio para obtener los gimnasios
+        const { gyms } = await getGyms();
         setGyms(gyms);
       } catch (error) {
         console.error('Error al obtener los gimnasios:', error);
@@ -21,9 +23,8 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Filtrar los gimnasios según el término de búsqueda
     if (searchTerm.trim() === '') {
-      setSuggestions([]); // Si el término está vacío, no mostrar sugerencias
+      setSuggestions([]);
     } else {
       const filtered = gyms.filter((gym) =>
         gym.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -34,54 +35,58 @@ const Home: React.FC = () => {
   }, [searchTerm, gyms]);
 
   const handleSelectSuggestion = (gymName: string) => {
-    setSearchTerm(gymName); // Actualiza el término de búsqueda con la selección
-    setSuggestions([]); // Limpia las sugerencias después de seleccionar
+    setSearchTerm(gymName);
+    setSuggestions([]);
   };
 
   return (
-    <section className="hero">
-      <div className="hero-content">
-        <h1>Organiza y encuentra combates de Boxeo al instante</h1>
-        <p>
-          Conecta con rivales, promotores y gimnasios. Participa en peleas equilibradas, 
-          entrena con los mejores y escala en el ranking.
-        </p>
-        <form className="search-form">
-          <div className="autocomplete">
-            <input
-              type="text"
-              placeholder="Ciudad, gimnasio o boxeador"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)} // Actualiza el término de búsqueda
-            />
-            {suggestions.length > 0 && (
-              <ul className="suggestions">
-                {suggestions.map((gym) => (
-                  <li
-                    key={gym.id}
-                    onClick={() => handleSelectSuggestion(gym.name)} // Selecciona el gimnasio
-                  >
-                    {gym.name} - {gym.place}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <select>
-            <option value="amateur">Amateur</option>
-            <option value="profesional">Profesional</option>
-            <option value="sparring">Sparring</option>
-          </select>
-          <input type="date" />
-          <select>
-            <option value="peso-pluma">Peso pluma</option>
-            <option value="peso-medio">Peso medio</option>
-            <option value="peso-pesado">Peso pesado</option>
-          </select>
-          <button type="submit" className="search-button">Buscar Combate</button>
-        </form>
-      </div>
-    </section>
+    <>
+      <section className="hero">
+        <div className="hero-content">
+          <h1>Organiza y encuentra combates de Boxeo al instante</h1>
+          <p>
+            Conecta con rivales, promotores y gimnasios. Participa en peleas equilibradas, 
+            entrena con los mejores y escala en el ranking.
+          </p>
+          <form className="search-form">
+            <div className="autocomplete">
+              <input
+                type="text"
+                placeholder="Ciudad, gimnasio o boxeador"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {suggestions.length > 0 && (
+                <ul className="suggestions">
+                  {suggestions.map((gym) => (
+                    <li
+                      key={gym.id}
+                      onClick={() => handleSelectSuggestion(gym.name)}
+                    >
+                      {gym.name} - {gym.place}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <select>
+              <option value="amateur">Amateur</option>
+              <option value="profesional">Profesional</option>
+              <option value="sparring">Sparring</option>
+            </select>
+            <input type="date" />
+            <select>
+              <option value="peso-pluma">Peso pluma</option>
+              <option value="peso-medio">Peso medio</option>
+              <option value="peso-pesado">Peso pesado</option>
+            </select>
+            <button type="submit" className="search-button">Buscar Combate</button>
+          </form>
+        </div>
+      </section>
+      <StepsSection />
+      <AboutSection /> 
+    </>
   );
 };
 

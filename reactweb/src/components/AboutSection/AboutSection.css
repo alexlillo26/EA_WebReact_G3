@@ -1,0 +1,50 @@
+.about-section {
+    background-color: #f9f9f9; /* Fondo claro */
+    padding: 60px 20px;
+    text-align: center;
+  }
+  
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .about-title {
+    font-size: 36px; /* Título grande */
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .about-text {
+    font-size: 16px; /* Texto más pequeño */
+    line-height: 1.8;
+    color: #555;
+    text-align: justify;
+  }
+  
+  .about-logo img {
+    max-width: 150px; /* Tamaño del logo */
+    height: auto;
+  }
+  
+  @media (min-width: 768px) {
+    .about-content {
+      flex-direction: row; /* Logo y texto en fila en pantallas grandes */
+      justify-content: space-between;
+      align-items: center;
+    }
+  
+    .about-text {
+      max-width: 600px;
+      text-align: left;
+    }
+  
+    .about-logo img {
+      max-width: 200px; /* Logo más grande en pantallas grandes */
+    }
+  }

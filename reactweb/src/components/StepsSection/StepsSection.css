@@ -1,0 +1,58 @@
+.steps-section {
+    background-image: url('../../assets/ring.png'); /* Cambia por la imagen de fondo */
+    background-size: cover;
+    background-position: center;
+    padding: 80px 20px; /* Más espacio para que la imagen predomine */
+    color: #fff;
+    text-align: center;
+  }
+  
+  .steps-title {
+    font-size: 48px; /* Título más grande */
+    font-weight: bold;
+    margin-bottom: 50px; /* Más espacio entre el título y las tarjetas */
+    color: #fff;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7); /* Sombra más pronunciada */
+  }
+  
+  .steps-container {
+    display: flex;
+    flex-direction: column; /* Asegura que las tarjetas estén una debajo de otra */
+    align-items: center;
+    gap: 30px; /* Espacio entre las tarjetas */
+  }
+  
+  .step-card {
+    background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
+    color: #333;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px 20px; /* Reduce el tamaño de las tarjetas */
+    text-align: center;
+    max-width: 250px; /* Tarjetas más pequeñas */
+    width: 100%;
+  }
+  
+  .step-number {
+    font-size: 36px; /* Número más pequeño */
+    font-weight: bold;
+    color: #FF3B30;
+    margin-bottom: 10px;
+  }
+  
+  .step-card h3 {
+    font-size: 20px; /* Título más pequeño */
+    margin-bottom: 8px;
+  }
+  
+  .step-card p {
+    font-size: 14px; /* Texto más pequeño */
+    line-height: 1.4;
+  }
+  
+  @media (min-width: 768px) {
+    .steps-container {
+      flex-direction: row; /* En pantallas grandes, las tarjetas estarán en fila */
+      justify-content: center;
+    }
+  }
