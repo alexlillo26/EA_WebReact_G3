@@ -17,8 +17,9 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
           <UserMenu userName={user.name} onLogout={onLogout} />
         ) : (
           <>
-            <Link to="/login" className="nav-link">Inicia sesión / Regístrate</Link>
-            <Link to="/gyms" className="gym-button">¿Eres un gimnasio?</Link>
+            <Link to="/login" className="nav-link">Inicia sesión</Link>
+            <Link to="/register" className="nav-link">Regístrate</Link>
+            <Link to="/gym-registration" className="gym-button">Eres un gimnasio</Link>
           </>
         )}
       </nav>
