@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Header.css';
+import UserMenu from '../UserMenu/UserMenu';
 
 interface HeaderProps {
   user: { name: string } | null;
@@ -14,13 +14,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
       <nav className="nav">
         <Link to="/events" className="nav-link">Eventos</Link>
         {user ? (
-          <div className="user-menu">
-            <span className="nav-link user-name">{user.name}</span>
-            <div className="dropdown">
-              <Link to="/profile" className="dropdown-item">Mi Perfil</Link>
-              <button className="dropdown-item" onClick={onLogout}>Cerrar Sesión</button>
-            </div>
-          </div>
+          <UserMenu userName={user.name} onLogout={onLogout} />
         ) : (
           <>
             <Link to="/login" className="nav-link">Inicia sesión / Regístrate</Link>

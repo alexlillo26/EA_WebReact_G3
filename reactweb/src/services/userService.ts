@@ -8,9 +8,9 @@ const REGISTER_URL = `${API_BASE_URL}/users/register`; // Cambiar a /users/regis
 const GET_USER_BY_ID_URL = (id: string) => `${API_BASE_URL}/users/${id}`; // Cambiar a /users/:id
 
 // Servicio para iniciar sesión
-export const loginUser = async (email: string, password: string): Promise<Usuario | null> => {
+export const loginUser = async (email: string, password: string): Promise<{ name: string } | null> => {
   try {
-    const response = await fetch(LOGIN_URL, { // Usar LOGIN_URL en lugar de apiRoutes.login
+    const response = await fetch('http://localhost:9000/api/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -20,14 +20,14 @@ export const loginUser = async (email: string, password: string): Promise<Usuari
       throw new Error('Error al iniciar sesión');
     }
 
-    const user: Usuario = await response.json();
-    return user;
+    const data = await response.json();
+    console.log('Respuesta del backend:', data); // Depuración
+    return data.user; // Extraer el objeto `user` de la respuesta
   } catch (error) {
     console.error('Error en loginUser:', error);
     return null;
   }
 };
-
 // Servicio para registrar un nuevo usuario
 export const registerUser = async (userData: Omit<Usuario, 'id' | 'isHidden'>): Promise<Usuario | null> => {
   try {

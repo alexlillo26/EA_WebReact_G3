@@ -7,6 +7,10 @@ import Register from './components/register/register';
 import Profile from './components/profile/Profile';
 import './App.css';
 
+interface User {
+  name: string;
+}
+
 function App() {
   const [user, setUser] = useState<{ name: string } | null>(null);
 
@@ -16,7 +20,17 @@ function App() {
         <Header user={user} onLogout={() => setUser(null)} />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login onLogin={(name) => setUser({ name })} />} />
+          <Route
+            path="/login"
+            element={
+              <Login
+                onLogin={(name) => {
+                  console.log('Usuario autenticado:', name); // Depuración
+                  setUser({ name });
+                }}
+              />
+            }
+          />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile user={user} />} />
         </Routes>

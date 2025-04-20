@@ -12,10 +12,11 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
-
+  
     try {
       const user = await loginUser(email, password);
-
+      console.log('Usuario recibido en Login:', user); // Depuración
+  
       if (user) {
         onLogin(user.name); // Pasar el nombre del usuario al componente principal
         navigate('/'); // Redirigir a la página principal
