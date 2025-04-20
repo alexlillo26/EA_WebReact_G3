@@ -7,6 +7,7 @@ import Register from './components/register/register';
 import Profile from './components/profile/Profile';
 import GymRegistration from './components/gyms/GymRegistration';
 import GymList from './components/gyms/GymList';
+import CombatList from './components/CombatList/CombatList'; // Importa el componente CombatList
 import './App.css';
 
 interface User {
@@ -37,6 +38,7 @@ function App() {
           <Route path="/profile" element={<Profile user={user} />} />
           <Route path="/gym-registration" element={<GymRegistration />} />
           <Route path="/gyms" element={<GymList />} />
+          <Route path="/combats" element={<CombatList />} /> {/* Nueva ruta para CombatList */}
         </Routes>
       </div>
     </Router>
