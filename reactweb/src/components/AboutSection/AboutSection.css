@@ -47,4 +47,8 @@
     .about-logo img {
       max-width: 200px; /* Logo más grande en pantallas grandes */
     }
+
+    .about-text p {
+      text-align: justify;
+    }
   }

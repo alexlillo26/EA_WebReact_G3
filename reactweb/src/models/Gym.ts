@@ -5,5 +5,5 @@ export interface Gym {
     phone: string;
     place: string;
     price: number;
-    password?: string; // Opcional, solo para registro
+    password: string; 
   }

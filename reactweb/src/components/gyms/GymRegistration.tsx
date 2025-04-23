@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
-import { registerGym } from '../../services/gymService';
-import { Gym } from '../../models/Gym';
-import './GymRegistration.css';
+import React, { useState } from "react";
+import styled from "styled-components";
 
 const GymRegistration: React.FC = () => {
-  const [gymData, setGymData] = useState<Gym>({
-    name: '',
-    email: '',
-    phone: '',
-    place: '',
-    price: 0,
-    password: '',
+  const [gymData, setGymData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    place: "",
+    price: "",
+    password: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,43 +16,142 @@ const GymRegistration: React.FC = () => {
     setGymData({ ...gymData, [name]: value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await registerGym(gymData);
-      alert('Gimnasio registrado exitosamente');
-    } catch (error) {
-      console.error('Error al registrar el gimnasio:', error);
-      alert('Error al registrar el gimnasio');
-    }
+    console.log("Gym Registration Data:", gymData);
   };
 
   return (
-    <div className="gym-registration-container">
-      <h1>Registro de Gimnasio</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Nombre:</label>
-        <input type="text" id="name" name="name" value={gymData.name} onChange={handleChange} required />
-
-        <label htmlFor="email">Correo Electrónico:</label>
-        <input type="email" id="email" name="email" value={gymData.email} onChange={handleChange} required />
-
-        <label htmlFor="phone">Teléfono:</label>
-        <input type="text" id="phone" name="phone" value={gymData.phone} onChange={handleChange} required />
-
-        <label htmlFor="place">Ubicación:</label>
-        <input type="text" id="place" name="place" value={gymData.place} onChange={handleChange} required />
-
-        <label htmlFor="price">Precio:</label>
-        <input type="number" id="price" name="price" value={gymData.price} onChange={handleChange} required />
-
-        <label htmlFor="password">Contraseña:</label>
-        <input type="password" id="password" name="password" value={gymData.password} onChange={handleChange} required />
-
-        <button type="submit">Registrar</button>
-      </form>
-    </div>
+    <StyledRegistration>
+      <div className="flip-card__back">
+        <div className="card">
+          <h2>Registro</h2>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              placeholder="Nombre"
+              name="name"
+              value={gymData.name}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="email"
+              placeholder="Correo Electrónico"
+              name="email"
+              value={gymData.email}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Teléfono"
+              name="phone"
+              value={gymData.phone}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Ubicación"
+              name="place"
+              value={gymData.place}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="number"
+              placeholder="Precio"
+              name="price"
+              value={gymData.price}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Contraseña"
+              name="password"
+              value={gymData.password}
+              onChange={handleChange}
+              required
+            />
+            <button type="submit">Registrarse</button>
+          </form>
+        </div>
+      </div>
+    </StyledRegistration>
   );
 };
+
+const StyledRegistration = styled.div`
+  .flip-card__front {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card {
+    background-color: rgba(
+      26,
+      26,
+      26,
+      0.9
+    ); /* Fondo oscuro con transparencia */
+    color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 400px; /* Limitar el ancho de la tarjeta */
+    width: 100%; /* Asegurar que no exceda el ancho máximo */
+    max-height: 600px;
+    text-align: center;
+  }
+
+  h2 {
+    margin-bottom: 20px;
+    color: #d62828;
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #2c2c2c;
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: #121212;
+    color: white;
+    transition: border-color 0.3s;
+  }
+
+  input:focus {
+    border-color: #d62828;
+    outline: none;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    background-color: #d62828;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #a31f1f;
+  }
+`;
 
 export default GymRegistration;

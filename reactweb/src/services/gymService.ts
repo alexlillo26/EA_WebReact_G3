@@ -71,3 +71,25 @@ export const deleteGym = async (id: string): Promise<void> => {
     throw new Error('Error al eliminar el gimnasio');
   }
 };
+
+// Iniciar sesión como gimnasio
+export const loginGym = async (email: string, password: string): Promise<{ name: string } | null> => {
+  try {
+    const response = await fetch('http://localhost:9000/api/gym/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al iniciar sesión');
+    }
+
+    const data = await response.json();
+    console.log('Respuesta del backend:', data); // Depuración
+    return data.gym; // Extraer el objeto `gym` de la respuesta
+  } catch (error) {
+    console.error('Error en loginGym:', error);
+    return null;
+  }
+}

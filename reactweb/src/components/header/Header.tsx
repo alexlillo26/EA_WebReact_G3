@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import UserMenu from '../UserMenu/UserMenu';
+import React from "react";
+import { Link } from "react-router-dom";
+import UserMenu from "../UserMenu/UserMenu";
 
 interface HeaderProps {
   user: { name: string } | null;
@@ -10,16 +10,26 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
   return (
     <header className="header">
-      <div className="logo">Face2Face</div>
+      <Link to="/" className="logo">
+        Face2Face
+      </Link>
       <nav className="nav">
-        <Link to="/events" className="nav-link">Eventos</Link>
+        <Link to="/events" className="nav-link">
+          Eventos
+        </Link>
         {user ? (
           <UserMenu userName={user.name} onLogout={onLogout} />
         ) : (
           <>
-            <Link to="/login" className="nav-link">Inicia sesión</Link>
-            <Link to="/register" className="nav-link">Regístrate</Link>
-            <Link to="/gym-registration" className="gym-button">Eres un gimnasio</Link>
+            <Link to="/login" className="nav-link">
+              Inicia sesión
+            </Link>
+            <Link to="/register" className="nav-link">
+              Regístrate
+            </Link>
+            <Link to="/gym-toggle" className="gym-button">
+              Eres un gimnasio
+            </Link>
           </>
         )}
       </nav>
