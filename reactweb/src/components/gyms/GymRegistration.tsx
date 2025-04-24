@@ -23,17 +23,16 @@ const GymRegistration: React.FC = () => {
 
   return (
     <StyledRegistration>
-      <div className="flip-card__back">
-        <div className="card">
-          <h2>Registro</h2>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Nombre"
-              name="name"
-              value={gymData.name}
-              onChange={handleChange}
-              required
+      <div className="card">
+        <h2>Registro</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Nombre"
+            name="name"
+            value={gymData.name}
+            onChange={handleChange}
+            required
             />
             <input
               type="email"
@@ -78,7 +77,7 @@ const GymRegistration: React.FC = () => {
             <button type="submit">Registrarse</button>
           </form>
         </div>
-      </div>
+      
     </StyledRegistration>
   );
 };

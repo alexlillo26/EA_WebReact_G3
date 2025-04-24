@@ -37,11 +37,12 @@ const StyledWrapper = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
+  padding 0 20px;
 
   .card-container {
     position: relative;
-    width: 400px;
-    height: 10px;
+    width: 400px; /* Ajustar el ancho */
+    height: 350px; /* Altura dinámica */
     perspective: 1000px; /* Necesario para el efecto 3D */
   }
 
@@ -60,23 +61,22 @@ const StyledWrapper = styled.div`
   .flip-card__front,
   .flip-card__back {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 112%;
+    height: auto; /* Altura dinámica */
     backface-visibility: hidden;
-    top: 0;
-    left: 0;
-    background-color: rgba(
-      26,
-      26,
-      26,
-      0.9
-    ); /* Fondo oscuro con transparencia */
+    top: 10%;
+    left: 10%;
+    background-color: rgba(26, 26, 26, 0.9); /* Fondo oscuro con transparencia */
     color: white; /* Color del texto */
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Alinear contenido en columna */
+    justify-content: center; /* Centrar verticalmente */
     align-items: center;
-    border-radius: 10px; /* Bordes redondeados */
+    border-radius: 10x; /* Bordes redondeados */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar */
+    padding: 20px; /* Espaciado interno */
+    box-shadow: 0 0 15px rgba(214, 40, 40, 0.4);
+
   }
 
   .flip-card__back {
@@ -93,9 +93,9 @@ const StyledWrapper = styled.div`
 
   .toggle-btn {
     position: absolute;
-    top: -200px; /* Mueve el botón hacia arriba */
+    top: -60px; /* Ajustar la posición del botón */
     left: 50%;
-    transform: translateX(-50%); /* Centra el botón horizontalmente */
+    transform: translateX(-50%); /* Centrar el botón horizontalmente */
     background-color: #d62828;
     color: white;
     padding: 12px;
@@ -105,7 +105,7 @@ const StyledWrapper = styled.div`
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    width: 200px; /* Ajusta el ancho del botón */
+    width: auto; /* Ajustar el ancho del botón */
     height: 40px;
   }
 

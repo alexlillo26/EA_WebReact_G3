@@ -38,7 +38,9 @@
   background-color: #FF3B30;
 }
 
+/* Asegúrate de que el tamaño de fuente sea consistente */
 .logout-button {
+  font-size: inherit; /* Hereda el tamaño de fuente de .dropdown-item */
   background: none;
   border: none;
   color: #fff;
