@@ -16,9 +16,37 @@ const GymRegistration: React.FC = () => {
     setGymData({ ...gymData, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Gym Registration Data:", gymData);
+    try {
+      const response = await fetch("http://localhost:9000/api/gym", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(gymData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Gimnasio registrado con éxito:", result);
+        alert("Gimnasio registrado con éxito");
+        setGymData({
+          name: "",
+          email: "",
+          phone: "",
+          place: "",
+          price: "",
+          password: "",
+        }); // Limpia el formulario
+      } else {
+        console.error("Error al registrar el gimnasio:", response.statusText);
+        alert("Error al registrar el gimnasio");
+      }
+    } catch (error) {
+      console.error("Error al conectar con el servidor:", error);
+      alert("Error al conectar con el servidor");
+    }
   };
 
   return (
@@ -33,51 +61,50 @@ const GymRegistration: React.FC = () => {
             value={gymData.name}
             onChange={handleChange}
             required
-            />
-            <input
-              type="email"
-              placeholder="Correo Electrónico"
-              name="email"
-              value={gymData.email}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Teléfono"
-              name="phone"
-              value={gymData.phone}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Ubicación"
-              name="place"
-              value={gymData.place}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="number"
-              placeholder="Precio"
-              name="price"
-              value={gymData.price}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Contraseña"
-              name="password"
-              value={gymData.password}
-              onChange={handleChange}
-              required
-            />
-            <button type="submit">Registrarse</button>
-          </form>
-        </div>
-      
+          />
+          <input
+            type="email"
+            placeholder="Correo Electrónico"
+            name="email"
+            value={gymData.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Teléfono"
+            name="phone"
+            value={gymData.phone}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Ubicación"
+            name="place"
+            value={gymData.place}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="number"
+            placeholder="Precio"
+            name="price"
+            value={gymData.price}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            name="password"
+            value={gymData.password}
+            onChange={handleChange}
+            required
+          />
+          <button type="submit">Registrarse</button>
+        </form>
+      </div>
     </StyledRegistration>
   );
 };

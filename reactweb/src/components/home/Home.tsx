@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { getGyms } from '../../services/gymService';
-import { Gym } from '../../models/Gym';
-import StepsSection from '../StepsSection/SteptsSection';
-import AboutSection from '../AboutSection/AboutSection'; // Importa el nuevo componente
-import './Home.css';
+import React, { useEffect, useState } from "react";
+import { getGyms } from "../../services/gymService";
+import { Gym } from "../../models/Gym";
+import StepsSection from "../StepsSection/SteptsSection";
+import AboutSection from "../AboutSection/AboutSection"; // Importa el nuevo componente
+import GymMap from "../Geolocalization/GymMap"; // Importa el componente del mapa
+import "./Home.css";
 
 const Home: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<Gym[]>([]);
 
   useEffect(() => {
@@ -16,19 +17,20 @@ const Home: React.FC = () => {
         const { gyms } = await getGyms();
         setGyms(gyms);
       } catch (error) {
-        console.error('Error al obtener los gimnasios:', error);
+        console.error("Error al obtener los gimnasios:", error);
       }
     };
     fetchGyms();
   }, []);
 
   useEffect(() => {
-    if (searchTerm.trim() === '') {
+    if (searchTerm.trim() === "") {
       setSuggestions([]);
     } else {
-      const filtered = gyms.filter((gym) =>
-        gym.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        gym.place.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = gyms.filter(
+        (gym) =>
+          gym.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          gym.place.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setSuggestions(filtered);
     }
@@ -45,8 +47,8 @@ const Home: React.FC = () => {
         <div className="hero-content">
           <h1>Organiza y encuentra combates de Boxeo al instante</h1>
           <p>
-            Conecta con rivales, promotores y gimnasios. Participa en peleas equilibradas, 
-            entrena con los mejores y escala en el ranking.
+            Conecta con rivales, promotores y gimnasios. Participa en peleas
+            equilibradas, entrena con los mejores y escala en el ranking.
           </p>
           <form className="search-form">
             <div className="autocomplete">
@@ -80,12 +82,15 @@ const Home: React.FC = () => {
               <option value="peso-medio">Peso medio</option>
               <option value="peso-pesado">Peso pesado</option>
             </select>
-            <button type="submit" className="search-button">Buscar Combate</button>
+            <button type="submit" className="search-button">
+              Buscar Combate
+            </button>
           </form>
         </div>
       </section>
       <StepsSection />
-      <AboutSection /> 
+      <AboutSection />
+      <GymMap gyms={gyms} />
     </>
   );
 };
