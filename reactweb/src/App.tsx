@@ -12,7 +12,7 @@ import "./App.css";
 import GymLogin from "./components/gyms/GymLogin";
 import GymToggleCard from "./components/gyms/GymToggleCard";
 import { getToken } from "./services/authService";
-import { jwtDecode } from "jwt-decode"; // Use named import
+import jwtDecode from "jwt-decode"; // Use named import
 
 // Define the User type
 interface User {
@@ -34,7 +34,10 @@ function App() {
           try {
             const decoded = jwtDecode<{ id: string; name?: string }>(token); // Fix call
             if (decoded && decoded.id) {
-              const userData = { id: decoded.id, name: decoded.name || "Usuario" };
+              const userData = {
+                id: decoded.id,
+                name: decoded.name || "Usuario",
+              };
               setUser(userData);
               localStorage.setItem("userData", JSON.stringify(userData));
             }
@@ -62,26 +65,15 @@ function App() {
       <div className="landing-page">
         <Header user={user} onLogout={handleLogout} />
         <Routes>
-          <Route
-            path="/"
-            element={<Home />}
-          />
+          <Route path="/" element={<Home />} />
           <Route
             path="/login"
             element={
-              <Login
-                onLogin={(name) => setUser({ id: "temp-id", name })}
-              />
+              <Login onLogin={(name) => setUser({ id: "temp-id", name })} />
             }
           />
-          <Route
-            path="/register"
-            element={<Register />}
-          />
-          <Route
-            path="/profile"
-            element={<Profile user={user} />}
-          />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile user={user} />} />
           <Route path="/gym-registration" element={<GymRegistration />} />
           <Route path="/gym-login" element={<GymLogin />} />
           <Route path="/gym-toggle" element={<GymToggleCard />} />

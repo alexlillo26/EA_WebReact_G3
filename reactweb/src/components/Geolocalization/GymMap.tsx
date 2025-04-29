@@ -3,6 +3,18 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Gym } from "../../models/Gym";
 import { geocodeAddress } from "../../services/geocodingService";
+import L from "leaflet";
+
+const redIcon = L.icon({
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png", // URL del icono
+  iconSize: [25, 41], // Tamaño del icono
+  iconAnchor: [12, 41], // Punto de anclaje del icono
+  popupAnchor: [1, -34], // Punto donde se abre el popup
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png", // Sombra del icono
+  shadowSize: [41, 41], // Tamaño de la sombra
+});
 
 interface GymMapProps {
   gyms: Gym[];
@@ -93,7 +105,7 @@ const GymMap: React.FC<GymMapProps> = ({ gyms }) => {
           {/* Actualiza dinámicamente el centro y el zoom */}
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {gymLocations.map((gym) => (
-            <Marker key={gym.id} position={gym.position}>
+            <Marker key={gym.id} position={gym.position} icon={redIcon}>
               <Popup>
                 <strong>{gym.name}</strong>
                 <br />

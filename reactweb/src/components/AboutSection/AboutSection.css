@@ -1,15 +1,16 @@
 .about-section {
     background-color: #f9f9f9; /* Fondo claro */
     padding: 60px 20px;
-    text-align: center;
   }
   
   .about-content {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrar horizontalmente */
+    align-items: flex-start; /* Centrar horizontalmente */
     justify-content: center; /* Centrar verticalmente */
     gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
   }
   
   .about-title {
@@ -24,6 +25,7 @@
     line-height: 1.8;
     color: #555;
     text-align: justify;
+    max-width: 500px; /* Ancho máximo del texto */
   }
   
   .about-logo img {
@@ -36,15 +38,16 @@
       flex-direction: row; /* Logo y texto en fila en pantallas grandes */
       justify-content: space-between;
       align-items: center;
+      gap: 30px; /* Espacio entre logo y texto */
     }
   
     .about-text {
-      max-width: 600px;
+      max-width: 500px;
       text-align: left;
     }
   
     .about-logo img {
-      max-width: 200px; /* Logo más grande en pantallas grandes */
+      max-width: 180px; /* Logo más grande en pantallas grandes */
     }
 
     .about-text p {

@@ -52,7 +52,18 @@ a {
   gap: 15px; /* Espaciado entre los enlaces */
 }
 
-.nav-link,
+.nav-link {
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: #f70909;
+}
 
 .user-name {
   color: #fff;
@@ -62,11 +73,11 @@ a {
 }
 
 .user-name:hover {
-  color: #FF3B30;
+  color: #f70909;
 }
 
 .gym-button {
-  background-color: #FF3B30;
+  background-color: #f70909;
   color: #fff;
   padding: 10px 20px;
   border-radius: 5px;
