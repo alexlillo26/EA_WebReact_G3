@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./UserMenu.css";
 
 interface UserMenuProps {
-  userName: string;
+  userName: string; // Ensure this prop is passed correctly
   onLogout: () => void;
 }
 
@@ -17,7 +17,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
   return (
     <div className="user-menu">
       <span className="user-name" onClick={toggleMenu}>
-        {userName}
+        {userName} {/* Display the correct user name */}
       </span>
       {isOpen && (
         <div className="dropdown">

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { getUserById } from "../../services/userService";
 
 interface ProfileProps {
-  user: { name: string } | null;
+  user: { id: string; name: string } | null; // Include user ID
 }
 
 const Profile: React.FC<ProfileProps> = ({ user }) => {
@@ -19,8 +19,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
+      if (!user) return; // Ensure user is logged in
       try {
-        const storedData = localStorage.getItem("profileData");
+        const storedData = localStorage.getItem(`profileData_${user.id}`); // Use user ID for unique storage
         if (storedData) {
           setFormData(JSON.parse(storedData));
         } else {
@@ -35,7 +36,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
             password: "",
           };
           setFormData(initialData);
-          localStorage.setItem("profileData", JSON.stringify(initialData));
+          localStorage.setItem(`profileData_${user.id}`, JSON.stringify(initialData)); // Store data uniquely
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -43,7 +44,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     };
 
     fetchUserData();
-  }, []);
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,8 +52,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   };
 
   const handleSave = () => {
+    if (!user) return; // Ensure user is logged in
     console.log("Saving user data:", formData);
-    localStorage.setItem("profileData", JSON.stringify(formData));
+    localStorage.setItem(`profileData_${user.id}`, JSON.stringify(formData)); // Save data uniquely
     alert("Cambios guardados exitosamente.");
   };
 

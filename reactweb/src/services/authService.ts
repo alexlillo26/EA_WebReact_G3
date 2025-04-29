@@ -8,15 +8,11 @@ interface LoginResponse {
 }
 
 export const getToken = (): string | null => {
-  const token = localStorage.getItem("token");
-  console.log("Token:", token); // Log del token
-  return token;
+  return localStorage.getItem("token");
 };
 
 export const getRefreshToken = (): string | null => {
-  const refreshToken = localStorage.getItem("refreshToken");
-  console.log("Refresh Token:", refreshToken); // Log del refresh token
-  return refreshToken;
+  return localStorage.getItem("refreshToken");
 };
 
 export const setTokens = (token: string, refreshToken: string): void => {
@@ -32,8 +28,22 @@ export const clearTokens = (): void => {
 export const login = async (email: string, password: string): Promise<void> => {
   const response = await axios.post<LoginResponse>(`${API_BASE_URL}/users/login`, { email, password });
   const { token, refreshToken } = response.data;
-  console.log("Login successful. Token:", token, "Refresh Token:", refreshToken); // Log de éxito
   setTokens(token, refreshToken);
+};
+
+export const handleGoogleOAuth = async (code: string): Promise<{ id: string; name: string }> => {
+  console.log("Handling Google OAuth with code:", code);
+  const response = await axios.post<LoginResponse>(`${API_BASE_URL}/auth/google`, { code });
+  const { token, refreshToken } = response.data;
+  console.log("Received token:", token);
+  console.log("Received refreshToken:", refreshToken);
+  setTokens(token, refreshToken);
+
+  const decoded = JSON.parse(atob(token.split('.')[1])); // Decode token
+  console.log("Decoded token payload:", decoded);
+  const userData = { id: decoded.id, name: decoded.name || "Usuario" };
+  localStorage.setItem("userData", JSON.stringify(userData)); // Save user state
+  return userData;
 };
 
 export const refreshAccessToken = async (): Promise<string> => {
@@ -47,7 +57,6 @@ export const refreshAccessToken = async (): Promise<string> => {
 };
 
 export const logout = (): void => {
-  console.log("Logging out..."); // Log de cierre de sesión
   clearTokens();
   window.location.href = "/login";
 };

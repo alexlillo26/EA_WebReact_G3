@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { registerUser } from '../../services/userService';
+import { handleGoogleOAuth } from '../../services/authService';
 import './register.css';
 
 const Register: React.FC = () => {
@@ -28,6 +29,21 @@ const Register: React.FC = () => {
       }
     } catch (error) {
       setErrorMessage('Ocurrió un error al registrar el usuario. Por favor, inténtalo más tarde.');
+    }
+  };
+
+  const handleGoogleRegister = async () => {
+    try {
+      const googleCode = new URLSearchParams(window.location.search).get("code");
+      if (googleCode) {
+        const userData = await handleGoogleOAuth(googleCode);
+        alert(`Registro exitoso. Bienvenido, ${userData.name}`);
+      } else {
+        window.location.href = 'http://localhost:9000/api/auth/google?origin=webreact';
+      }
+    } catch (error) {
+      console.error("Error en el registro con Google:", error);
+      alert("Error al registrar con Google. Por favor, inténtalo más tarde.");
     }
   };
 
@@ -66,6 +82,9 @@ const Register: React.FC = () => {
         />
         <button type="submit">Registrarse</button>
       </form>
+      <button onClick={handleGoogleRegister} className="google-register-button">
+        Registrarse con Google
+      </button>
     </div>
   );
 };

@@ -7,12 +7,10 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use((config: any) => {
   const token = getToken();
+  console.log("Attaching token to request:", token); // Debugging log
   if (token) {
-    console.log('Request authorized with token:', token); // Log de autorización
     config.headers = config.headers || {};
     config.headers.Authorization = `Bearer ${token}`;
-  } else {
-    console.log('Request not authorized. No token found.'); // Log de no autorización
   }
   return config;
 });

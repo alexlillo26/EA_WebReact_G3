@@ -64,3 +64,20 @@ body {
     color: #cccccc;
   }
   
+  .google-register-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.google-register-button:hover {
+  background-color: #357ae8;
+}

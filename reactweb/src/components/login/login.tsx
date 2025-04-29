@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../../services/authService';
+import { login, getToken } from '../../services/authService'; // Added getToken import
 import './login.css';
 
 const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
@@ -14,12 +14,26 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
     setErrorMessage(null);
 
     try {
+      console.log("Attempting login with email:", email);
       await login(email, password);
-      onLogin(email); // Actualiza el estado del usuario
-      navigate('/'); // Redirige al inicio
+      const token = getToken();
+      console.log("Token after login:", token);
+      if (token) {
+        const decoded = JSON.parse(atob(token.split('.')[1]));
+        console.log("Decoded token payload:", decoded);
+        const userData = { id: decoded.id, name: decoded.name || "Usuario" };
+        onLogin(userData.name); // Update user state
+        localStorage.setItem("userData", JSON.stringify(userData));
+        navigate('/'); // Redirect to home
+      }
     } catch (error) {
+      console.error("Login error:", error);
       setErrorMessage('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:9000/api/auth/google?origin=webreact';
   };
 
   return (
@@ -43,6 +57,9 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
         />
         <button type="submit">Ingresar</button>
       </form>
+      <button onClick={handleGoogleLogin} className="google-login-button">
+        Iniciar sesión con Google
+      </button>
       <p>
         ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
       </p>
