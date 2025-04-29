@@ -47,7 +47,13 @@ a {
   flex-wrap: nowrap;
 }
 
+.auth-links {
+  display: flex;
+  gap: 15px; /* Espaciado entre los enlaces */
+}
+
 .nav-link,
+
 .user-name {
   color: #fff;
   font-weight: bold;
@@ -55,7 +61,6 @@ a {
   cursor: pointer;
 }
 
-.nav-link:hover,
 .user-name:hover {
   color: #FF3B30;
 }

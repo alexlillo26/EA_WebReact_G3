@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './UserMenu.css';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import "./UserMenu.css";
 
 interface UserMenuProps {
   userName: string;
@@ -21,9 +21,15 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
       </span>
       {isOpen && (
         <div className="dropdown">
-          <Link to="/profile" className="dropdown-item">Perfil</Link>
-          <Link to="/combates" className="dropdown-item">Mis Combates</Link>
-          <Link to="/estadisticas" className="dropdown-item">Estadísticas</Link>
+          <Link to="/profile" className="dropdown-item">
+            Perfil
+          </Link>
+          <Link to="/combates" className="dropdown-item">
+            Mis Combates
+          </Link>
+          <Link to="/estadisticas" className="dropdown-item">
+            Estadísticas
+          </Link>
           <button className="dropdown-item logout-button" onClick={onLogout}>
             Cerrar Sesión
           </button>

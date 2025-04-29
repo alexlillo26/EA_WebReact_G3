@@ -14,10 +14,14 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchGyms = async () => {
       try {
-        const { gyms } = await getGyms();
-        setGyms(gyms);
+        const response = await getGyms(); // Explicitly typed response
+        setGyms(response.gyms);
       } catch (error) {
-        console.error("Error al obtener los gimnasios:", error);
+        if (error instanceof Error) {
+          console.error("Error al obtener los gimnasios:", error.message);
+        } else {
+          console.error("Error al obtener los gimnasios:", error);
+        }
       }
     };
     fetchGyms();
@@ -61,10 +65,7 @@ const Home: React.FC = () => {
               {suggestions.length > 0 && (
                 <ul className="suggestions">
                   {suggestions.map((gym) => (
-                    <li
-                      key={gym.id}
-                      onClick={() => handleSelectSuggestion(gym.name)}
-                    >
+                    <li key={gym.id} onClick={() => handleSelectSuggestion(gym.name)}>
                       {gym.name} - {gym.place}
                     </li>
                   ))}

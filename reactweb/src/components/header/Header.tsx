@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import UserMenu from "../UserMenu/UserMenu";
+import { logout } from "../../services/authService";
 
 interface HeaderProps {
   user: { name: string } | null;
@@ -20,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
         {user ? (
           <UserMenu userName={user.name} onLogout={onLogout} />
         ) : (
-          <>
+          <div className="auth-links">
             <Link to="/login" className="nav-link">
               Inicia sesión
             </Link>
@@ -30,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
             <Link to="/gym-toggle" className="gym-button">
               Eres un gimnasio
             </Link>
-          </>
+          </div>
         )}
       </nav>
     </header>

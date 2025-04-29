@@ -1,38 +1,64 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { getUserById } from "../../services/userService";
 
 interface ProfileProps {
-  user: {
-    name: string;
-    email?: string;
-    phone?: string;
-  } | null;
+  user: { name: string } | null;
 }
 
 const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    weight: "", // Nuevo campo: peso
-    location: "", // Nuevo campo: localidad
-    birthdate: "", // Nuevo campo: fecha de nacimiento
-    password: "", // Nuevo campo: contraseña
+    name: "",
+    email: "",
+    phone: "",
+    weight: "",
+    location: "",
+    birthdate: "",
+    password: "",
   });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const storedData = localStorage.getItem("profileData");
+        if (storedData) {
+          setFormData(JSON.parse(storedData));
+        } else {
+          const userData = await getUserById();
+          const initialData = {
+            name: userData?.name || "",
+            email: userData?.email || "",
+            phone: userData?.phone || "",
+            weight: "",
+            location: "",
+            birthdate: "",
+            password: "",
+          };
+          setFormData(initialData);
+          localStorage.setItem("profileData", JSON.stringify(initialData));
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  
+  const handleSave = () => {
+    console.log("Saving user data:", formData);
+    localStorage.setItem("profileData", JSON.stringify(formData));
+    alert("Cambios guardados exitosamente.");
+  };
+
   return (
     <StyledProfile>
       <h2>Perfil</h2>
-      <div className="tabs">
-        <button className="tab active">Editar perfil</button>
-        <button className="tab">Editar contraseña</button>
-      </div>
       <div className="profile-details">
         <div className="detail">
           <label>Nombre</label>
@@ -97,14 +123,13 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
             onChange={handleChange}
           />
         </div>
+        <button className="save-button" onClick={handleSave}>
+          Guardar Cambios
+        </button>
       </div>
     </StyledProfile>
   );
 };
-  
-
-// Añadir peso, localidad, fecha de nacimiento, email y password 
-   
 
 const StyledProfile = styled.div`
   width: 100vw; /* Ocupa todo el ancho de la ventana */
@@ -126,34 +151,38 @@ const StyledProfile = styled.div`
   }
 
   .tabs {
-    position: sticky; /* Fija los botones al fondo de la pantalla */
-    bottom: 1000; /* Alinea al fondo */
-    left: 0; /* Alinea al inicio horizontal */
-    width: 90%; /* Ocupa todo el ancho */
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     display: flex;
     justify-content: center;
-    gap: 20px; /* Espaciado entre los botones */
-    padding: 20px 0; /* Espaciado interno */
-    background-color: rgba(26, 26, 26, 0.9); /* Fondo oscuro para los botones */
+    gap: 20px;
+    padding: 20px 0;
+    background-color: rgba(26, 26, 26, 0.9);
 
     .tab {
       background: none;
-      border: 2px solid #d62828; /* Borde rojo */
+      border: 2px solid #d62828;
       color: white;
-      font-size: 18px; /* Tamaño de fuente más grande */
-      padding: 15px 30px; /* Más espacio interno */
+      font-size: 18px;
+      padding: 15px 30px;
       cursor: pointer;
-      border-radius: 5px; /* Bordes redondeados */
+      border-radius: 5px;
       transition: all 0.3s ease;
+      height: 50px; /* Asegurar altura uniforme */
+      display: flex;
+      align-items: center; /* Centrar contenido verticalmente */
+      justify-content: center; /* Centrar contenido horizontalmente */
     }
 
     .tab.active {
-      background-color: #d62828; /* Fondo rojo para el botón activo */
+      background-color: #d62828;
       color: white;
     }
 
     .tab:hover {
-      background-color: #a31f1f; /* Fondo rojo oscuro al pasar el mouse */
+      background-color: #a31f1f;
       border-color: #a31f1f;
     }
   }
@@ -190,5 +219,23 @@ const StyledProfile = styled.div`
       }
     }
   }
+
+  .save-button {
+    background-color: #d62828;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+  }
+
+  .save-button:hover {
+    background-color: #a31f1f;
+  }
 `;
+
 export default Profile;

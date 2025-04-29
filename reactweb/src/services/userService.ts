@@ -1,4 +1,5 @@
-import { Usuario } from '../models/Usuario'; // Importar el modelo de usuario
+import { Usuario } from '../models/Usuario';
+import { getToken } from './authService';
 
 
 // Definir las rutas de la API
@@ -50,10 +51,15 @@ export const registerUser = async (userData: Omit<Usuario, 'id' | 'isHidden'>): 
 };
 
 // Servicio para obtener un usuario por ID
-export const getUserById = async (id: string): Promise<Usuario | null> => {
+export const getUserById = async (): Promise<Usuario | null> => {
   try {
-    const response = await fetch(GET_USER_BY_ID_URL(id), { // Usar GET_USER_BY_ID_URL en lugar de apiRoutes.getUserById
+    const token = getToken();
+    if (!token) throw new Error('No token available');
+
+    const { id } = JSON.parse(atob(token.split('.')[1])); // Decodifica el payload del token
+    const response = await fetch(GET_USER_BY_ID_URL(id), {
       method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (!response.ok) {

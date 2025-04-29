@@ -18,15 +18,24 @@ export const getCombats = async (page: number = 1, pageSize: number = 10): Promi
 
 // Registrar un combate
 export const registerCombat = async (combatData: Combat): Promise<Combat> => {
-  const response = await fetch(`${API_BASE_URL}/combat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(combatData),
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/combat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(combatData),
+    });
 
-  if (!response.ok) {
-    throw new Error('Error al registrar el combate');
+    if (!response.ok) {
+      throw new Error('Error al registrar el combate');
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error al registrar el combate:", error.message);
+    } else {
+      console.error("Error al registrar el combate:", error);
+    }
+    throw error;
   }
-
-  return response.json();
 };

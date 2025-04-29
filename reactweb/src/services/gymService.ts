@@ -1,95 +1,43 @@
+import axiosInstance from './axiosInstance';
 import { Gym } from '../models/Gym';
 
 const API_BASE_URL = 'http://localhost:9000/api';
 
+interface GetGymsResponse {
+  gyms: Gym[];
+  totalGyms: number;
+  totalPages: number;
+  currentPage: number;
+}
+
 // Obtener todos los gimnasios con paginación
-export const getGyms = async (page: number = 1, pageSize: number = 10): Promise<{ gyms: Gym[]; totalGyms: number; totalPages: number; currentPage: number }> => {
-  const response = await fetch(`${API_BASE_URL}/gym?page=${page}&pageSize=${pageSize}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+export const getGyms = async (page: number = 1, pageSize: number = 10): Promise<GetGymsResponse> => {
+  const response = await axiosInstance.get<GetGymsResponse>(`${API_BASE_URL}/gym`, {
+    params: { page, pageSize },
   });
 
-  if (!response.ok) {
-    throw new Error('Error al obtener los gimnasios');
-  }
-
-  return response.json();
+  return response.data;
 };
 
 // Registrar un gimnasio
 export const registerGym = async (gymData: Gym): Promise<Gym> => {
-  const response = await fetch(`${API_BASE_URL}/gym`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(gymData),
-  });
-
-  if (!response.ok) {
-    throw new Error('Error al registrar el gimnasio');
-  }
-
-  return response.json();
+  const response = await axiosInstance.post<Gym>(`${API_BASE_URL}/gym`, gymData);
+  return response.data;
 };
 
 // Obtener un gimnasio por ID
 export const getGymById = async (id: string): Promise<Gym> => {
-  const response = await fetch(`${API_BASE_URL}/gym/${id}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    throw new Error('Error al obtener el gimnasio');
-  }
-
-  return response.json();
+  const response = await axiosInstance.get<Gym>(`${API_BASE_URL}/gym/${id}`);
+  return response.data;
 };
 
 // Actualizar un gimnasio
 export const updateGym = async (id: string, updateData: Partial<Gym>): Promise<Gym> => {
-  const response = await fetch(`${API_BASE_URL}/gym/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updateData),
-  });
-
-  if (!response.ok) {
-    throw new Error('Error al actualizar el gimnasio');
-  }
-
-  return response.json();
+  const response = await axiosInstance.put<Gym>(`${API_BASE_URL}/gym/${id}`, updateData);
+  return response.data;
 };
 
 // Eliminar un gimnasio
 export const deleteGym = async (id: string): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/gym/${id}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    throw new Error('Error al eliminar el gimnasio');
-  }
+  await axiosInstance.delete(`${API_BASE_URL}/gym/${id}`);
 };
-
-// Iniciar sesión como gimnasio
-export const loginGym = async (email: string, password: string): Promise<{ name: string } | null> => {
-  try {
-    const response = await fetch('http://localhost:9000/api/gym/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al iniciar sesión');
-    }
-
-    const data = await response.json();
-    console.log('Respuesta del backend:', data); // Depuración
-    return data.gym; // Extraer el objeto `gym` de la respuesta
-  } catch (error) {
-    console.error('Error en loginGym:', error);
-    return null;
-  }
-}

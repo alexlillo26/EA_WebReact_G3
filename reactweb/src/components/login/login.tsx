@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { loginUser } from '../../services/userService';
+import { login } from '../../services/authService';
 import './login.css';
 
 const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
@@ -12,19 +12,13 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
-  
+
     try {
-      const user = await loginUser(email, password);
-      console.log('Usuario recibido en Login:', user); // Depuración
-  
-      if (user) {
-        onLogin(user.name); // Pasar el nombre del usuario al componente principal
-        navigate('/'); // Redirigir a la página principal
-      } else {
-        setErrorMessage('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
-      }
+      await login(email, password);
+      onLogin(email); // Actualiza el estado del usuario
+      navigate('/'); // Redirige al inicio
     } catch (error) {
-      setErrorMessage('Ocurrió un error al iniciar sesión. Por favor, inténtalo más tarde.');
+      setErrorMessage('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
     }
   };
 

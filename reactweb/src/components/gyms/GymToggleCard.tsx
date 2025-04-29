@@ -106,7 +106,10 @@ const StyledWrapper = styled.div`
     cursor: pointer;
     transition: background-color 0.3s ease;
     width: auto; /* Ajustar el ancho del botón */
-    height: 40px;
+    height: 50px; /* Asegurar altura uniforme */
+    display: flex; /* Centrar contenido */
+    align-items: center; /* Centrar verticalmente */
+    justify-content: center; /* Centrar horizontalmente */
   }
 
   .toggle-btn:hover {

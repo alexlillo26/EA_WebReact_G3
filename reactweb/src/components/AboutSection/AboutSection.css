@@ -7,10 +7,9 @@
   .about-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; /* Centrar horizontalmente */
+    justify-content: center; /* Centrar verticalmente */
     gap: 20px;
-    max-width: 1000px;
-    margin: 0 auto;
   }
   
   .about-title {
