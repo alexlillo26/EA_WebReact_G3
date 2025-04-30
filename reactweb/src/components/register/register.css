@@ -64,20 +64,39 @@ body {
     color: #cccccc;
   }
   
-  .google-register-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #4285f4;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
-}
-
-.google-register-button:hover {
-  background-color: #357ae8;
-}
+  .registerGoogle {
+    width: 100%;
+    display: flex;
+    padding: 12px;
+    font-size: 16px;
+    line-height: 1.25rem;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    align-items: center;
+    border-radius: 6px;
+    border: none;
+    gap: 0.75rem;
+    color: #c4d2dc;
+    background-color: #3607f2 !important;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5px;
+    margin-top: 10px;
+  }
+  
+  .registerGoogle:hover {
+    background-color: #357abd !important;
+  }
+  
+  .registerGoogle:last-child {
+    margin-bottom: 0;
+  }
+  
+  button svg {
+    height: 24px;
+    width: auto;
+  }
+  

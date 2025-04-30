@@ -7,14 +7,44 @@ const GymLogin: React.FC = () => {
     password: "",
   });
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginData({ ...loginData, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login Data:", loginData);
+    try {
+      const response = await fetch("http://localhost:9000/api/gym/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Inicio de sesión exitoso:", data);
+
+        // Guarda el token en localStorage
+        localStorage.setItem("gymToken", data.token);
+
+        // Redirige al usuario a la página principal o dashboard
+        alert("Inicio de sesión exitoso");
+        window.location.href = "/"; // Cambia "/dashboard" por la ruta deseada
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Error al iniciar sesión");
+      }
+    } catch (error) {
+      console.error("Error al conectar con el servidor:", error);
+      setErrorMessage(
+        "Error al conectar con el servidor. Por favor, inténtalo más tarde."
+      );
+    }
   };
 
   return (
@@ -41,6 +71,7 @@ const GymLogin: React.FC = () => {
             />
             <button type="submit">Ingresar</button>
           </form>
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
         </div>
       </div>
     </StyledLogin>

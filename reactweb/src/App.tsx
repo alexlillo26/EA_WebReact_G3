@@ -33,9 +33,12 @@ function App() {
         console.log("Token from localStorage:", token);
         if (token) {
           try {
-            const decoded = JSON.parse(atob(token.split('.')[1]));
+            const decoded = JSON.parse(atob(token.split(".")[1]));
             console.log("Decoded token:", decoded);
-            const userData = { id: decoded.id, name: decoded.name || "Usuario" };
+            const userData = {
+              id: decoded.id,
+              name: decoded.name || "Usuario",
+            };
             setUser(userData);
             localStorage.setItem("userData", JSON.stringify(userData));
           } catch (error) {
@@ -54,7 +57,7 @@ function App() {
     if (googleToken) {
       localStorage.setItem("token", googleToken); // Save token to localStorage
       try {
-        const decoded = JSON.parse(atob(googleToken.split('.')[1]));
+        const decoded = JSON.parse(atob(googleToken.split(".")[1]));
         console.log("Decoded token from URL:", decoded);
         const userData = { id: decoded.id, name: decoded.name || "Usuario" };
         setUser(userData);
