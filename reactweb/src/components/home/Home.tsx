@@ -5,6 +5,7 @@ import StepsSection from "../StepsSection/SteptsSection";
 import AboutSection from "../AboutSection/AboutSection"; // Importa el nuevo componente
 import GymMap from "../Geolocalization/GymMap"; // Importa el componente del mapa
 import "./Home.css";
+import AppPromoSection from "../AppPromoSection/AppPromoSection"; // Importa el nuevo componente
 
 const Home: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);
@@ -92,6 +93,8 @@ const Home: React.FC = () => {
       <StepsSection />
       <AboutSection />
       <GymMap gyms={gyms} />
+      <AppPromoSection />
+
     </>
   );
 };
