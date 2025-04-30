@@ -1,5 +1,8 @@
 .app-promo-section {
-    background-color: #121212; /* Fondo oscuro */
+    background-image: url('../../assets/fondopromo.png'); /* Cambia por la ruta de tu imagen */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: #fff;
     padding: 60px 20px;
     display: flex;
