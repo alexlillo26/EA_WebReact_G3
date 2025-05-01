@@ -29,8 +29,20 @@ const AppPromoSection: React.FC = () => {
             <li>📸 Compartir resultados y fotos de peleas.</li>
           </ul>
           <div className="app-download-buttons">
-            <img src={appStoreBadge} alt="Descargar en App Store" />
-            <img src={googlePlayBadge} alt="Descargar en Google Play" />
+            <a
+              href="https://apps.apple.com/" // Reemplaza con el enlace real de tu app en App Store
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={appStoreBadge} alt="Descargar en App Store" />
+            </a>
+            <a
+              href="https://play.google.com/store" // Reemplaza con el enlace real de tu app en Google Play
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={googlePlayBadge} alt="Descargar en Google Play" />
+            </a>
           </div>
         </div>
       </div>
