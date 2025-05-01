@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getUserById } from "../../services/userService";
+import { getUserById, updateUser } from "../../services/userService"; // Importa el servicio para actualizar el usuario
 
 interface ProfileProps {
   user: { id: string; name: string } | null; // Include user ID
@@ -21,22 +21,19 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     const fetchUserData = async () => {
       if (!user) return; // Ensure user is logged in
       try {
-        const storedData = localStorage.getItem(`profileData_${user.id}`); // Use user ID for unique storage
-        if (storedData) {
-          setFormData(JSON.parse(storedData));
-        } else {
-          const userData = await getUserById();
-          const initialData = {
-            name: userData?.name || "",
-            email: userData?.email || "",
-            phone: userData?.phone || "",
-            weight: "",
-            location: "",
-            birthdate: "",
-            password: "",
-          };
-          setFormData(initialData);
-          localStorage.setItem(`profileData_${user.id}`, JSON.stringify(initialData)); // Store data uniquely
+        const userData = await getUserById(); // Always fetch fresh data from the backend
+        if (userData) {
+          setFormData({
+            name: userData.name || "",
+            email: userData.email || "",
+            phone: userData.phone || "",
+            weight: userData.weight || "",
+            location: userData.city || "",
+            birthdate: userData.birthDate
+              ? new Date(userData.birthDate).toISOString().split("T")[0]
+              : "",
+            password: "", // Do not prefill the password field
+          });
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -51,11 +48,19 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!user) return; // Ensure user is logged in
-    console.log("Saving user data:", formData);
-    localStorage.setItem(`profileData_${user.id}`, JSON.stringify(formData)); // Save data uniquely
-    alert("Cambios guardados exitosamente.");
+    try {
+      const updatedUser = {
+        ...formData,
+        birthDate: new Date(formData.birthdate), // Convierte la fecha a formato Date
+      };
+      await updateUser(user.id, updatedUser); // Llama al servicio para actualizar el usuario
+      alert("Cambios guardados exitosamente.");
+    } catch (error) {
+      console.error("Error al guardar los cambios:", error);
+      alert("Error al guardar los cambios. Por favor, inténtalo de nuevo.");
+    }
   };
 
   return (

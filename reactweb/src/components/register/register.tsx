@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { registerUser } from "../../services/userService";
-import { handleGoogleOAuth } from "../../services/authService";
+import { handleGoogleOAuth, login } from "../../services/authService";
 import "./register.css";
 
 const Register: React.FC = () => {
@@ -8,11 +8,18 @@ const Register: React.FC = () => {
   const [birthDate, setBirthDate] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [weight, setWeight] = useState("");
+  const [city, setCity] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    if (!name || !birthDate || !email || !password || !weight || !city) {
+      setErrorMessage("Todos los campos son obligatorios.");
+      return;
+    }
 
     try {
       const user = await registerUser({
@@ -20,16 +27,26 @@ const Register: React.FC = () => {
         birthDate: new Date(birthDate),
         email,
         password,
+        weight,
+        city,
       });
 
       if (user) {
         alert("Registro exitoso");
+        // Inicia sesión automáticamente
+        await login(email, password);
+        localStorage.setItem(
+          "userData",
+          JSON.stringify({ id: user.id, name: user.name })
+        );
+        window.location.href = "/"; // Redirige al inicio
       } else {
         setErrorMessage(
           "No se pudo completar el registro. Por favor, inténtalo de nuevo."
         );
       }
     } catch (error) {
+      console.error("Error en el registro:", error);
       setErrorMessage(
         "Ocurrió un error al registrar el usuario. Por favor, inténtalo más tarde."
       );
@@ -89,6 +106,23 @@ const Register: React.FC = () => {
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <select
+          value={weight}
+          onChange={(e) => setWeight(e.target.value)}
+          required
+        >
+          <option value="">Selecciona tu peso</option>
+          <option value="Peso pluma">Peso pluma</option>
+          <option value="Peso medio">Peso medio</option>
+          <option value="Peso pesado">Peso pesado</option>
+        </select>
+        <input
+          type="text"
+          placeholder="Ciudad"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
           required
         />
         <button type="submit">Registrarse</button>

@@ -32,20 +32,23 @@ export const loginUser = async (email: string, password: string): Promise<{ name
 // Servicio para registrar un nuevo usuario
 export const registerUser = async (userData: Omit<Usuario, 'id' | 'isHidden'>): Promise<Usuario | null> => {
   try {
-    const response = await fetch(REGISTER_URL, { // Usar REGISTER_URL en lugar de apiRoutes.register
+    console.log("Sending registration data:", userData); // Log the payload
+    const response = await fetch(REGISTER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
     });
 
     if (!response.ok) {
-      throw new Error('Error al registrar usuario');
+      const errorDetails = await response.json(); // Parse error response
+      console.error("Backend error details:", errorDetails); // Log backend error
+      throw new Error(`Error al registrar usuario: ${errorDetails.message || response.statusText}`);
     }
 
     const user: Usuario = await response.json();
     return user;
   } catch (error) {
-    console.error('Error en registerUser:', error);
+    console.error("Error en registerUser:", error);
     return null;
   }
 };
@@ -54,22 +57,49 @@ export const registerUser = async (userData: Omit<Usuario, 'id' | 'isHidden'>): 
 export const getUserById = async (): Promise<Usuario | null> => {
   try {
     const token = getToken();
-    if (!token) throw new Error('No token available');
+    if (!token) throw new Error("No token available");
 
-    const { id } = JSON.parse(atob(token.split('.')[1])); // Decodifica el payload del token
+    const { id } = JSON.parse(atob(token.split(".")[1])); // Decode token payload
     const response = await fetch(GET_USER_BY_ID_URL(id), {
-      method: 'GET',
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
 
     if (!response.ok) {
-      throw new Error('Error al obtener el usuario');
+      throw new Error("Error al obtener el usuario");
     }
 
     const user: Usuario = await response.json();
     return user;
   } catch (error) {
-    console.error('Error en getUserById:', error);
+    console.error("Error en getUserById:", error);
+    return null;
+  }
+};
+
+// Servicio para actualizar un usuario
+export const updateUser = async (id: string, updateData: Partial<Usuario>): Promise<Usuario | null> => {
+  try {
+    const token = getToken();
+    if (!token) throw new Error("No token available");
+
+    const response = await fetch(GET_USER_BY_ID_URL(id), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al actualizar el usuario");
+    }
+
+    const updatedUser: Usuario = await response.json();
+    return updatedUser;
+  } catch (error) {
+    console.error("Error en updateUser:", error);
     return null;
   }
 };

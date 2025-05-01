@@ -5,4 +5,6 @@ export interface Usuario {
     email: string;
     phone?: string; // Nuevo campo opcional
     password: string;
+    weight: string; // Nuevo campo
+    city: string; // Nuevo campo
 }
