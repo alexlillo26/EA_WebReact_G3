@@ -20,12 +20,9 @@ export const getCombatsByBoxer = async (
     page: number = 1,
     pageSize: number = 10
 ): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
-    const mikeTysonId = '681646e81c856dc8e4fe0431'; // ID de Mike Tyson en MongoDB
 
-    const url = `${API_BASE_URL}/combat/boxer/${mikeTysonId}?page=${page}&pageSize=${pageSize}`;
+    const url = `${API_BASE_URL}/combat/boxer/${boxerId}?page=${page}&pageSize=${pageSize}`;
     console.log('Calling API with URL:', url); // Debug
-    console.log('Calling API with URL:', url); // Debug
-    console.log(`Fetching from: ${url}`);
     console.log('Boxer ID:', boxerId); // Debug
 
     try {
@@ -34,7 +31,7 @@ export const getCombatsByBoxer = async (
             headers: { 'Content-Type': 'application/json' },
         });
 
-        console.log('API response status:', response.status); // Debug
+        console.log('Resposta que ens dona la API:', response.status); // Debug
 
         if (!response.ok) {
             throw new Error(`Error al obtener los combates del boxeador: ${response.statusText}`);
