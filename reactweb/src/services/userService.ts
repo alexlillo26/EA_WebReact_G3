@@ -4,7 +4,6 @@ import { getToken } from './authService';
 
 // Definir las rutas de la API
 const API_BASE_URL = 'http://localhost:9000/api'; // Asegúrate de que coincida con el backend
-const LOGIN_URL = `${API_BASE_URL}/users/login`; // Cambiar a /users/login
 const REGISTER_URL = `${API_BASE_URL}/users/register`; // Cambiar a /users/register
 const GET_USER_BY_ID_URL = (id: string) => `${API_BASE_URL}/users/${id}`; // Cambiar a /users/:id
 
@@ -78,25 +77,32 @@ export const getUserById = async (): Promise<Usuario | null> => {
 };
 
 // Servicio para actualizar un usuario
-export const updateUser = async (id: string, updateData: Partial<Usuario>): Promise<Usuario | null> => {
+export const updateUser = async (id: string, updateData: Partial<Usuario> | FormData): Promise<Usuario | null> => {
   try {
     const token = getToken();
     if (!token) throw new Error("No token available");
 
+    const isFormData = updateData instanceof FormData; // Check if updateData is FormData
+
     const response = await fetch(GET_USER_BY_ID_URL(id), {
       method: "PUT",
-      headers: {
+      headers: isFormData
+        ? { Authorization: `Bearer ${token}`}
+        : {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(updateData),
+        },
+      body: isFormData ? updateData : JSON.stringify(updateData),
     });
 
     if (!response.ok) {
+      const errorDetails = await response.json(); // Parse error response
+      console.error("Backend error details:", errorDetails); // Log backend error
       throw new Error("Error al actualizar el usuario");
     }
 
     const updatedUser: Usuario = await response.json();
+    console.log("Usuario actualizado:", updatedUser); // Log the updated user
     return updatedUser;
   } catch (error) {
     console.error("Error en updateUser:", error);

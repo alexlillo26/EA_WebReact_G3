@@ -12,40 +12,61 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     email: "",
     phone: "",
     weight: "",
-    location: "",
+    city: "",
     birthdate: "",
     password: "",
+    profilePicture: "",
   });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user) return; // Ensure user is logged in
-      try {
-        const userData = await getUserById(); // Always fetch fresh data from the backend
-        if (userData) {
-          setFormData({
-            name: userData.name || "",
-            email: userData.email || "",
-            phone: userData.phone || "",
-            weight: userData.weight || "",
-            location: userData.city || "",
-            birthdate: userData.birthDate
-              ? new Date(userData.birthDate).toISOString().split("T")[0]
-              : "",
-            password: "", // Do not prefill the password field
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
+    null
+  );
+  const fetchUserData = React.useCallback(async () => {
+    if (!user) return; // Ensure user is logged in
+    try {
+      const userData = await getUserById(); // Always fetch fresh data from the backend
+      if (userData) {
+        setFormData({
+          name: userData.name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          weight: userData.weight || "",
+          city: userData.city || "",
+          birthdate: userData.birthDate
+            ? new Date(userData.birthDate).toISOString().split("T")[0]
+            : "",
+          password: "", // Do not prefill the password field
+          profilePicture: userData.profilePicture || "",
+        });
+        setPreviewImage(userData.profilePicture || null);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }, [user]); // Depend on user to refetch when it changes
 
-    fetchUserData();
-  }, [user]);
+  useEffect(() => {
+    fetchUserData(); // Fetch user data when the component mounts
+  }, [fetchUserData]); // Only fetch once when the component mounts
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string); // Mostrar vista previa
+      };
+      reader.readAsDataURL(file);
+      setProfilePictureFile(file); // Guardar el archivo para enviarlo al backend
+    }
   };
 
   const handleSave = async () => {
@@ -55,8 +76,16 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         ...formData,
         birthDate: new Date(formData.birthdate), // Convierte la fecha a formato Date
       };
-      await updateUser(user.id, updatedUser); // Llama al servicio para actualizar el usuario
+      if (profilePictureFile) {
+        const formDataToSend = new FormData();
+        formDataToSend.append("profilePicture", profilePictureFile);
+        formDataToSend.append("data", JSON.stringify(updatedUser));
+        await updateUser(user.id, formDataToSend);
+      } else {
+        await updateUser(user.id, updatedUser); // Llama al servicio para actualizar el usuario
+      }
       alert("Cambios guardados exitosamente.");
+      await fetchUserData(); // Refresca los datos del usuario después de guardar
     } catch (error) {
       console.error("Error al guardar los cambios:", error);
       alert("Error al guardar los cambios. Por favor, inténtalo de nuevo.");
@@ -66,6 +95,30 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   return (
     <StyledProfile>
       <h2>Perfil</h2>
+      <div className="profile-picture">
+        {previewImage ? (
+          <img
+            src={previewImage}
+            alt="Foto de perfil"
+            className="profile-img"
+          />
+        ) : (
+          <p>No hay foto de perfil</p>
+        )}
+        <label
+          htmlFor="file-upload"
+          className={`custom-file-upload ${previewImage ? "has-image" : ""}`}
+        >
+          {previewImage ? "Cambiar foto de perfil" : "Elegir foto de perfil"}
+        </label>
+        <input
+          id="file-upload"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          style={{ display: "none" }} // Oculta el campo de entrada
+        />
+      </div>
       <div className="profile-details">
         <div className="detail">
           <label>Nombre</label>
@@ -95,20 +148,20 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           />
         </div>
         <div className="detail">
-          <label>Peso (kg)</label>
-          <input
-            type="number"
-            name="weight"
-            value={formData.weight}
-            onChange={handleChange}
-          />
+          <label>Peso</label>
+          <select name="weight" value={formData.weight} onChange={handleChange}>
+            <option value="">Selecciona una opción</option>
+            <option value="peso pluma">Peso Pluma</option>
+            <option value="peso medio">Peso Medio</option>
+            <option value="peso pesado">Peso Pesado</option>
+          </select>
         </div>
         <div className="detail">
           <label>Localidad</label>
           <input
             type="text"
             name="location"
-            value={formData.location}
+            value={formData.city}
             onChange={handleChange}
           />
         </div>
@@ -118,15 +171,6 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
             type="date"
             name="birthdate"
             value={formData.birthdate}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="detail">
-          <label>Contraseña</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
             onChange={handleChange}
           />
         </div>
@@ -199,7 +243,7 @@ const StyledProfile = styled.div`
     padding: 0 20px; /* Espaciado lateral */
     margin-top: 20px; /* Espaciado desde la cabecera */
     margin-bottom: 80px; /* Espacio para evitar que el contenido se solape con los botones */
-    
+
     .detail {
       margin-bottom: 15px;
 
@@ -210,7 +254,8 @@ const StyledProfile = styled.div`
         color: #d62828; /* Rojo principal */
       }
 
-      input {
+      input,
+      select {
         width: 100%; /* Ocupa todo el ancho disponible */
         background-color: #333;
         padding: 15px;
@@ -220,7 +265,8 @@ const StyledProfile = styled.div`
         font-size: 16px;
       }
 
-      input:focus {
+      input:focus,
+      select:focus {
         outline: none;
         border-color: #d62828; /* Rojo principal */
       }
@@ -238,10 +284,76 @@ const StyledProfile = styled.div`
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin-top: 20px;
+    display: block;
+    margin-left: auto; /* Alinear a la derecha */
+    margin-right: auto; /* Alinear a la derecha */
   }
 
   .save-button:hover {
     background-color: #a31f1f;
+  }
+
+  select {
+    width: 100%;
+    background-color: #333;
+    padding: 15px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: #d62828; /* Rojo principal */
+  }
+
+  .profile-picture {
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .profile-img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 0 auto;
+    }
+  }
+
+  .custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #d62828;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+
+  .custom-file-upload.has-image {
+    background-color: #a31f1f; /* Cambia el color cuando hay una imagen */
+  }
+
+  .custom-file-upload:hover {
+    background-color: #a31f1f;
+  }
+
+  .custom-file-upload.has-image:hover {
+    background-color: #388e3c; /* Cambia el color al pasar el mouse si hay una imagen */
   }
 `;
 

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom"; // Removed BrowserRouter
-import Header from "./components/Header/Header";
-import Home from "./components/Home/Home";
-import Login from "./components/Login/login";
-import Register from "./components/Register/register";
-import Profile from "./components/Profile/Profile";
-import GymRegistration from "./components/Gyms/GymRegistration";
-import GymList from "./components/Gyms/GymList";
+import Header from "./components/header/Header";
+import Home from "./components/home/Home";
+import Login from "./components/login/login";
+import Register from "./components/register/register";
+import Profile from "./components/profile/Profile";
+import GymRegistration from "./components/gyms/GymRegistration";
+import GymList from "./components/gyms/GymList";
 import CombatList from "./components/CombatList/CombatList";
 import "./App.css";
-import GymLogin from "./components/Gyms/GymLogin";
-import GymToggleCard from "./components/Gyms/GymToggleCard";
-import Statistics from './components/Statistics/Statistics';
+import GymLogin from "./components/gyms/GymLogin";
+import GymToggleCard from "./components/gyms/GymToggleCard";
+import Statistics from "./components/Statistics/Statistics";
 import { getToken, handleGoogleOAuth } from "./services/authService";
 
 interface User {
@@ -105,7 +105,10 @@ function App() {
         <Route path="/gym-toggle" element={<GymToggleCard />} />
         <Route path="/gyms" element={<GymList />} />
         <Route path="/combats" element={<CombatList />} />
-        <Route path="/estadisticas" element={<Statistics boxerId="6802ab47458bfd82550849ed" />} />
+        <Route
+          path="/estadisticas"
+          element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
+        />
       </Routes>
     </div>
   );

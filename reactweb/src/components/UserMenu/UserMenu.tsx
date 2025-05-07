@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "./UserMenu.css";
 
@@ -9,13 +9,27 @@ interface UserMenuProps {
 
 const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    setIsOpen((prev) => !prev);
   };
 
+  const handleClickOutside = (event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      setIsOpen(false); // Close the menu if the click is outside
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="user-menu">
+    <div className="user-menu" ref={menuRef}>
       <span className="user-name" onClick={toggleMenu}>
         {userName} {/* Display the correct user name */}
       </span>

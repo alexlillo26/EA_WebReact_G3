@@ -10,13 +10,22 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState("");
   const [weight, setWeight] = useState("");
   const [city, setCity] = useState("");
+  const [phone, setPhone] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    if (!name || !birthDate || !email || !password || !weight || !city) {
+    if (
+      !name ||
+      !birthDate ||
+      !email ||
+      !password ||
+      !weight ||
+      !city ||
+      !phone
+    ) {
       setErrorMessage("Todos los campos son obligatorios.");
       return;
     }
@@ -29,6 +38,7 @@ const Register: React.FC = () => {
         password,
         weight,
         city,
+        phone,
       });
 
       if (user) {
@@ -101,13 +111,6 @@ const Register: React.FC = () => {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
         <select
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
@@ -123,6 +126,20 @@ const Register: React.FC = () => {
           placeholder="Ciudad"
           value={city}
           onChange={(e) => setCity(e.target.value)}
+          required
+        />
+        <input
+          type="tel"
+          placeholder="Teléfono"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
         <button type="submit">Registrarse</button>
