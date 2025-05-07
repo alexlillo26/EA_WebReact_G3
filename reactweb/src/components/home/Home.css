@@ -60,6 +60,11 @@
     background-color: #D32F2F;
   }
   
+  .search-form select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
   @media (max-width: 768px) {
     .hero h1 {
       font-size: 32px;
@@ -69,4 +74,117 @@
     .search-form select {
       width: 100%;
     }
+  }
+
+  .search-results {
+    margin-top: 30px;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+  }
+  
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .user-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+  }
+  
+  .user-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .user-card h3 {
+    color: #FF3B30;
+    margin-bottom: 10px;
+  }
+  
+  .user-card p {
+    color: white;
+    margin: 5px 0;
+  }
+  
+  .user-result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+  }
+  
+  .user-result-item:hover {
+    transform: translateY(-2px);
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .user-info h3 {
+    color: #FF3B30;
+    margin: 0 0 5px 0;
+  }
+  
+  .user-info p {
+    margin: 3px 0;
+    color: #fff;
+  }
+  
+  .contact-button {
+    background-color: #FF3B30;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+  }
+  
+  .contact-button:hover {
+    background-color: #D32F2F;
+  }
+  
+  .error-message {
+    color: #FF3B30;
+    background-color: rgba(255, 59, 48, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 15px;
+    text-align: center;
+  }
+
+  .level-select {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .level-select:not([disabled]):hover {
+    border-color: #FF3B30;
+    cursor: pointer;
+  }
+  
+  .level-select option {
+    background-color: #1f1f1f;
+    color: white;
   }

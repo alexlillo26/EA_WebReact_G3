@@ -109,3 +109,48 @@ export const updateUser = async (id: string, updateData: Partial<Usuario> | Form
     return null;
   }
 };
+
+// Servicio para buscar usuarios
+export const searchUsers = async (city?: string, weight?: string): Promise<any[]> => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    let url = `${API_BASE_URL}/users/search`;
+    const params = new URLSearchParams();
+    
+    if (city) params.append('city', city);
+    if (weight) params.append('weight', weight);
+    
+    const queryString = params.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+
+    console.log('Calling search API:', url); // Debug log
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Search API error:', errorData);
+      throw new Error(errorData.message || 'Error en la búsqueda');
+    }
+
+    const data = await response.json();
+    console.log('Search results:', data); // Debug log
+    return data.users || [];
+    
+  } catch (error) {
+    console.error('Error en searchUsers:', error);
+    throw error;
+  }
+};
