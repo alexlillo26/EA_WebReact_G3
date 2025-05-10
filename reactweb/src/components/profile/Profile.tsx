@@ -16,6 +16,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     birthdate: "",
     password: "",
     profilePicture: "",
+    gender: "",
   });
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -38,6 +39,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
             : "",
           password: "", // Do not prefill the password field
           profilePicture: userData.profilePicture || "",
+          gender: userData.gender || "",
         });
         setPreviewImage(userData.profilePicture || null);
       }
@@ -130,6 +132,15 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           />
         </div>
         <div className="detail">
+          <label>Fecha de nacimiento</label>
+          <input
+            type="date"
+            name="birthdate"
+            value={formData.birthdate}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="detail">
           <label>Email</label>
           <input
             type="email"
@@ -139,25 +150,24 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           />
         </div>
         <div className="detail">
-          <label>Teléfono</label>
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-          />
+          <label>Sexo</label>
+          <select name="gender" value={formData.gender} onChange={handleChange}>
+            <option value="">Selecciona una opción</option>
+            <option value="Hombre">Hombre</option>
+            <option value="Mujer">Mujer</option>
+          </select>
         </div>
         <div className="detail">
           <label>Peso</label>
           <select name="weight" value={formData.weight} onChange={handleChange}>
             <option value="">Selecciona una opción</option>
-            <option value="peso pluma">Peso Pluma</option>
-            <option value="peso medio">Peso Medio</option>
-            <option value="peso pesado">Peso Pesado</option>
+            <option value="Peso pluma">Peso pluma (50 kg - 69 kg)</option>
+            <option value="Peso medio">Peso medio (70 kg - 89 kg)</option>
+            <option value="Peso pesado">Peso pesado (+90 kg)</option>
           </select>
         </div>
         <div className="detail">
-          <label>Localidad</label>
+          <label>Ciudad</label>
           <input
             type="text"
             name="location"
@@ -166,11 +176,11 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           />
         </div>
         <div className="detail">
-          <label>Fecha de nacimiento</label>
+          <label>Teléfono</label>
           <input
-            type="date"
-            name="birthdate"
-            value={formData.birthdate}
+            type="tel"
+            name="phone"
+            value={formData.phone}
             onChange={handleChange}
           />
         </div>
