@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom"; // Removed BrowserRouter
 import Header from "./components/header/Header";
 import Home from "./components/home/Home";
@@ -13,6 +13,9 @@ import GymLogin from "./components/gyms/GymLogin";
 import GymToggleCard from "./components/gyms/GymToggleCard";
 import Statistics from "./components/Statistics/Statistics";
 import { getToken, handleGoogleOAuth } from "./services/authService";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import { translations } from "./translations/translations";
+import { LanguageProvider } from "./context/LanguageContext";
 
 interface User {
   id: string;
@@ -22,6 +25,20 @@ interface User {
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [searchParams] = useSearchParams();
+  const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] =
+    useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [language, setLanguage] = useState<keyof typeof translations>("es");
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+      setIsAccessibilityPanelOpen(false);
+    }
+  };
+
+  const t = (key: keyof (typeof translations)["en"]) => {
+    return translations[language][key] || key;
+  };
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -77,7 +94,17 @@ function App() {
     } else {
       initializeUser();
     }
-  }, [searchParams]);
+
+    if (isAccessibilityPanelOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [searchParams, isAccessibilityPanelOpen]);
 
   const handleLogout = () => {
     setUser(null);
@@ -88,29 +115,77 @@ function App() {
   };
 
   return (
-    <div className="landing-page">
-      <Header user={user} onLogout={handleLogout} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/login"
-          element={
-            <Login onLogin={(name) => setUser({ id: "temp-id", name })} />
-          }
-        />
-        <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile user={user} />} />
-        <Route path="/gym-registration" element={<GymRegistration />} />
-        <Route path="/gym-login" element={<GymLogin />} />
-        <Route path="/gym-toggle" element={<GymToggleCard />} />
-        <Route path="/gyms" element={<GymList />} />
-        <Route path="/combats" element={<CombatList />} />
-        <Route
-          path="/estadisticas"
-          element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
-        />
-      </Routes>
-    </div>
+    <LanguageProvider>
+      <div className="landing-page">
+        <Header user={user} onLogout={handleLogout} />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/login"
+            element={
+              <Login onLogin={(name) => setUser({ id: "temp-id", name })} />
+            }
+          />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile user={user} />} />
+          <Route path="/gym-registration" element={<GymRegistration />} />
+          <Route path="/gym-login" element={<GymLogin />} />
+          <Route path="/gym-toggle" element={<GymToggleCard />} />
+          <Route path="/gyms" element={<GymList />} />
+          <Route path="/combats" element={<CombatList />} />
+          <Route
+            path="/estadisticas"
+            element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
+          />
+        </Routes>
+        <div className="accessibility-button">
+          <button onClick={() => setIsAccessibilityPanelOpen(true)}>
+            <i className="fas fa-universal-access"></i>
+          </button>
+        </div>
+        <div
+          ref={panelRef} // Asigna la referencia al panel lateral
+          className={`accessibility-panel ${
+            isAccessibilityPanelOpen ? "open" : ""
+          }`}
+        >
+          <button
+            className="close-button"
+            onClick={() => setIsAccessibilityPanelOpen(false)}
+          >
+            &times;
+          </button>
+          <h2>{t("accessibilityOptions")}</h2>
+          <ul>
+            <li>
+              <div className="language-selector">
+                {["es", "ca", "eu", "en"].map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() =>
+                      setLanguage(lang as keyof typeof translations)
+                    }
+                    className={language === lang ? "selected" : ""}
+                  >
+                    {lang.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </li>
+            <li>
+              <button onClick={() => alert(t("changeTheme"))}>
+                {t("changeTheme")}
+              </button>
+            </li>
+            <li>
+              <button onClick={() => alert(t("highContrastMode"))}>
+                {t("highContrastMode")}
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </LanguageProvider>
   );
 }
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import UserMenu from "../UserMenu/UserMenu";
-import { logout } from "../../services/authService";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface HeaderProps {
   user: { name: string } | null;
@@ -9,6 +9,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
+  const { t } = useLanguage();
   return (
     <header className="header">
       <Link to="/" className="logo">
@@ -16,20 +17,20 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
       </Link>
       <nav className="nav">
         <Link to="/events" className="nav-link">
-          Eventos
+          {t("events")}
         </Link>
         {user ? (
           <UserMenu userName={user.name} onLogout={onLogout} />
         ) : (
           <div className="auth-links">
             <Link to="/login" className="nav-link">
-              Inicia sesión
+              {t("login")}
             </Link>
             <Link to="/register" className="nav-link">
-              Regístrate
+              {t("register")}
             </Link>
             <Link to="/gym-toggle" className="gym-button">
-              Eres un gimnasio
+              {t("gymButton")}
             </Link>
           </div>
         )}
