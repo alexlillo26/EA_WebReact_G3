@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "./UserMenu.css";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface UserMenuProps {
   userName: string; // Ensure this prop is passed correctly
@@ -8,6 +9,7 @@ interface UserMenuProps {
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -36,16 +38,16 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
       {isOpen && (
         <div className="dropdown">
           <Link to="/profile" className="dropdown-item">
-            Perfil
+            {t("profile")}
           </Link>
           <Link to="/combates" className="dropdown-item">
-            Mis Combates
+            {t("myCombats")}
           </Link>
           <Link to="/estadisticas" className="dropdown-item">
-            Estadísticas
+            {t("statistics")}
           </Link>
           <button className="dropdown-item logout-button" onClick={onLogout}>
-            Cerrar Sesión
+            {t("logout")}
           </button>
         </div>
       )}

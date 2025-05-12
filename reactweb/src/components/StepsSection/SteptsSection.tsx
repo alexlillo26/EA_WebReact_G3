@@ -1,25 +1,27 @@
-import React from 'react';
-import './StepsSection.css';
+import React from "react";
+import "./StepsSection.css";
+import { useLanguage } from "../../context/LanguageContext";
 
 const StepsSection: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <section className="steps-section">
-      <h2 className="steps-title">Con Face2Face es así de sencillo</h2>
+      <h2 className="steps-title">{t("stepsTitle")}</h2>
       <div className="steps-container">
         <div className="step-card">
           <div className="step-number">1</div>
-          <h3>Encuentra Rival</h3>
-          <p>Conecta con boxeadores de nivel similar y organiza combates emocionantes.</p>
+          <h3>{t("step1Title")}</h3>
+          <p>{t("step1Description")}</p>
         </div>
         <div className="step-card">
           <div className="step-number">2</div>
-          <h3>Organiza Combates</h3>
-          <p>Programa peleas en gimnasios cercanos y lleva tu entrenamiento al siguiente nivel.</p>
+          <h3>{t("step2Title")}</h3>
+          <p>{t("step2Description")}</p>
         </div>
         <div className="step-card">
           <div className="step-number">3</div>
-          <h3>Mejora tu Ranking</h3>
-          <p>Compite, gana y sube de nivel para convertirte en el mejor.</p>
+          <h3>{t("step3Title")}</h3>
+          <p>{t("step3Description")}</p>
         </div>
       </div>
     </section>
