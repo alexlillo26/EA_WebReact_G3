@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { registerUser } from "../../services/userService";
 import { handleGoogleOAuth, login } from "../../services/authService";
 import "./register.css";
+import { useLanguage } from "../../context/LanguageContext";
 
 const Register: React.FC = () => {
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [email, setEmail] = useState("");
@@ -29,21 +31,19 @@ const Register: React.FC = () => {
       !phone ||
       !gender
     ) {
-      setErrorMessage("Todos los campos son obligatorios.");
+      setErrorMessage(t("allFieldsRequired"));
       return;
     }
 
     const passwwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwwordRegex.test(password)) {
-      setErrorMessage(
-        "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial."
-      );
+      setErrorMessage(t("passwordRequirements"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage("Las contraseñas no coinciden.");
+      setErrorMessage(t("passwordsDoNotMatch"));
       return;
     }
 
@@ -60,7 +60,7 @@ const Register: React.FC = () => {
       });
 
       if (user) {
-        alert("Registro exitoso");
+        alert(t("registrationSuccess"));
         // Inicia sesión automáticamente
         await login(email, password);
         localStorage.setItem(
@@ -69,15 +69,11 @@ const Register: React.FC = () => {
         );
         window.location.href = "/"; // Redirige al inicio
       } else {
-        setErrorMessage(
-          "No se pudo completar el registro. Por favor, inténtalo de nuevo."
-        );
+        setErrorMessage(t("registrationError"));
       }
     } catch (error) {
-      console.error("Error en el registro:", error);
-      setErrorMessage(
-        "Ocurrió un error al registrar el usuario. Por favor, inténtalo más tarde."
-      );
+      console.error(t("serverError"), error);
+      setErrorMessage(t("serverError"));
     }
   };
 
@@ -88,21 +84,21 @@ const Register: React.FC = () => {
       );
       if (googleCode) {
         const userData = await handleGoogleOAuth(googleCode);
-        alert(`Registro exitoso. Bienvenido, ${userData.name}`);
+        alert(t("googleRegisterSuccess").replace("{name}", userData.name));
       } else {
         window.location.href =
           "http://localhost:9000/api/auth/google?origin=webreact";
       }
     } catch (error) {
-      console.error("Error en el registro con Google:", error);
-      alert("Error al registrar con Google. Por favor, inténtalo más tarde.");
+      console.error(t("googleRegisterError"), error);
+      alert(t("googleRegisterError"));
     }
   };
 
   return (
     <div className="register-container">
       <form onSubmit={handleSubmit}>
-        <h2>Registro</h2>
+        <h2>{t("registerTitle")}</h2>
         {errorMessage && (
           <p style={{ color: "#ff4d4d", marginBottom: "15px" }}>
             {errorMessage}
@@ -110,21 +106,21 @@ const Register: React.FC = () => {
         )}
         <input
           type="text"
-          placeholder="Nombre"
+          placeholder={t("namePlaceholder")}
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
         <input
           type="date"
-          placeholder="Fecha de nacimiento"
+          placeholder={t("birthdatePlaceholder")}
           value={birthDate}
           onChange={(e) => setBirthDate(e.target.value)}
           required
         />
         <input
           type="email"
-          placeholder="Correo electrónico"
+          placeholder={t("emailPlaceholder")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -134,44 +130,44 @@ const Register: React.FC = () => {
           onChange={(e) => setGender(e.target.value)}
           required
         >
-          <option value="">Selecciona tu sexo</option>
-          <option value="Hombre">Hombre</option>
-          <option value="Mujer">Mujer</option>
+          <option value="">{t("genderPlaceholder")}</option>
+          <option value="Hombre">{t("male")}</option>
+          <option value="Mujer">{t("female")}</option>
         </select>
         <select
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
           required
         >
-          <option value="">Selecciona tu peso</option>
-          <option value="Peso pluma">Peso pluma (50 kg - 69 kg)</option>
-          <option value="Peso medio">Peso medio (70 kg - 89 kg)</option>
-          <option value="Peso pesado">Peso pesado (+90 kg)</option>
+          <option value="">{t("weightPlaceholder")}</option>
+          <option value="Peso pluma">{t("featherweight_kg")}</option>
+          <option value="Peso medio">{t("middleweight_kg")}</option>
+          <option value="Peso pesado">{t("heavyweight_kg")}</option>
         </select>
         <input
           type="text"
-          placeholder="Ciudad"
+          placeholder={t("cityPlaceholder")}
           value={city}
           onChange={(e) => setCity(e.target.value)}
           required
         />
         <input
           type="tel"
-          placeholder="Teléfono"
+          placeholder={t("phonePlaceholder")}
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Contraseña"
+          placeholder={t("passwordPlaceholder")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Confirmar contraseña"
+          placeholder={t("confirmPasswordPlaceholder")}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
@@ -181,10 +177,10 @@ const Register: React.FC = () => {
         ) &&
           password.length > 0 && (
             <p style={{ color: "#ff4d4d", marginTop: "0px" }}>
-              Recuerda que tu contraseña debe ser segura
+              {t("passwordReminder")}
             </p>
           )}
-        <button type="submit">Registrarse</button>
+        <button type="submit">{t("registerButton")}</button>
       </form>
       <button onClick={handleGoogleRegister} className="registerGoogle">
         <svg
@@ -209,7 +205,7 @@ const Register: React.FC = () => {
             fill="#EB4335"
           ></path>
         </svg>
-        Registrarse con Google
+        {t("googleRegisterButton")}
       </button>
     </div>
   );

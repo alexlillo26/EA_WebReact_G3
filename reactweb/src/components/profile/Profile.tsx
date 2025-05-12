@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { getUserById, updateUser } from "../../services/userService"; // Importa el servicio para actualizar el usuario
+import { useLanguage } from "../../context/LanguageContext";
 
 interface ProfileProps {
   user: { id: string; name: string } | null; // Include user ID
 }
 
 const Profile: React.FC<ProfileProps> = ({ user }) => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -86,32 +88,32 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
       } else {
         await updateUser(user.id, updatedUser); // Llama al servicio para actualizar el usuario
       }
-      alert("Cambios guardados exitosamente.");
+      alert(t("saveSuccess"));
       await fetchUserData(); // Refresca los datos del usuario después de guardar
     } catch (error) {
-      console.error("Error al guardar los cambios:", error);
-      alert("Error al guardar los cambios. Por favor, inténtalo de nuevo.");
+      console.error(t("saveError"), error);
+      alert(t("saveError"));
     }
   };
 
   return (
     <StyledProfile>
-      <h2>Perfil</h2>
+      <h2>{t("profileTitle")}</h2>
       <div className="profile-picture">
         {previewImage ? (
           <img
             src={previewImage}
-            alt="Foto de perfil"
+            alt={t("profilePictureLabel")}
             className="profile-img"
           />
         ) : (
-          <p>No hay foto de perfil</p>
+          <p>{t("noProfilePicture")}</p>
         )}
         <label
           htmlFor="file-upload"
           className={`custom-file-upload ${previewImage ? "has-image" : ""}`}
         >
-          {previewImage ? "Cambiar foto de perfil" : "Elegir foto de perfil"}
+          {previewImage ? t("changeProfilePicture") : t("chooseProfilePicture")}
         </label>
         <input
           id="file-upload"
@@ -123,7 +125,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
       </div>
       <div className="profile-details">
         <div className="detail">
-          <label>Nombre</label>
+          <label>{t("nameLabel")}</label>
           <input
             type="text"
             name="name"
@@ -132,7 +134,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           />
         </div>
         <div className="detail">
-          <label>Fecha de nacimiento</label>
+          <label>{t("birthdateLabel")}</label>
           <input
             type="date"
             name="birthdate"
@@ -141,7 +143,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           />
         </div>
         <div className="detail">
-          <label>Email</label>
+          <label>{t("emailLabel")}</label>
           <input
             type="email"
             name="email"
@@ -150,24 +152,24 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           />
         </div>
         <div className="detail">
-          <label>Sexo</label>
+          <label>{t("genderLabel")}</label>
           <select name="gender" value={formData.gender} onChange={handleChange}>
-            <option value="">Selecciona una opción</option>
-            <option value="Hombre">Hombre</option>
-            <option value="Mujer">Mujer</option>
+            <option value="">{t("chooseGender")}</option>
+            <option value="Hombre">{t("male")}</option>
+            <option value="Mujer">{t("female")}</option>
           </select>
         </div>
         <div className="detail">
-          <label>Peso</label>
+          <label>{t("weightLabel")}</label>
           <select name="weight" value={formData.weight} onChange={handleChange}>
-            <option value="">Selecciona una opción</option>
-            <option value="Peso pluma">Peso pluma (50 kg - 69 kg)</option>
-            <option value="Peso medio">Peso medio (70 kg - 89 kg)</option>
-            <option value="Peso pesado">Peso pesado (+90 kg)</option>
+            <option value="">{t("chooseWeight")}</option>
+            <option value="Peso pluma">{t("featherweight_kg")}</option>
+            <option value="Peso medio">{t("middleweight_kg")}</option>
+            <option value="Peso pesado">{t("heavyweight_kg")}</option>
           </select>
         </div>
         <div className="detail">
-          <label>Ciudad</label>
+          <label>{t("cityLabel")}</label>
           <input
             type="text"
             name="location"
@@ -176,7 +178,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           />
         </div>
         <div className="detail">
-          <label>Teléfono</label>
+          <label>{t("phoneLabel")}</label>
           <input
             type="tel"
             name="phone"
@@ -185,7 +187,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           />
         </div>
         <button className="save-button" onClick={handleSave}>
-          Guardar Cambios
+          {t("saveButton")}
         </button>
       </div>
     </StyledProfile>
