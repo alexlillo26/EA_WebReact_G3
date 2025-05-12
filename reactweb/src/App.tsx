@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom"; // Removed BrowserRouter
 import Header from "./components/header/Header";
 import Home from "./components/home/Home";
@@ -14,6 +14,9 @@ import GymToggleCard from "./components/gyms/GymToggleCard";
 import Statistics from "./components/Statistics/Statistics";
 import { getToken, handleGoogleOAuth } from "./services/authService";
 import SearchResults from './components/SearchResults/SearchResults';
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import { LanguageProvider } from "./context/LanguageContext";
+import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
 
 interface User {
   id: string;
@@ -23,6 +26,15 @@ interface User {
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [searchParams] = useSearchParams();
+  const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] =
+    useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+      setIsAccessibilityPanelOpen(false);
+    }
+  };
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -78,7 +90,17 @@ function App() {
     } else {
       initializeUser();
     }
-  }, [searchParams]);
+
+    if (isAccessibilityPanelOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [searchParams, isAccessibilityPanelOpen]);
 
   const handleLogout = () => {
     setUser(null);
@@ -89,30 +111,41 @@ function App() {
   };
 
   return (
-    <div className="landing-page">
-      <Header user={user} onLogout={handleLogout} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/login"
-          element={
-            <Login onLogin={(name) => setUser({ id: "temp-id", name })} />
-          }
+    <LanguageProvider>
+      <div className="landing-page">
+        <Header user={user} onLogout={handleLogout} />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/login"
+            element={
+              <Login onLogin={(name) => setUser({ id: "temp-id", name })} />
+            }
+          />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile user={user} />} />
+          <Route path="/gym-registration" element={<GymRegistration />} />
+          <Route path="/gym-login" element={<GymLogin />} />
+          <Route path="/gym-toggle" element={<GymToggleCard />} />
+          <Route path="/gyms" element={<GymList />} />
+          <Route path="/combats" element={<CombatList />} />
+          <Route
+            path="/estadisticas"
+            element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
+          />
+          <Route path="/search-results" element={<SearchResults />} />
+        </Routes>
+        <div className="accessibility-button">
+          <button onClick={() => setIsAccessibilityPanelOpen(true)}>
+            <i className="fas fa-universal-access"></i>
+          </button>
+        </div>
+        <AccessibilityMenu
+          isOpen={isAccessibilityPanelOpen}
+          onClose={() => setIsAccessibilityPanelOpen(false)}
         />
-        <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile user={user} />} />
-        <Route path="/gym-registration" element={<GymRegistration />} />
-        <Route path="/gym-login" element={<GymLogin />} />
-        <Route path="/gym-toggle" element={<GymToggleCard />} />
-        <Route path="/gyms" element={<GymList />} />
-        <Route path="/combats" element={<CombatList />} />
-        <Route
-          path="/estadisticas"
-          element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
-        />
-        <Route path="/search-results" element={<SearchResults />} />
-      </Routes>
-    </div>
+      </div>
+    </LanguageProvider>
   );
 }
 

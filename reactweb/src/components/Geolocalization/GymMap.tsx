@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { Gym } from "../../models/Gym";
 import { geocodeAddress } from "../../services/geocodingService";
 import L, { Icon } from "leaflet"; // Ensure correct import
+import { useLanguage } from "../../context/LanguageContext";
 
 const redIcon: Icon = L.icon({
   iconUrl:
@@ -33,6 +34,7 @@ const SetMapView: React.FC<{ center: [number, number]; zoom: number }> = ({
 };
 
 const GymMap: React.FC<GymMapProps> = ({ gyms }) => {
+  const { t } = useLanguage();
   const [gymLocations, setGymLocations] = useState<
     { id: string; name: string; place: string; position: [number, number] }[]
   >([]);
@@ -67,7 +69,7 @@ const GymMap: React.FC<GymMapProps> = ({ gyms }) => {
 
   // Si el centro aún no está definido, muestra un mensaje de carga
   if (!center) {
-    return <div>Cargando mapa...</div>;
+    return <div>{t("loadingMap")}</div>;
   }
 
   return (
@@ -88,7 +90,7 @@ const GymMap: React.FC<GymMapProps> = ({ gyms }) => {
           fontSize: "24px",
         }}
       >
-        Localiza tus gimnasios favoritos
+        {t("gymMapTitle")}
       </h2>
       <div
         style={{

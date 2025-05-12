@@ -2,22 +2,22 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import GymLogin from "./GymLogin";
 import GymRegistration from "./GymRegistration";
+import { useLanguage } from "../../context/LanguageContext";
 
 const GymToggleCard: React.FC = () => {
+  const { t } = useLanguage();
   const [isFlipped, setIsFlipped] = useState(false);
 
   const handleToggle = () => {
     setIsFlipped(!isFlipped);
-    console.log(
-      isFlipped ? "Girando para iniciar sesión" : "Girando para registrarse"
-    );
+    console.log(isFlipped ? t("flippingToLogin") : t("flippingToRegister"));
   };
 
   return (
     <StyledWrapper>
       <div className="card-container">
         <button className="toggle-btn" onClick={handleToggle}>
-          {isFlipped ? "Ir a Iniciar Sesión" : "Ir a Registro"}
+          {isFlipped ? t("toggleToLogin") : t("toggleToRegister")}
         </button>
         <div className={`flip-card__inner ${isFlipped ? "flipped" : ""}`}>
           <div className="flip-card__front">

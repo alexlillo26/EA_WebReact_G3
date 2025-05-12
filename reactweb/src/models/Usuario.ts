@@ -7,5 +7,6 @@ export interface Usuario {
     password: string;
     weight: string; // Nuevo campo
     city: string; // Nuevo campo
+    gender: string;
     profilePicture?: string; // URL de la imagen de perfil
 }

@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login, getToken } from "../../services/authService"; // Added getToken import
 import "./login.css";
+import { useLanguage } from "../../context/LanguageContext";
 
 const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
+
+  console.log("Current language:", language);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,9 +32,7 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setErrorMessage(
-        "Credenciales incorrectas. Por favor, inténtalo de nuevo."
-      );
+      setErrorMessage(t("loginError"));
     }
   };
 
@@ -42,7 +44,7 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit}>
-        <h2>Iniciar Sesión</h2>
+        <h2>{t("loginTitle")}</h2>
         {errorMessage && (
           <p style={{ color: "#ff4d4d", marginBottom: "15px" }}>
             {errorMessage}
@@ -50,19 +52,19 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
         )}
         <input
           type="email"
-          placeholder="Correo Electrónico"
+          placeholder={t("emailPlaceholder")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Contraseña"
+          placeholder={t("passwordPlaceholder")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Iniciar Sesión</button>
+        <button type="submit">{t("loginButton")}</button>
       </form>
       <button onClick={handleGoogleLogin} className="loginGoogle">
         <svg
@@ -87,10 +89,10 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
             fill="#EB4335"
           ></path>
         </svg>
-        Iniciar sesión con Google
+        {t("googleLoginButton")}
       </button>
       <p>
-        ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
+        {t("noAccount")} <Link to="/register">{t("register")}</Link>
       </p>
     </div>
   );

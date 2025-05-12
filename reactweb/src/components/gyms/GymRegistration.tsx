@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useLanguage } from "../../context/LanguageContext";
 
 const GymRegistration: React.FC = () => {
+  const { t } = useLanguage();
   const [gymData, setGymData] = useState({
     name: "",
     email: "",
@@ -29,8 +31,8 @@ const GymRegistration: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log("Gimnasio registrado con éxito:", result);
-        alert("Gimnasio registrado con éxito");
+        console.log(t("registrationSuccess"), result);
+        alert(t("registrationSuccess"));
         setGymData({
           name: "",
           email: "",
@@ -40,23 +42,23 @@ const GymRegistration: React.FC = () => {
           password: "",
         }); // Limpia el formulario
       } else {
-        console.error("Error al registrar el gimnasio:", response.statusText);
-        alert("Error al registrar el gimnasio");
+        console.error(t("registrationError"), response.statusText);
+        alert(t("registrationError"));
       }
     } catch (error) {
-      console.error("Error al conectar con el servidor:", error);
-      alert("Error al conectar con el servidor");
+      console.error(t("serverError"), error);
+      alert(t("serverError"));
     }
   };
 
   return (
     <StyledRegistration>
       <div className="card">
-        <h2>Registro</h2>
+        <h2>{t("gymRegistrationTitle")}</h2>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="Nombre"
+            placeholder={t("namePlaceholder")}
             name="name"
             value={gymData.name}
             onChange={handleChange}
@@ -64,7 +66,7 @@ const GymRegistration: React.FC = () => {
           />
           <input
             type="email"
-            placeholder="Correo Electrónico"
+            placeholder={t("emailPlaceholder")}
             name="email"
             value={gymData.email}
             onChange={handleChange}
@@ -72,7 +74,7 @@ const GymRegistration: React.FC = () => {
           />
           <input
             type="text"
-            placeholder="Teléfono"
+            placeholder={t("phonePlaceholder")}
             name="phone"
             value={gymData.phone}
             onChange={handleChange}
@@ -80,7 +82,7 @@ const GymRegistration: React.FC = () => {
           />
           <input
             type="text"
-            placeholder="Ubicación"
+            placeholder={t("placePlaceholder")}
             name="place"
             value={gymData.place}
             onChange={handleChange}
@@ -88,7 +90,7 @@ const GymRegistration: React.FC = () => {
           />
           <input
             type="number"
-            placeholder="Precio"
+            placeholder={t("pricePlaceholder")}
             name="price"
             value={gymData.price}
             onChange={handleChange}
@@ -96,13 +98,13 @@ const GymRegistration: React.FC = () => {
           />
           <input
             type="password"
-            placeholder="Contraseña"
+            placeholder={t("passwordPlaceholder")}
             name="password"
             value={gymData.password}
             onChange={handleChange}
             required
           />
-          <button type="submit">Registrarse</button>
+          <button type="submit">{t("registerButton")}</button>
         </form>
       </div>
     </StyledRegistration>

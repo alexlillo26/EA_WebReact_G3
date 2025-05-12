@@ -11,6 +11,8 @@ const Register: React.FC = () => {
   const [weight, setWeight] = useState("");
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,9 +26,24 @@ const Register: React.FC = () => {
       !password ||
       !weight ||
       !city ||
-      !phone
+      !phone ||
+      !gender
     ) {
       setErrorMessage("Todos los campos son obligatorios.");
+      return;
+    }
+
+    const passwwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwwordRegex.test(password)) {
+      setErrorMessage(
+        "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial."
+      );
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Las contraseñas no coinciden.");
       return;
     }
 
@@ -39,6 +56,7 @@ const Register: React.FC = () => {
         weight,
         city,
         phone,
+        gender,
       });
 
       if (user) {
@@ -112,14 +130,23 @@ const Register: React.FC = () => {
           required
         />
         <select
+          value={gender}
+          onChange={(e) => setGender(e.target.value)}
+          required
+        >
+          <option value="">Selecciona tu sexo</option>
+          <option value="Hombre">Hombre</option>
+          <option value="Mujer">Mujer</option>
+        </select>
+        <select
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
           required
         >
           <option value="">Selecciona tu peso</option>
-          <option value="Peso pluma">Peso pluma</option>
-          <option value="Peso medio">Peso medio</option>
-          <option value="Peso pesado">Peso pesado</option>
+          <option value="Peso pluma">Peso pluma (50 kg - 69 kg)</option>
+          <option value="Peso medio">Peso medio (70 kg - 89 kg)</option>
+          <option value="Peso pesado">Peso pesado (+90 kg)</option>
         </select>
         <input
           type="text"
@@ -142,6 +169,21 @@ const Register: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <input
+          type="password"
+          placeholder="Confirmar contraseña"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+        {!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+          password
+        ) &&
+          password.length > 0 && (
+            <p style={{ color: "#ff4d4d", marginTop: "0px" }}>
+              Recuerda que tu contraseña debe ser segura
+            </p>
+          )}
         <button type="submit">Registrarse</button>
       </form>
       <button onClick={handleGoogleRegister} className="registerGoogle">
