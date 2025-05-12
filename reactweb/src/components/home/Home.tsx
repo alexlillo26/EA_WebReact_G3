@@ -8,6 +8,7 @@ import AboutSection from "../AboutSection/AboutSection"; // Importa el nuevo com
 import GymMap from "../Geolocalization/GymMap"; // Importa el componente del mapa
 import "./Home.css";
 import AppPromoSection from "../AppPromoSection/AppPromoSection"; // Importa el nuevo componente
+import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);
@@ -16,6 +17,7 @@ const Home: React.FC = () => {
   const [level, setLevel] = useState(""); // 添加级别状态
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGyms = async () => {
@@ -43,22 +45,13 @@ const Home: React.FC = () => {
     }
 
     try {
-      const token = getToken();
-      if (!token) {
-        setError("Debes iniciar sesión para buscar usuarios");
-        return;
-      }
-
       const results = await searchUsers(city, weight);
-      setSearchResults(results);
-      
-      if (results.length === 0) {
-        setError("No se encontraron usuarios con los criterios especificados");
-      }
+      const searchParams = `?city=${encodeURIComponent(city)}&weight=${encodeURIComponent(weight)}&level=${encodeURIComponent(level)}`;
+      navigate(`/search-results${searchParams}`, { 
+        state: { results }
+      });
     } catch (err) {
-      console.error("Error en la búsqueda:", err);
-      setError("Error al buscar usuarios. Por favor, inténtalo de nuevo.");
-      setSearchResults([]);
+      setError("Error al realizar la búsqueda");
     }
   };
 

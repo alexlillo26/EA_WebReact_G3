@@ -13,6 +13,7 @@ import GymLogin from "./components/gyms/GymLogin";
 import GymToggleCard from "./components/gyms/GymToggleCard";
 import Statistics from "./components/Statistics/Statistics";
 import { getToken, handleGoogleOAuth } from "./services/authService";
+import SearchResults from './components/SearchResults/SearchResults';
 
 interface User {
   id: string;
@@ -109,6 +110,7 @@ function App() {
           path="/estadisticas"
           element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
         />
+        <Route path="/search-results" element={<SearchResults />} />
       </Routes>
     </div>
   );
