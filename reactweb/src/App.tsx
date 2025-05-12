@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Route, Routes, useSearchParams } from "react-router-dom"; // Removed BrowserRouter
+import { Route, Routes, useSearchParams } from "react-router-dom";
 import Header from "./components/header/Header";
 import Home from "./components/home/Home";
 import Login from "./components/login/login";
@@ -14,7 +14,6 @@ import GymToggleCard from "./components/gyms/GymToggleCard";
 import Statistics from "./components/Statistics/Statistics";
 import { getToken, handleGoogleOAuth } from "./services/authService";
 import SearchResults from './components/SearchResults/SearchResults';
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import { LanguageProvider } from "./context/LanguageContext";
 import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
 
