@@ -8,6 +8,7 @@ import AboutSection from "../AboutSection/AboutSection"; // Importa el nuevo com
 import GymMap from "../Geolocalization/GymMap"; // Importa el componente del mapa
 import "./Home.css";
 import AppPromoSection from "../AppPromoSection/AppPromoSection"; // Importa el nuevo componente
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from "../../context/LanguageContext"; // Importa el contexto de idioma
 
 const Home: React.FC = () => {
@@ -18,6 +19,7 @@ const Home: React.FC = () => {
   const [level, setLevel] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGyms = async () => {
@@ -52,11 +54,15 @@ const Home: React.FC = () => {
       }
 
       const results = await searchUsers(city, weight);
-      setSearchResults(results);
-
       if (results.length === 0) {
         setError(t("searchErrorNoResults"));
+        return;
       }
+
+      const searchParams = `?city=${encodeURIComponent(city)}&weight=${encodeURIComponent(weight)}&level=${encodeURIComponent(level)}`;
+      navigate(`/search-results${searchParams}`, { 
+        state: { results }
+      });
     } catch (err) {
       console.error(t("searchErrorGeneral"), err);
       setError(t("searchErrorGeneral"));

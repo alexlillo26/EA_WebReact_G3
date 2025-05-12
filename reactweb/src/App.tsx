@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Route, Routes, useSearchParams } from "react-router-dom"; // Removed BrowserRouter
+import { Route, Routes, useSearchParams } from "react-router-dom";
 import Header from "./components/header/Header";
 import Home from "./components/home/Home";
 import Login from "./components/login/login";
@@ -13,7 +13,7 @@ import GymLogin from "./components/gyms/GymLogin";
 import GymToggleCard from "./components/gyms/GymToggleCard";
 import Statistics from "./components/Statistics/Statistics";
 import { getToken, handleGoogleOAuth } from "./services/authService";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+import SearchResults from './components/SearchResults/SearchResults';
 import { LanguageProvider } from "./context/LanguageContext";
 import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
 
@@ -132,6 +132,7 @@ function App() {
             path="/estadisticas"
             element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
           />
+          <Route path="/search-results" element={<SearchResults />} />
         </Routes>
         <div className="accessibility-button">
           <button onClick={() => setIsAccessibilityPanelOpen(true)}>
