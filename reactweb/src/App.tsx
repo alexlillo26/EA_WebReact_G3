@@ -14,8 +14,8 @@ import GymToggleCard from "./components/gyms/GymToggleCard";
 import Statistics from "./components/Statistics/Statistics";
 import { getToken, handleGoogleOAuth } from "./services/authService";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { translations } from "./translations/translations";
 import { LanguageProvider } from "./context/LanguageContext";
+import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
 
 interface User {
   id: string;
@@ -28,16 +28,11 @@ function App() {
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] =
     useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
-  const [language, setLanguage] = useState<keyof typeof translations>("es");
 
   const handleClickOutside = (event: MouseEvent) => {
     if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
       setIsAccessibilityPanelOpen(false);
     }
-  };
-
-  const t = (key: keyof (typeof translations)["en"]) => {
-    return translations[language][key] || key;
   };
 
   useEffect(() => {
@@ -143,47 +138,10 @@ function App() {
             <i className="fas fa-universal-access"></i>
           </button>
         </div>
-        <div
-          ref={panelRef} // Asigna la referencia al panel lateral
-          className={`accessibility-panel ${
-            isAccessibilityPanelOpen ? "open" : ""
-          }`}
-        >
-          <button
-            className="close-button"
-            onClick={() => setIsAccessibilityPanelOpen(false)}
-          >
-            &times;
-          </button>
-          <h2>{t("accessibilityOptions")}</h2>
-          <ul>
-            <li>
-              <div className="language-selector">
-                {["es", "ca", "eu", "en"].map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() =>
-                      setLanguage(lang as keyof typeof translations)
-                    }
-                    className={language === lang ? "selected" : ""}
-                  >
-                    {lang.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </li>
-            <li>
-              <button onClick={() => alert(t("changeTheme"))}>
-                {t("changeTheme")}
-              </button>
-            </li>
-            <li>
-              <button onClick={() => alert(t("highContrastMode"))}>
-                {t("highContrastMode")}
-              </button>
-            </li>
-          </ul>
-        </div>
+        <AccessibilityMenu
+          isOpen={isAccessibilityPanelOpen}
+          onClose={() => setIsAccessibilityPanelOpen(false)}
+        />
       </div>
     </LanguageProvider>
   );

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useLanguage } from "../../context/LanguageContext";
 
 const GymLogin: React.FC = () => {
+  const { t } = useLanguage();
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -27,23 +29,21 @@ const GymLogin: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Inicio de sesión exitoso:", data);
+        console.log(t("loginSuccess"), data);
 
         // Guarda el token en localStorage
         localStorage.setItem("gymToken", data.token);
 
         // Redirige al usuario a la página principal o dashboard
-        alert("Inicio de sesión exitoso");
+        alert(t("loginSuccess"));
         window.location.href = "/"; // Cambia "/dashboard" por la ruta deseada
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.message || "Error al iniciar sesión");
+        setErrorMessage(errorData.message || t("loginError"));
       }
     } catch (error) {
-      console.error("Error al conectar con el servidor:", error);
-      setErrorMessage(
-        "Error al conectar con el servidor. Por favor, inténtalo más tarde."
-      );
+      console.error(t("serverError"), error);
+      setErrorMessage(t("serverError"));
     }
   };
 
@@ -51,11 +51,11 @@ const GymLogin: React.FC = () => {
     <StyledLogin>
       <div className="flip-card__front">
         <div className="card">
-          <h2>Iniciar Sesión</h2>
+          <h2>{t("gymLoginTitle")}</h2>
           <form onSubmit={handleSubmit}>
             <input
               type="email"
-              placeholder="Correo Electrónico"
+              placeholder={t("emailPlaceholder")}
               name="email"
               value={loginData.email}
               onChange={handleChange}
@@ -63,13 +63,13 @@ const GymLogin: React.FC = () => {
             />
             <input
               type="password"
-              placeholder="Contraseña"
+              placeholder={t("passwordPlaceholder")}
               name="password"
               value={loginData.password}
               onChange={handleChange}
               required
             />
-            <button type="submit">Ingresar</button>
+            <button type="submit">{t("loginButton")}</button>
           </form>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
         </div>
