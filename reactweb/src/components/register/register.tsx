@@ -40,6 +40,11 @@ const Register: React.FC = () => {
       return;
     }
 
+    if (!/^\d{9}$/.test(phone)) {
+      setErrorMessage("El teléfono debe tener 9 dígitos.");
+      return;
+    }
+
     const passwwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwwordRegex.test(password)) {
