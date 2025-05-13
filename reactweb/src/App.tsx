@@ -64,18 +64,16 @@ function App() {
     };
 
     const googleCode = searchParams.get("code");
-    const googleToken = searchParams.get("token"); // Extract token from URL
+    const googleToken = searchParams.get("token");
+    const googleRefreshToken = searchParams.get("refreshToken"); // Extract refreshToken from URL
     console.log("Google OAuth code:", googleCode);
     console.log("Google OAuth token:", googleToken);
+    console.log("Google OAuth refreshToken:", googleRefreshToken);
 
-    if (googleToken) {
-      console.log("Saving Google token and refreshToken to localStorage."); // Debug log
+    if (googleToken && googleRefreshToken) {
       localStorage.setItem("token", googleToken); // Save token to localStorage
-      // Ensure refreshToken is not lost
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) {
-        console.warn("No refreshToken found after Google login. Check OAuth flow.");
-      }
+      localStorage.setItem("refreshToken", googleRefreshToken); // Save refreshToken to localStorage
+      console.log("✅ Tokens guardados tras login con Google.");
       try {
         const decoded = JSON.parse(atob(googleToken.split(".")[1]));
         console.log("Decoded token from URL:", decoded);
