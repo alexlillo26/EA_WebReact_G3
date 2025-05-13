@@ -69,7 +69,13 @@ function App() {
     console.log("Google OAuth token:", googleToken);
 
     if (googleToken) {
+      console.log("Saving Google token and refreshToken to localStorage."); // Debug log
       localStorage.setItem("token", googleToken); // Save token to localStorage
+      // Ensure refreshToken is not lost
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        console.warn("No refreshToken found after Google login. Check OAuth flow.");
+      }
       try {
         const decoded = JSON.parse(atob(googleToken.split(".")[1]));
         console.log("Decoded token from URL:", decoded);

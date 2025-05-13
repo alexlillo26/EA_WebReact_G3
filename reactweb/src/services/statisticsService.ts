@@ -1,3 +1,5 @@
+import axiosInstance from './axiosInstance';
+
 const API_BASE_URL = 'http://localhost:9000/api';
 
 export interface Combat {
@@ -21,26 +23,13 @@ export const getCombatsByBoxer = async (
     pageSize: number = 10
 ): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
 
-    const url = `${API_BASE_URL}/combat/boxer/${boxerId}?page=${page}&pageSize=${pageSize}`;
+    const url = `${API_BASE_URL}/combat/boxer/${boxerId}`;
     console.log('Calling API with URL:', url); // Debug
-    console.log('Boxer ID:', boxerId); // Debug
 
     try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-        });
-
-        console.log('Resposta que ens dona la API:', response.status); // Debug
-
-        if (!response.ok) {
-            throw new Error(`Error al obtener los combates del boxeador: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log('API response data:', data); // Debug
-
-        return data;
+        const response = await axiosInstance.get<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }>(url, { params: { page, pageSize } });
+        console.log('API response data:', response.data); // Debug
+        return response.data;
     } catch (error) {
         console.error('Error en getCombatsByBoxer:', error);
         throw error;

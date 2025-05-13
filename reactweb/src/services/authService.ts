@@ -16,6 +16,7 @@ export const getRefreshToken = (): string | null => {
 };
 
 export const setTokens = (token: string, refreshToken: string): void => {
+  console.log("Storing tokens:", { token, refreshToken }); // Debug log
   localStorage.setItem("token", token);
   localStorage.setItem("refreshToken", refreshToken);
 };
@@ -48,12 +49,24 @@ export const handleGoogleOAuth = async (code: string): Promise<{ id: string; nam
 
 export const refreshAccessToken = async (): Promise<string> => {
   const refreshToken = getRefreshToken();
-  if (!refreshToken) throw new Error("No refresh token available");
+  console.log("🔄 Attempting to refresh with refreshToken:", refreshToken); // Debug log
 
-  const response = await axios.post<{ token: string }>(`${API_BASE_URL}/auth/refresh-token`, { refreshToken });
-  const { token } = response.data;
-  setTokens(token, refreshToken);
-  return token;
+  if (!refreshToken) {
+    console.warn("No refresh token available. User might need to reauthenticate.");
+    throw new Error("No refresh token available");
+  }
+
+  try {
+    const response = await axios.post<{ token: string }>(`${API_BASE_URL}/users/refresh-token`, {
+      refreshToken,
+    });
+    console.log("✅ Token refreshed successfully:", response.data.token);
+    setTokens(response.data.token, refreshToken); // Save the new token
+    return response.data.token;
+  } catch (error: any) {
+    console.error("❌ Failed to refresh token:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const logout = (): void => {

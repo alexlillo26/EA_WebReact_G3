@@ -1,6 +1,6 @@
 import { Usuario } from '../models/Usuario';
 import { getToken } from './authService';
-
+import axiosInstance from './axiosInstance';
 
 // Definir las rutas de la API
 const API_BASE_URL = 'http://localhost:9000/api'; // Asegúrate de que coincida con el backend
@@ -59,17 +59,8 @@ export const getUserById = async (): Promise<Usuario | null> => {
     if (!token) throw new Error("No token available");
 
     const { id } = JSON.parse(atob(token.split(".")[1])); // Decode token payload
-    const response = await fetch(GET_USER_BY_ID_URL(id), {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!response.ok) {
-      throw new Error("Error al obtener el usuario");
-    }
-
-    const user: Usuario = await response.json();
-    return user;
+    const response = await axiosInstance.get<Usuario>(GET_USER_BY_ID_URL(id));
+    return response.data;
   } catch (error) {
     console.error("Error en getUserById:", error);
     return null;
@@ -79,31 +70,12 @@ export const getUserById = async (): Promise<Usuario | null> => {
 // Servicio para actualizar un usuario
 export const updateUser = async (id: string, updateData: Partial<Usuario> | FormData): Promise<Usuario | null> => {
   try {
-    const token = getToken();
-    if (!token) throw new Error("No token available");
-
     const isFormData = updateData instanceof FormData; // Check if updateData is FormData
-
-    const response = await fetch(GET_USER_BY_ID_URL(id), {
-      method: "PUT",
-      headers: isFormData
-        ? { Authorization: `Bearer ${token}`}
-        : {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        },
-      body: isFormData ? updateData : JSON.stringify(updateData),
+    const response = await axiosInstance.put<Usuario>(GET_USER_BY_ID_URL(id), updateData, {
+      headers: isFormData ? {} : { "Content-Type": "application/json" },
     });
-
-    if (!response.ok) {
-      const errorDetails = await response.json(); // Parse error response
-      console.error("Backend error details:", errorDetails); // Log backend error
-      throw new Error("Error al actualizar el usuario");
-    }
-
-    const updatedUser: Usuario = await response.json();
-    console.log("Usuario actualizado:", updatedUser); // Log the updated user
-    return updatedUser;
+    console.log("Usuario actualizado:", response.data); // Log the updated user
+    return response.data;
   } catch (error) {
     console.error("Error en updateUser:", error);
     return null;
@@ -113,42 +85,13 @@ export const updateUser = async (id: string, updateData: Partial<Usuario> | Form
 // Servicio para buscar usuarios
 export const searchUsers = async (city?: string, weight?: string): Promise<any[]> => {
   try {
-    const token = getToken();
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
+    const params: Record<string, string> = {};
+    if (city) params.city = city;
+    if (weight) params.weight = weight;
 
-    let url = `${API_BASE_URL}/users/search`;
-    const params = new URLSearchParams();
-    
-    if (city) params.append('city', city);
-    if (weight) params.append('weight', weight);
-    
-    const queryString = params.toString();
-    if (queryString) {
-      url += `?${queryString}`;
-    }
-
-    console.log('Calling search API:', url); // Debug log
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Search API error:', errorData);
-      throw new Error(errorData.message || 'Error en la búsqueda');
-    }
-
-    const data = await response.json();
-    console.log('Search results:', data); // Debug log
-    return data.users || [];
-    
+    const response = await axiosInstance.get<{ users: any[] }>(`${API_BASE_URL}/users/search`, { params });
+    console.log('Search results:', response.data); // Debug log
+    return response.data.users || [];
   } catch (error) {
     console.error('Error en searchUsers:', error);
     throw error;
