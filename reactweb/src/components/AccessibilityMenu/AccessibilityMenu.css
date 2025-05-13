@@ -27,6 +27,9 @@
 
 .accessibility-panel {
   position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   top: 0;
   left: -400px; /* Oculto inicialmente */
   width: 300px;
@@ -66,14 +69,24 @@
 }
 
 .accessibility-panel ul li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 15px;
+}
+
+.accessibility-panel ul li label {
+  font-size: 16px;
+  color: white;
+  flex-grow: 1;
+  margin-top: 10px;
 }
 
 .accessibility-panel ul li button {
   background-color: #d62828;
   color: white;
   border: none;
-  padding: 10px 15px;
+  padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -83,10 +96,20 @@
   background-color: #a31f1f;
 }
 
+.accessibility-panel ul li button.on {
+  background-color: #4caf50; /* Verde para ON */
+}
+
+.accessibility-panel ul li button.off {
+  background-color: #d62828; /* Rojo para OFF */
+}
+
 .language-selector {
   display: flex;
-  gap: 10px; /* Espaciado entre los botones */
-  margin-top: 20px; /* Espaciado superior */
+  gap: 15px; /* Espaciado entre los botones */
+  margin: 0 auto; /* Centra los botones */
+  align-items: center;
+  height: 100%;
   justify-content: center; /* Centra los botones horizontalmente */
 }
 
@@ -94,9 +117,9 @@
   background-color: #d62828;
   color: white;
   border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
-  font-size: 14px;
+  border-radius: 8px; /* Botones con bordes más redondeados */
+  padding: 15px 20px; /* Aumenta el tamaño del botón */
+  font-size: 16px; /* Aumenta el tamaño del texto */
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
@@ -109,4 +132,109 @@
   background-color: #4caf50; /* Color verde para el idioma seleccionado */
   transform: scale(1.1); /* Agranda ligeramente el botón seleccionado */
   font-weight: bold;
+}
+
+body {
+  position: static; /* Asegúrate de que no sea relative */
+  overflow: visible; /* Asegúrate de que no esté oculto */
+}
+
+body.dyslexia-mode {
+  cursor: default; /* Oculta el cursor predeterminado */
+}
+
+body.dyslexia-mode::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px; /* Grosor de la línea */
+  background-color: yellow; /* Color de la línea */
+  pointer-events: none; 
+  transform: translateY(var(--cursor-y, 0px));
+  z-index: 9999; 
+}
+
+body.adhd-mode {
+  cursor: default; 
+  position: relative;
+}
+
+body.adhd-mode::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%; /* Ocupa todo el ancho */
+  height: 150px; /* Altura del rectángulo brillante */
+  background-color: transparent; /* Transparente para mostrar el contenido dentro del rectángulo */
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); /* Oscurece el área fuera del rectángulo */
+  pointer-events: none; /* Permite interactuar con los elementos debajo */
+  transform: translateY(calc(var(--cursor-y, 0px) - 75px)); /* Centra el rectángulo en el cursor */
+  z-index: 9999; /* Asegúrate de que esté por encima de otros elementos */
+}
+
+body.adhd-mode::before {
+  content: "";
+  position: fixed;
+  top: calc(var(--cursor-y, 0px) - 2px); /* Centra la línea dentro del rectángulo */
+  left: 0;
+  width: 100%;
+  height: 4px; /* Grosor de la línea */
+  background-color: yellow; /* Color amarillo */
+  pointer-events: none; /* Permite interactuar con los elementos debajo */
+  z-index: 10000; /* Asegúrate de que esté por encima del rectángulo */
+}
+
+.checkbox-wrapper-8 .tgl {
+  display: none;
+}
+
+.checkbox-wrapper-8 .tgl + .tgl-btn {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+  cursor: pointer;
+  background: #d62828; /* Color para OFF */
+  border-radius: 50px;
+  transition: all 0.4s ease;
+}
+
+.checkbox-wrapper-8 .tgl:checked + .tgl-btn {
+  background: #4caf50; /* Color para ON */
+}
+
+.checkbox-wrapper-8 .tgl + .tgl-btn:after {
+  content: attr(data-tg-off);
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: white;
+  transition: all 0.4s ease;
+}
+
+.checkbox-wrapper-8 .tgl:checked + .tgl-btn:after {
+  content: attr(data-tg-on);
+  left: auto;
+  right: 10px;
+}
+
+.checkbox-wrapper-8 .tgl + .tgl-btn:before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.checkbox-wrapper-8 .tgl:checked + .tgl-btn:before {
+  left: calc(100% - 27px);
 }

@@ -13,6 +13,8 @@ const AccessibilityMenu: React.FC<AccessibilityMenuProps> = ({
   onClose,
 }) => {
   const { t, setLanguage, language } = useLanguage();
+  const [isDyslexiaMode, setIsDyslexiaMode] = React.useState(false);
+  const [isADHDMode, setIsADHDMode] = React.useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -20,6 +22,75 @@ const AccessibilityMenu: React.FC<AccessibilityMenuProps> = ({
       onClose();
     }
   };
+
+  const activateMode = (mode: "dyslexia" | "adhd") => {
+    // Si el modo seleccionado ya está activo, desactívalo
+    if (
+      (mode === "dyslexia" && isDyslexiaMode) ||
+      (mode === "adhd" && isADHDMode)
+    ) {
+      document.body.classList.remove("dyslexia-mode", "adhd-mode");
+      setIsDyslexiaMode(false);
+      setIsADHDMode(false);
+      return;
+    }
+
+    // Desactivar todos los modos
+    document.body.classList.remove("dyslexia-mode", "adhd-mode");
+    setIsDyslexiaMode(false);
+    setIsADHDMode(false);
+
+    // Activar el modo seleccionado
+    if (mode === "dyslexia") {
+      document.body.classList.add("dyslexia-mode");
+      setIsDyslexiaMode(true);
+    } else if (mode === "adhd") {
+      document.body.classList.add("adhd-mode");
+      setIsADHDMode(true);
+    }
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      if (isDyslexiaMode) {
+        document.documentElement.style.setProperty(
+          "--cursor-y",
+          `${event.clientY}px`
+        );
+      }
+    };
+
+    if (isDyslexiaMode) {
+      document.addEventListener("mousemove", handleMouseMove);
+    } else {
+      document.removeEventListener("mousemove", handleMouseMove);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [isDyslexiaMode]);
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      if (isADHDMode) {
+        document.documentElement.style.setProperty(
+          "--cursor-y",
+          `${event.clientY}px`
+        );
+      }
+    };
+
+    if (isADHDMode) {
+      document.addEventListener("mousemove", handleMouseMove);
+    } else {
+      document.removeEventListener("mousemove", handleMouseMove);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [isADHDMode]);
 
   useEffect(() => {
     if (isOpen) {
@@ -60,14 +131,44 @@ const AccessibilityMenu: React.FC<AccessibilityMenuProps> = ({
           </div>
         </li>
         <li>
-          <button onClick={() => alert(t("changeTheme"))}>
-            {t("changeTheme")}
-          </button>
+          <label>
+            {t("dyslexiaModeLabel")}
+            <div className="checkbox-wrapper-8">
+              <input
+                type="checkbox"
+                id="dyslexia-toggle"
+                className="tgl tgl-skewed"
+                checked={isDyslexiaMode}
+                onChange={() => activateMode("dyslexia")}
+              />
+              <label
+                htmlFor="dyslexia-toggle"
+                data-tg-on="ON"
+                data-tg-off="OFF"
+                className="tgl-btn"
+              ></label>
+            </div>
+          </label>
         </li>
         <li>
-          <button onClick={() => alert(t("highContrastMode"))}>
-            {t("highContrastMode")}
-          </button>
+          <label>
+            {t("adhdModeLabel")}
+            <div className="checkbox-wrapper-8">
+              <input
+                type="checkbox"
+                id="adhd-toggle"
+                className="tgl tgl-skewed"
+                checked={isADHDMode}
+                onChange={() => activateMode("adhd")}
+              />
+              <label
+                htmlFor="adhd-toggle"
+                data-tg-on="ON"
+                data-tg-off="OFF"
+                className="tgl-btn"
+              ></label>
+            </div>
+          </label>
         </li>
       </ul>
     </div>
