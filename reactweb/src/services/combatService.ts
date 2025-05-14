@@ -39,3 +39,20 @@ export const registerCombat = async (combatData: Combat): Promise<Combat> => {
     throw error;
   }
 };
+
+// Get combats for a specific gym with pagination
+export const getGymCombats = async (gymId: string, page: number = 1, pageSize: number = 10): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
+  const response = await fetch(`${API_BASE_URL}/combat/gym/${gymId}?page=${page}&pageSize=${pageSize}`, {
+    method: 'GET',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('gymToken')}`
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Error al obtener los combates del gimnasio');
+  }
+
+  return response.json();
+};

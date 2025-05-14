@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useLanguage } from "../../context/LanguageContext";
+import { API_BASE_URL } from '../../services/config';
 
 const GymLogin: React.FC = () => {
   const { t } = useLanguage();
@@ -19,7 +20,7 @@ const GymLogin: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:9000/api/gym/login", {
+      const response = await fetch(`${API_BASE_URL}/gym/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -29,14 +30,15 @@ const GymLogin: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(t("loginSuccess"), data);
-
-        // Guarda el token en localStorage
+        // Store both token and gym data
         localStorage.setItem("gymToken", data.token);
-
-        // Redirige al usuario a la página principal o dashboard
+        localStorage.setItem("userData", JSON.stringify({
+          id: data.gym._id || data.gym.id, // handle both possible id fields
+          name: data.gym.name,
+          isGym: true,
+        }));
         alert(t("loginSuccess"));
-        window.location.href = "/"; // Cambia "/dashboard" por la ruta deseada
+        window.location.href = "/";
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || t("loginError"));

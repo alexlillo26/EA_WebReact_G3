@@ -141,6 +141,9 @@ export const translations = {
     gymPlaceholder: "Enter gym name",
     fillAllFields: "Please fill in all fields",
     combatCreated: "Combat created successfully!",
+    gymCombats: "Gym Combats",
+    gymProfile: "Gym Profile",
+    loading: "Loading...",
   },
   es: {
     appName: "Face2Face",
@@ -175,7 +178,7 @@ export const translations = {
     appBenefit6: "📸 Compartir resultados y fotos de peleas.",
     appStoreAlt: "Descargar en App Store",
     googlePlayAlt: "Descargar en Google Play",
-     gymMapTitle: "Localiza tus gimnasios favoritos",
+    gymMapTitle: "Localiza tus gimnasios favoritos",
     loadingMap: "Cargando mapa...",
     gymLoginTitle: "Iniciar Sesión",
     loginSuccess: "Inicio de sesión exitoso",
@@ -284,6 +287,9 @@ export const translations = {
     gymPlaceholder: "Introduce el nombre del gimnasio",
     fillAllFields: "Por favor, completa todos los campos",
     combatCreated: "¡Combate creado con éxito!",
+    gymCombats: "Combates del Gimnasio",
+    gymProfile: "Perfil del Gimnasio",
+    loading: "Cargando...",
   },
   ca: {
     appName: "Face2Face",
@@ -427,6 +433,9 @@ export const translations = {
     gymPlaceholder: "Introdueix el nom del gimnàs",
     fillAllFields: "Si us plau, completa tots els camps",
     combatCreated: "Combat creat amb èxit!",
+    gymCombats: "Combats del Gimnàs",
+    gymProfile: "Perfil del Gimnàs",
+    loading: "Carregant...",
   },
   eu: {
     appName: "Face2Face",
@@ -447,7 +456,7 @@ export const translations = {
     googleLoginButton: "Hasi saioa Google-rekin",
     noAccount: "Konturik ez duzu?",
     loginError: "Datu okerrak. Mesedez, saiatu berriro.",
-     aboutTitle: "Zer da Face2Face?",
+    aboutTitle: "Zer da Face2Face?",
     aboutDescription:
       "Face2Face plataforma bat da, boxeolariak, sustatzaileak eta gimnasioak leku bakarrean konektatzeko diseinatua. Gure helburua borrokak antolatzea erraztea, antzeko mailako aurkariak aurkitzea eta boxeolariei beren sailkapena hobetzen laguntzea da. Hasiberri edo profesionala izan, Face2Face-k zure karrera hurrengo mailara eramateko beharrezko tresnak eskaintzen dizkizu. Batu gure komunitatera eta esperimentatu boxeo munduan lehiatzeko eta hazteko modu errazago eta eraginkorrago bat.",
     appPromoTitle: "Deskargatu gure App-a!",
@@ -570,5 +579,8 @@ export const translations = {
     gymPlaceholder: "Sartu gimnasioaren izena",
     fillAllFields: "Mesedez, bete eremu guztiak",
     combatCreated: "Borroka arrakastaz sortu da!",
+    gymCombats: "Gimnasioko Borrokak",
+    gymProfile: "Gimnasioaren Profila",
+    loading: "Kargatzen...",
   },
 };

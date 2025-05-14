@@ -41,3 +41,55 @@ export const updateGym = async (id: string, updateData: Partial<Gym>): Promise<G
 export const deleteGym = async (id: string): Promise<void> => {
   await axiosInstance.delete(`${API_BASE_URL}/gym/${id}`);
 };
+
+// 获取当前登录的健身房信息
+export const getCurrentGym = async (): Promise<Gym> => {
+  const gymToken = localStorage.getItem('gymToken');
+  if (!gymToken) {
+    throw new Error('No gym token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/gym/current`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${gymToken}`
+    }
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      // Token expired or invalid
+      localStorage.removeItem('gymToken');
+      localStorage.removeItem('userData');
+      window.location.href = '/gym-login';
+      throw new Error('Unauthorized');
+    }
+    throw new Error('Failed to fetch gym data');
+  }
+
+  return response.json();
+};
+
+// 更新健身房信息
+export const updateGymProfile = async (gymId: string, updateData: Partial<Gym>): Promise<Gym> => {
+  const gymToken = localStorage.getItem('gymToken');
+  if (!gymToken) {
+    throw new Error('No gym token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/gym/${gymId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${gymToken}`
+    },
+    body: JSON.stringify(updateData)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update gym data');
+  }
+
+  return response.json();
+};

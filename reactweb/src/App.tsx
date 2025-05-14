@@ -18,6 +18,8 @@ import { LanguageProvider } from "./context/LanguageContext";
 import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import CreateCombat from "./components/CreateCombat/CreateCombat";
+import GymCombats from "./components/GymCombats/GymCombats";
+import GymProfile from "./components/GymProfile/GymProfile";
 
 interface User {
   id: string;
@@ -140,6 +142,8 @@ function App() {
           />
           <Route path="/search-results" element={<SearchResults />} />
           <Route path="/create-combat" element={<CreateCombat />} />
+          <Route path="/gym-combats" element={<GymCombats />} />
+          <Route path="/gym-profile" element={<GymProfile />} />
         </Routes>
         <div className="accessibility-button">
           <button onClick={() => setIsAccessibilityPanelOpen(true)}>
