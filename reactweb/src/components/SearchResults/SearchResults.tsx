@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { searchUsers } from "../../services/userService";
 import "./SearchResults.css";
@@ -11,11 +11,19 @@ const SearchResults = () => {
   const queryParams = new URLSearchParams(location.search);
   const [city, setCity] = useState(queryParams.get("city") || "");
   const [weight, setWeight] = useState(queryParams.get("weight") || "");
-  const [level, setLevel] = useState(queryParams.get("level") || "");
   const [searchResults, setSearchResults] = useState(
     location.state?.results || []
   );
+  const [currentUser, setCurrentUser] = useState<{ name: string } | null>(null);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("currentUser");
+    console.log("Stored user1:", storedUser);
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const translateWeight = (weight: string) => {
     switch (weight) {
@@ -45,7 +53,6 @@ const SearchResults = () => {
       const searchParams = new URLSearchParams();
       if (city) searchParams.set("city", city);
       if (weight) searchParams.set("weight", weight);
-      if (level) searchParams.set("level", level);
       navigate(`/search-results?${searchParams.toString()}`, {
         state: { results },
         replace: true,
@@ -72,12 +79,6 @@ const SearchResults = () => {
             <option value="Peso medio">{t("middleweight")}</option>
             <option value="Peso pesado">{t("heavyweight")}</option>
           </select>
-          <select value={level} onChange={(e) => setLevel(e.target.value)}>
-            <option value="">{t("searchLevelPlaceholder")}</option>
-            <option value="Amateur">{t("amateur")}</option>
-            <option value="Profesional">{t("professional")}</option>
-            <option value="Sparring">{t("sparring")}</option>
-          </select>
           <button type="submit">{t("searchButton")}</button>
         </form>
         {error && <p className="error-message">{error}</p>}
@@ -95,11 +96,29 @@ const SearchResults = () => {
                 <p>
                   {t("weightLabel")}: {translateWeight(user.weight)}
                 </p>
-                <p>
-                  {t("levelLabel")}: {user.level}
-                </p>
               </div>
-              <button className="contact-button">{t("contactButton")}</button>
+              <div className="result-card-buttons">
+                <button className="contact-button">{t("contactButton")}</button>
+                <button
+                  className="view-profile-button"
+                  onClick={() => navigate(`/profile/${user.id}`)}
+                >
+                  {t("viewProfileButton")}
+                </button>
+                <button
+                  className="create-combat-button"
+                  onClick={() =>
+                    navigate("/create-combat", {
+                      state: {
+                        creator: currentUser?.name,
+                        opponent: user.name,
+                      },
+                    })
+                  }
+                >
+                  {t("createCombatButton")}
+                </button>
+              </div>
             </div>
           ))
         ) : (

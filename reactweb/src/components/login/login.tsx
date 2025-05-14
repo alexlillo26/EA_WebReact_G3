@@ -25,7 +25,10 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
       if (token) {
         const decoded = JSON.parse(atob(token.split(".")[1]));
         console.log("Decoded token payload:", decoded);
-        const userData = { id: decoded.id, name: decoded.name || "Usuario" };
+        const userData = {
+          id: decoded.id,
+          name: decoded.username,
+        };
         onLogin(userData.name); // Update user state
         localStorage.setItem("userData", JSON.stringify(userData));
         navigate("/"); // Redirect to home

@@ -8,7 +8,7 @@ import AboutSection from "../AboutSection/AboutSection"; // Importa el nuevo com
 import GymMap from "../Geolocalization/GymMap"; // Importa el componente del mapa
 import "./Home.css";
 import AppPromoSection from "../AppPromoSection/AppPromoSection"; // Importa el nuevo componente
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext"; // Importa el contexto de idioma
 
 const Home: React.FC = () => {
@@ -16,7 +16,6 @@ const Home: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [city, setCity] = useState("");
   const [weight, setWeight] = useState("");
-  const [level, setLevel] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -59,9 +58,11 @@ const Home: React.FC = () => {
         return;
       }
 
-      const searchParams = `?city=${encodeURIComponent(city)}&weight=${encodeURIComponent(weight)}&level=${encodeURIComponent(level)}`;
-      navigate(`/search-results${searchParams}`, { 
-        state: { results }
+      const searchParams = `?city=${encodeURIComponent(
+        city
+      )}&weight=${encodeURIComponent(weight)}`;
+      navigate(`/search-results${searchParams}`, {
+        state: { results },
       });
     } catch (err) {
       console.error(t("searchErrorGeneral"), err);
@@ -72,10 +73,6 @@ const Home: React.FC = () => {
 
   const handleContact = (userId: string) => {
     console.log(t("contactButton"), userId);
-  };
-
-  const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLevel(e.target.value);
   };
 
   return (
@@ -96,16 +93,6 @@ const Home: React.FC = () => {
               <option value="Peso pluma">{t("featherweight")}</option>
               <option value="Peso medio">{t("middleweight")}</option>
               <option value="Peso pesado">{t("heavyweight")}</option>
-            </select>
-            <select
-              value={level}
-              onChange={handleLevelChange}
-              className="level-select"
-            >
-              <option value="">{t("searchLevelPlaceholder")}</option>
-              <option value="Amateur">{t("amateur")}</option>
-              <option value="Profesional">{t("professional")}</option>
-              <option value="Sparring">{t("sparring")}</option>
             </select>
             <button type="submit" className="search-button">
               {t("searchButton")}

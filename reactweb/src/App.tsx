@@ -17,6 +17,7 @@ import SearchResults from "./components/SearchResults/SearchResults";
 import { LanguageProvider } from "./context/LanguageContext";
 import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import CreateCombat from "./components/CreateCombat/CreateCombat";
 
 interface User {
   id: string;
@@ -138,6 +139,7 @@ function App() {
             element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
           />
           <Route path="/search-results" element={<SearchResults />} />
+          <Route path="/create-combat" element={<CreateCombat />} />
         </Routes>
         <div className="accessibility-button">
           <button onClick={() => setIsAccessibilityPanelOpen(true)}>

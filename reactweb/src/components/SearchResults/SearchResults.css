@@ -59,7 +59,8 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  gap: 20px;
+  align-items: flex-start;
   color: white;
 }
 
@@ -78,19 +79,46 @@
   color: #cccccc;
 }
 
-.contact-button {
+.result-card-buttons {
+  display: flex;
+  flex-direction: column; /* Apila los botones verticalmente */
+  gap: 10px; /* Espaciado entre los botones */
+}
+
+.result-card button {
+  width: 150px; /* Ancho fijo para los botones */
   padding: 10px 20px;
-  background-color: #ff0000;
-  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
-  min-width: 120px;
   transition: background-color 0.3s;
 }
 
+.contact-button {
+  background-color: #0834f8;
+  color: white;
+}
+
 .contact-button:hover {
+  background-color: #062be8;
+}
+
+.view-profile-button {
+  background-color: #03e43fc4;
+  color: white;
+}
+
+.view-profile-button:hover {
+  background-color: #1fdb00;
+}
+
+.create-combat-button {
+  background-color: #ff0000;
+  color: white;
+}
+
+.create-combat-button:hover {
   background-color: #cc0000;
 }
 
