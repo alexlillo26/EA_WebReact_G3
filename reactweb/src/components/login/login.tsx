@@ -4,7 +4,9 @@ import { login, getToken } from "../../services/authService"; // Added getToken 
 import "./login.css";
 import { useLanguage } from "../../context/LanguageContext";
 
-const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
+const Login: React.FC<{
+  onLogin: (user: { id: string; name: string }) => void;
+}> = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -29,7 +31,7 @@ const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
           id: decoded.id,
           name: decoded.username,
         };
-        onLogin(userData.name); // Update user state
+        onLogin(userData); // Update user state
         localStorage.setItem("userData", JSON.stringify(userData));
         navigate("/"); // Redirect to home
       }

@@ -19,9 +19,10 @@ export const getCombats = async (page: number = 1, pageSize: number = 10): Promi
 // Registrar un combate
 export const registerCombat = async (combatData: Combat): Promise<Combat> => {
   try {
+    const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/combat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify(combatData),
     });
 

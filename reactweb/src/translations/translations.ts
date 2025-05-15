@@ -147,6 +147,7 @@ export const translations = {
     cancelButton: "Cancel",
     hideGyms: "Hide gyms",
     seeGyms: "See gyms",
+    selectTimePlaceholder: "Select time",
   },
   es: {
     appName: "Face2Face",
@@ -296,6 +297,7 @@ export const translations = {
     cancelButton: "Cancelar",
     hideGyms: "Ocultar gimnasios",
     seeGyms: "Ver gimnasios",
+    selectTimePlaceholder: "Seleccionar hora",
   },
   ca: {
     appName: "Face2Face",
@@ -445,6 +447,7 @@ export const translations = {
     cancelButton: "Cancel·lar",
     hideGyms: "Amaga gimnasos",
     seeGyms: "Veure gimnasos",
+    selectTimePlaceholder: "Selecciona hora",
   },
   eu: {
     appName: "Face2Face",
@@ -594,5 +597,6 @@ export const translations = {
     cancelButton: "Ezeztatu",
     hideGyms: "Gimnasioak ezkutatu",
     seeGyms: "Ikusi gimnasioak",
+    selectTimePlaceholder: "Aukeratu ordua",
   },
 };

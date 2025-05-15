@@ -89,27 +89,31 @@
 
 .gym-suggestions {
   position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
   background: #232526;
-  border: 1px solid #4caf50;
+  border: 1px solid #f60505;
   border-radius: 0 0 8px 8px;
-  width: 90%;
-  max-height: 160px;
-  overflow-y: auto;
-  z-index: 10;
-  margin-top: 2px;
+  z-index: 20;
   list-style: none;
+  margin: 0;
   padding: 0;
+  max-height: 180px;
+  overflow-y: auto;
 }
 
 .gym-suggestions li {
-  padding: 10px;
+  padding: 10px 12px;
   cursor: pointer;
   color: #fff;
+  background: #232526;
+  transition: background 0.2s, color 0.2s;
 }
 
 .gym-suggestions li:hover {
-  background: #4caf50;
-  color: #232526;
+  background: #f20404;
+  color: #fafbfc;
 }
 
 .all-gyms-grid {
@@ -149,6 +153,7 @@
 }
 
 .gym-input-row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -208,4 +213,30 @@
   font-size: 0.95em;
   color: #bdbdbd;
   margin-bottom: 8px;
+}
+
+.hours-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 8px auto;
+  max-width: 320px;
+}
+
+.hour-btn {
+  padding: 12px 10px;
+  background: #232526;
+  color: #fff;
+  border: 1px solid #ef0e0e;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: bold;
+  transition: background 0.2s, color 0.2s;
+}
+
+.hour-btn.selected,
+.hour-btn:hover {
+  background: #f40404;
+  color: #fcfdfe;
 }

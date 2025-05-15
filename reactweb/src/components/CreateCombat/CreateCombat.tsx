@@ -4,16 +4,18 @@ import "./CreateCombat.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { getGyms } from "../../services/gymService";
 import { Gym } from "../../models/Gym";
+import { registerCombat } from "../../services/combatService";
 
 const CreateCombat: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const { creator, opponent } = location.state || {}; // Datos pasados desde SearchResults
+  const { creator, opponent, creatorName, opponentName } = location.state || {}; // Datos pasados desde SearchResults
 
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [gym, setGym] = useState("");
+  const [gymName, setGymName] = useState("");
   const [level, setLevel] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [gyms, setGyms] = useState<Gym[]>([]);
@@ -33,20 +35,28 @@ const CreateCombat: React.FC = () => {
   }, []);
 
   const filteredGyms = gyms.filter((g) =>
-    g.name.toLowerCase().includes(gym.toLowerCase())
+    g.name.toLowerCase().includes(gymName.toLowerCase())
   );
 
-  const handleCreateCombat = () => {
-    if (!date || !time || !gym || !level) {
+  const handleCreateCombat = async () => {
+    if (!date || !time || !gymName || !level) {
       alert(t("fillAllFields"));
       return;
     }
 
-    // Aquí puedes enviar los datos al backend si es necesario
-    console.log("Combate creado:", { creator, opponent, date, time, gym });
-
-    alert(t("combatCreated"));
-    navigate("/"); // Redirige a la página principal o a otra página
+    try {
+      await registerCombat({
+        boxers: [creator, opponent],
+        date: new Date(date),
+        time,
+        gym,
+        level,
+      });
+      alert(t("combatCreated"));
+      navigate("/");
+    } catch (error) {
+      alert("Error al crear el combate");
+    }
   };
 
   return (
@@ -54,10 +64,10 @@ const CreateCombat: React.FC = () => {
       <h2>{t("createCombatTitle")}</h2>
       <div className="combat-info">
         <p className="combat-info-creator">
-          <strong>{t("creatorLabel")}:</strong> {creator}
+          <strong>{t("creatorLabel")}:</strong> {creatorName}
         </p>
         <p className="combat-info-opponent">
-          <strong>{t("opponentLabel")}:</strong> {opponent}
+          <strong>{t("opponentLabel")}:</strong> {opponentName}
         </p>
       </div>
       <form className="combat-form" onSubmit={(e) => e.preventDefault()}>
@@ -79,11 +89,31 @@ const CreateCombat: React.FC = () => {
         </label>
         <label>
           {t("timeLabel")}
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-          />
+          <div className="hours-grid">
+            {[
+              "09:00",
+              "10:00",
+              "11:00",
+              "12:00",
+              "13:00",
+              "14:00",
+              "15:00",
+              "16:00",
+              "17:00",
+              "18:00",
+              "19:00",
+              "20:00",
+            ].map((h) => (
+              <button
+                type="button"
+                key={h}
+                className={`hour-btn${time === h ? " selected" : ""}`}
+                onClick={() => setTime(h)}
+              >
+                {h}
+              </button>
+            ))}
+          </div>
         </label>
         <label>
           {t("gymLabel")}
@@ -91,9 +121,9 @@ const CreateCombat: React.FC = () => {
             <input
               type="text"
               placeholder={t("gymPlaceholder")}
-              value={gym}
+              value={gymName}
               onChange={(e) => {
-                setGym(e.target.value);
+                setGymName(e.target.value);
                 setShowSuggestions(true);
               }}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
@@ -107,32 +137,38 @@ const CreateCombat: React.FC = () => {
             >
               {showAllGyms ? t("hideGyms") : t("seeGyms")}
             </button>
+            {showSuggestions && gymName && filteredGyms.length > 0 && (
+              <ul className="gym-suggestions">
+                {filteredGyms.map((g) => (
+                  <li
+                    key={g.id || g.name}
+                    onMouseDown={() => {
+                      if (g.id) {
+                        setGym(g.id);
+                        setGymName(g.name);
+                        setShowSuggestions(false);
+                      }
+                    }}
+                  >
+                    {g.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          {showSuggestions && gym && filteredGyms.length > 0 && (
-            <ul className="gym-suggestions">
-              {filteredGyms.map((g) => (
-                <li
-                  key={g.id}
-                  onMouseDown={() => {
-                    setGym(g.name);
-                    setShowSuggestions(false);
-                  }}
-                >
-                  {g.name}
-                </li>
-              ))}
-            </ul>
-          )}
         </label>
         {showAllGyms && (
           <div className="all-gyms-grid">
             {gyms.map((g) => (
               <div
-                key={g.id}
+                key={g.id || g.name}
                 className="gym-grid-item"
                 onMouseDown={() => {
-                  setGym(g.name);
-                  setShowAllGyms(false);
+                  if (g.id) {
+                    setGym(g.id);
+                    setGymName(g.name);
+                    setShowAllGyms(false);
+                  }
                 }}
               >
                 <img src="/logo.png" alt={g.name} className="gym-img" />
@@ -148,6 +184,7 @@ const CreateCombat: React.FC = () => {
           className="combat-form-confirm"
           type="submit"
           onClick={handleCreateCombat}
+          disabled={!date || !time || !gym || !level}
         >
           {t("createCombatButton")}
         </button>

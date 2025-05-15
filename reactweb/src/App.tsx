@@ -109,6 +109,11 @@ function App() {
     };
   }, [searchParams, isAccessibilityPanelOpen]);
 
+  const handleLogin = (user: { id: string; name: string }) => {
+    setUser(user);
+    localStorage.setItem("userData", JSON.stringify(user));
+  };
+
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("userData");
@@ -123,12 +128,7 @@ function App() {
         <Header user={user} onLogout={handleLogout} />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route
-            path="/login"
-            element={
-              <Login onLogin={(name) => setUser({ id: "temp-id", name })} />
-            }
-          />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile user={user} />} />
           <Route path="/gym-registration" element={<GymRegistration />} />

@@ -14,11 +14,14 @@ const SearchResults = () => {
   const [searchResults, setSearchResults] = useState(
     location.state?.results || []
   );
-  const [currentUser, setCurrentUser] = useState<{ name: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("currentUser");
+    const storedUser = localStorage.getItem("userData"); // <-- Cambia aquí
     console.log("Stored user1:", storedUser);
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser));
@@ -110,8 +113,10 @@ const SearchResults = () => {
                   onClick={() =>
                     navigate("/create-combat", {
                       state: {
-                        creator: currentUser?.name,
-                        opponent: user.name,
+                        creator: currentUser?.id,
+                        creatorName: currentUser?.name,
+                        opponent: user.id,
+                        opponentName: user.name,
                       },
                     })
                   }
