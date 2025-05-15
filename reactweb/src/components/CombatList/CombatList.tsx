@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { getCombats } from '../../services/combatService';
-import { Combat } from '../../models/Combat';
-import './CombatList.css';
+import React, { useEffect, useState } from "react";
+import { getCombats } from "../../services/combatService";
+import { Combat } from "../../models/Combat";
+import "./CombatList.css";
 
 const CombatList: React.FC = () => {
   const [combats, setCombats] = useState<Combat[]>([]);
@@ -15,7 +15,7 @@ const CombatList: React.FC = () => {
         setCombats(combats);
         setTotalPages(totalPages);
       } catch (error) {
-        console.error('Error al obtener los combates:', error);
+        console.error("Error al obtener los combates:", error);
       }
     };
     fetchCombats();
@@ -27,18 +27,30 @@ const CombatList: React.FC = () => {
       <ul>
         {combats.map((combat) => (
           <li key={combat.id}>
-            <strong>Fecha:</strong> {combat.date} <br />
+            <strong>Fecha:</strong>{" "}
+            {combat.date instanceof Date
+              ? combat.date.toLocaleDateString()
+              : combat.date}{" "}
+            <br />
             <strong>Gimnasio:</strong> {combat.gym} <br />
-            <strong>Boxeadores:</strong> {combat.boxers.join(', ')}
+            <strong>Boxeadores:</strong> {combat.boxers.join(", ")}
           </li>
         ))}
       </ul>
       <div className="pagination">
-        <button disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((prev) => prev - 1)}
+        >
           Anterior
         </button>
-        <span>Página {currentPage} de {totalPages}</span>
-        <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+        <span>
+          Página {currentPage} de {totalPages}
+        </span>
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+        >
           Siguiente
         </button>
       </div>

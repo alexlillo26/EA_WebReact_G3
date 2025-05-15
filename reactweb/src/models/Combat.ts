@@ -1,6 +1,8 @@
 export interface Combat {
-    id?: string; // Opcional, generado por el backend
-    date: string; // Fecha del combate
-    gym: string; // ID del gimnasio
-    boxers: string[]; // IDs de los boxeadores
+    id?: string; 
+    date: Date; 
+    time: string;
+    level: string;
+    gym: string; 
+    boxers: string[]; 
   }

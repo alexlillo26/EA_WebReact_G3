@@ -19,14 +19,13 @@ const GymProfile: React.FC = () => {
   useEffect(() => {
     const loadGymData = async () => {
       try {
-        const userData = localStorage.getItem('userData');
+        const userData = localStorage.getItem("userData");
         if (!userData) {
-          throw new Error('No user data found');
+          throw new Error("No user data found");
         }
 
-        const { id } = JSON.parse(userData);
         const data = await getCurrentGym();
-        console.log('Gym data loaded:', data); // Debug log
+        console.log("Gym data loaded:", data); // Debug log
         setGymData({
           name: data.name || "",
           email: data.email || "",
@@ -35,7 +34,7 @@ const GymProfile: React.FC = () => {
           price: data.price?.toString() || "",
         });
       } catch (err) {
-        console.error('Error loading gym data:', err);
+        console.error("Error loading gym data:", err);
         setError(t("serverError"));
       } finally {
         setLoading(false);
@@ -47,29 +46,29 @@ const GymProfile: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setGymData(prev => ({
+    setGymData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const userData = localStorage.getItem('userData');
+      const userData = localStorage.getItem("userData");
       if (!userData) {
-        throw new Error('No user data found');
+        throw new Error("No user data found");
       }
 
       const { id } = JSON.parse(userData);
       const updatedGymData: Partial<Gym> = {
         ...gymData,
-        price: Number(gymData.price)
+        price: Number(gymData.price),
       };
       await updateGymProfile(id, updatedGymData);
       alert(t("saveSuccess"));
     } catch (err) {
-      console.error('Error updating gym data:', err);
+      console.error("Error updating gym data:", err);
       alert(t("saveError"));
     }
   };

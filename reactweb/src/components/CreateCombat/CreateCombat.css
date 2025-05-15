@@ -1,6 +1,7 @@
 .create-combat-container {
-  max-width: 600px;
-  margin: 50px auto;
+  max-width: 80vw;
+  width: 80vw;
+  margin: 80px auto 20px auto;
   padding: 20px;
   background-color: #333;
   color: white;
@@ -14,7 +15,9 @@
 }
 
 .combat-info p {
-  margin: 10px 0;
+  margin-bottom: 2px;
+  margin-left: 170px;
+  margin-right: 170px;
 }
 
 .combat-form {
@@ -27,16 +30,17 @@
   display: flex;
   flex-direction: column;
   font-size: 14px;
+  font-weight: bold;
 }
 
-.combat-form input {
+.combat-form input, .combat-form select {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-top: 5px;
 }
 
-.combat-form button {
+.combat-form-confirm {
   padding: 10px 20px;
   background-color: #4caf50;
   color: white;
@@ -44,8 +48,164 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+  width: 50%;
+  margin: 0 auto;
 }
 
-.combat-form button:hover {
+.combat-form-confirm:hover {
   background-color: #45a049;
+}
+
+.combat-form-cancel {
+  padding: 10px 20px;
+  background-color: #f70404;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.combat-form-cancel:hover {
+  background-color: #eb0d0d;
+}
+
+.combat-info{
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.combat-info-creator,
+.combat-info-opponent {
+  display: inline-block;
+  border: 2px solid red;
+  border-radius: 6px;
+  padding: 4px 12px;
+  margin: 6px 0;
+  background: #222;
+}
+
+.gym-suggestions {
+  position: absolute;
+  background: #232526;
+  border: 1px solid #4caf50;
+  border-radius: 0 0 8px 8px;
+  width: 90%;
+  max-height: 160px;
+  overflow-y: auto;
+  z-index: 10;
+  margin-top: 2px;
+  list-style: none;
+  padding: 0;
+}
+
+.gym-suggestions li {
+  padding: 10px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.gym-suggestions li:hover {
+  background: #4caf50;
+  color: #232526;
+}
+
+.all-gyms-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  background: #232526;
+  border: none;
+  border-radius: 0 0 8px 8px;
+  width: 78vw;
+  max-height: none;
+  overflow-y: visible;
+  margin: 8px 0 0 0;
+  padding: 12px;
+  z-index: 10;
+}
+
+.gym-grid-item {
+  background: #333;
+  color: #fff;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; 
+  min-height: 170px;
+  height: 100%; 
+}
+
+.gym-grid-item:hover {
+  color: #ef0505;
+  border: 1.5px solid #f40606;
+}
+
+.gym-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gym-input-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 10px;
+  height: 40px;
+  box-sizing: border-box;
+}
+
+.see-gyms-btn {
+  padding: 0 14px;
+  font-size: 0.95em;
+  background: #ed0808;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.see-gyms-btn:hover {
+  background: #fb0303;
+}
+
+.gym-img {
+  width: 100%;        
+  height: 120px;       
+  object-fit: cover;
+  border-radius: 6px 6px 0 0; 
+  margin-bottom: 0; 
+  background: #222;
+  display: block;
+  border:none;
+}
+
+.gym-name, .gym-location {
+  background: #333;
+  border: none;
+  border-radius: 0;
+}
+
+.gym-name {
+  font-weight: bold;
+  margin-bottom: 2px;
+  font-size: 1.1em;
+}
+
+.gym-location {
+  font-size: 0.95em;
+  color: #bdbdbd;
+  margin-bottom: 8px;
 }
