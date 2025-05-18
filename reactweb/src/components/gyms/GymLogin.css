@@ -1,0 +1,107 @@
+.gym-login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.gym-login-box {
+  background: rgba(20,20,20,0.97);
+  border-radius: 18px;
+  box-shadow: 0 0 24px 4px #d62828, 0 0 0 2px #d62828;
+  padding: 32px 24px 18px 24px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+}
+
+.gym-login-box h2 {
+  color: #d62828;
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 28px;
+  letter-spacing: 1px;
+}
+
+.gym-login-box input {
+  width: 100%;
+  height: 44px;
+  background: #111;
+  color: #fff;
+  border: 2px solid #222;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  padding: 0 14px;
+  transition: border-color 0.3s;
+}
+
+.gym-login-box input:focus {
+  border-color: #d62828;
+  outline: none;
+}
+
+.gym-login-box .login-btn {
+  width: 100%;
+  background: #d62828;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gym-login-box .login-btn:hover {
+  background: #a31f1f;
+}
+
+.gym-login-box .google-btn {
+  width: 100%;
+  background: #2a1cf7;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  margin-bottom: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: background 0.2s;
+}
+
+.gym-login-box .google-btn:hover {
+  background: #1a0cc7;
+}
+
+.gym-login-box .bottom-tip {
+  color: #fff;
+  font-size: 1rem;
+  margin-top: 12px;
+}
+
+.gym-login-box .bottom-tip a {
+  color: #d62828;
+  font-weight: bold;
+  margin-left: 4px;
+  text-decoration: none;
+}
+
+.gym-login-box .bottom-tip a:hover {
+  text-decoration: underline;
+}
+
+.gym-login-box .error-message {
+  color: #ff4d4d;
+  margin-top: 10px;
+  font-size: 15px;
+} 

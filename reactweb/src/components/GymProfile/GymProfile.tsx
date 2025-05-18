@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getCurrentGym, updateGymProfile } from "../../services/gymService";
 import { useLanguage } from "../../context/LanguageContext";
 import { Gym } from "../../models/Gym";
-import styled from "styled-components";
+import "./gym-profile.css";
 
 const GymProfile: React.FC = () => {
   const { t } = useLanguage();
@@ -23,9 +23,7 @@ const GymProfile: React.FC = () => {
         if (!userData) {
           throw new Error("No user data found");
         }
-
         const data = await getCurrentGym();
-        console.log("Gym data loaded:", data); // Debug log
         setGymData({
           name: data.name || "",
           email: data.email || "",
@@ -34,13 +32,11 @@ const GymProfile: React.FC = () => {
           price: data.price?.toString() || "",
         });
       } catch (err) {
-        console.error("Error loading gym data:", err);
         setError(t("serverError"));
       } finally {
         setLoading(false);
       }
     };
-
     loadGymData();
   }, [t]);
 
@@ -59,7 +55,6 @@ const GymProfile: React.FC = () => {
       if (!userData) {
         throw new Error("No user data found");
       }
-
       const { id } = JSON.parse(userData);
       const updatedGymData: Partial<Gym> = {
         ...gymData,
@@ -68,7 +63,6 @@ const GymProfile: React.FC = () => {
       await updateGymProfile(id, updatedGymData);
       alert(t("saveSuccess"));
     } catch (err) {
-      console.error("Error updating gym data:", err);
       alert(t("saveError"));
     }
   };
@@ -76,109 +70,59 @@ const GymProfile: React.FC = () => {
   if (loading) return <div>{t("loadingCombats")}</div>;
 
   return (
-    <StyledProfile>
-      <h2>{t("gymProfile")}</h2>
+    <div className="register-container">
       <form onSubmit={handleSubmit}>
-        <div className="input-group">
-          <label>{t("nameLabel")}</label>
-          <input
-            type="text"
-            name="name"
-            value={gymData.name}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="input-group">
-          <label>{t("emailLabel")}</label>
-          <input
-            type="email"
-            name="email"
-            value={gymData.email}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="input-group">
-          <label>{t("phoneLabel")}</label>
-          <input
-            type="tel"
-            name="phone"
-            value={gymData.phone}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="input-group">
-          <label>{t("placePlaceholder")}</label>
-          <input
-            type="text"
-            name="place"
-            value={gymData.place}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="input-group">
-          <label>{t("pricePlaceholder")}</label>
-          <input
-            type="text"
-            name="price"
-            value={gymData.price}
-            onChange={handleChange}
-          />
-        </div>
+        <h2>{t("gymProfile")}</h2>
+        {error && <p style={{ color: "#ff4d4d", marginBottom: "15px" }}>{error}</p>}
+        <label className="input-label">{t("nameLabel")}</label>
+        <input
+          type="text"
+          name="name"
+          placeholder={t("nameLabel")}
+          value={gymData.name}
+          onChange={handleChange}
+          required
+        />
+        <label className="input-label">{t("emailLabel")}</label>
+        <input
+          type="email"
+          name="email"
+          placeholder={t("emailLabel")}
+          value={gymData.email}
+          onChange={handleChange}
+          required
+        />
+        <label className="input-label">{t("phoneLabel")}</label>
+        <input
+          type="tel"
+          name="phone"
+          placeholder={t("phoneLabel")}
+          value={gymData.phone}
+          onChange={handleChange}
+          required
+        />
+        <label className="input-label">{t("placePlaceholder")}</label>
+        <input
+          type="text"
+          name="place"
+          placeholder={t("placePlaceholder")}
+          value={gymData.place}
+          onChange={handleChange}
+          required
+        />
+        <label className="input-label">{t("pricePlaceholder")}</label>
+        <input
+          type="text"
+          name="price"
+          placeholder={t("pricePlaceholder")}
+          value={gymData.price}
+          onChange={handleChange}
+          required
+        />
         <button type="submit">{t("saveButton")}</button>
       </form>
-      {error && <div className="error-message">{error}</div>}
-    </StyledProfile>
+    </div>
   );
 };
-
-const StyledProfile = styled.div`
-  max-width: 600px;
-  margin: 80px auto;
-  padding: 20px;
-  background-color: #2a2a2a;
-  border-radius: 8px;
-  color: white;
-
-  h2 {
-    color: #d62828;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .input-group {
-    margin-bottom: 15px;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 5px;
-    color: #d62828;
-  }
-
-  input {
-    width: 100%;
-    padding: 8px;
-    background-color: #333;
-    border: 1px solid #555;
-    border-radius: 4px;
-    color: white;
-  }
-
-  button {
-    width: 100%;
-    padding: 10px;
-    background-color: #d62828;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 20px;
-  }
-
-  .error-message {
-    color: #ff4444;
-    margin-top: 10px;
-  }
-`;
 
 export default GymProfile;

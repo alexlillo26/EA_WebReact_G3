@@ -48,3 +48,26 @@
   background-color: #666;
   cursor: not-allowed;
 }
+
+.combat-detail-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 7px;
+  gap: 10px;
+}
+
+.combat-detail-label {
+  min-width: 110px;
+  color: #d62828;
+  font-weight: 700;
+  font-size: 1.08em;
+  letter-spacing: 0.5px;
+}
+
+.combat-detail-value {
+  color: #fff;
+  font-weight: 400;
+  font-size: 1.08em;
+  word-break: break-word;
+}

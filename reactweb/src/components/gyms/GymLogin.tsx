@@ -38,7 +38,7 @@ const GymLogin: React.FC = () => {
           isGym: true,
         }));
         alert(t("loginSuccess"));
-        window.location.href = "/";
+        window.location.href = "/gym-home";
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || t("loginError"));

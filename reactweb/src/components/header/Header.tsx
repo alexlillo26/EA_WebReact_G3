@@ -12,13 +12,16 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
   const { t } = useLanguage();
   return (
     <header className="header">
-      <Link to="/" className="logo">
+      <Link to={user?.isGym ? "/gym-home" : "/"} className="logo">
         Face2Face
       </Link>
       <nav className="nav">
         {user?.isGym ? (
           // Gym user navigation
           <>
+            <Link to="/events" className="nav-link">
+              {t("events")}
+            </Link>
             <Link to="/gym-combats" className="nav-link">
               {t("gymCombats")}
             </Link>

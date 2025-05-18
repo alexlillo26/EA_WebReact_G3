@@ -45,11 +45,28 @@ const GymCombats: React.FC = () => {
         <div className="combats-list">
           {combats.map((combat) => (
             <div key={combat.id} className="combat-card">
-              <div className="combat-info">
-                <span className="date">{new Date(combat.date).toLocaleDateString()}</span>
-                <div className="boxers">
-                  {combat.boxers.map(boxer => boxer).join(' vs ')}
-                </div>
+              <div className="combat-detail-row">
+                <span className="combat-detail-label">Fecha:</span>
+                <span className="combat-detail-value">{new Date(combat.date).toLocaleString()}</span>
+              </div>
+              <div className="combat-detail-row">
+                <span className="combat-detail-label">Boxeadores:</span>
+                <span className="combat-detail-value">{combat.boxers && combat.boxers.length > 0 ?
+                  combat.boxers.map((boxer: any) =>
+                    typeof boxer === 'string' ? boxer : (boxer.name || boxer._id || '-')
+                  ).join(' vs ') : '-'}</span>
+              </div>
+              <div className="combat-detail-row">
+                <span className="combat-detail-label">Gimnasio:</span>
+                <span className="combat-detail-value">{combat.gym && typeof combat.gym === 'object' ? (combat.gym.name || combat.gym._id) : combat.gym}</span>
+              </div>
+              <div className="combat-detail-row">
+                <span className="combat-detail-label">Nivel:</span>
+                <span className="combat-detail-value">{combat.level || '-'}</span>
+              </div>
+              <div className="combat-detail-row">
+                <span className="combat-detail-label">Visible:</span>
+                <span className="combat-detail-value">{combat.isHidden ? 'No' : 'Sí'}</span>
               </div>
             </div>
           ))}

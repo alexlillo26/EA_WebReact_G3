@@ -20,6 +20,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import CreateCombat from "./components/CreateCombat/CreateCombat";
 import GymCombats from "./components/GymCombats/GymCombats";
 import GymProfile from "./components/GymProfile/GymProfile";
+import HomeGym from "./components/home/HomeGym";
 
 interface User {
   id: string;
@@ -144,6 +145,7 @@ function App() {
           <Route path="/create-combat" element={<CreateCombat />} />
           <Route path="/gym-combats" element={<GymCombats />} />
           <Route path="/gym-profile" element={<GymProfile />} />
+          <Route path="/gym-home" element={<HomeGym />} />
         </Routes>
         <div className="accessibility-button">
           <button onClick={() => setIsAccessibilityPanelOpen(true)}>

@@ -27,13 +27,33 @@ const CombatList: React.FC = () => {
       <ul>
         {combats.map((combat) => (
           <li key={combat.id}>
-            <strong>Fecha:</strong>{" "}
-            {combat.date instanceof Date
-              ? combat.date.toLocaleDateString()
-              : combat.date}{" "}
-            <br />
-            <strong>Gimnasio:</strong> {combat.gym} <br />
-            <strong>Boxeadores:</strong> {combat.boxers.join(", ")}
+            <div className="combat-detail-row">
+              <span className="combat-detail-label">Fecha:</span>
+              <span className="combat-detail-value">{combat.date instanceof Date ? combat.date.toLocaleString() : combat.date}</span>
+            </div>
+            <div className="combat-detail-row">
+              <span className="combat-detail-label">Hora:</span>
+              <span className="combat-detail-value">{combat.time || '-'}</span>
+            </div>
+            <div className="combat-detail-row">
+              <span className="combat-detail-label">Boxeadores:</span>
+              <span className="combat-detail-value">{combat.boxers && combat.boxers.length > 0 ?
+                combat.boxers.map((boxer: any) =>
+                  typeof boxer === 'string' ? boxer : (boxer.name || boxer._id || '-')
+                ).join(' vs ') : '-'}</span>
+            </div>
+            <div className="combat-detail-row">
+              <span className="combat-detail-label">Gimnasio:</span>
+              <span className="combat-detail-value">{typeof combat.gym === 'object' && combat.gym !== null ? (combat.gym.name || combat.gym._id) : combat.gym}</span>
+            </div>
+            <div className="combat-detail-row">
+              <span className="combat-detail-label">Nivel:</span>
+              <span className="combat-detail-value">{combat.level || '-'}</span>
+            </div>
+            <div className="combat-detail-row">
+              <span className="combat-detail-label">Visible:</span>
+              <span className="combat-detail-value">{combat.isHidden ? 'No' : 'Sí'}</span>
+            </div>
           </li>
         ))}
       </ul>
