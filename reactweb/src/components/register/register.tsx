@@ -98,7 +98,7 @@ const Register: React.FC = () => {
         alert(t("googleRegisterSuccess").replace("{name}", userData.name));
       } else {
         window.location.href =
-          "http://localhost:9000/api/auth/google?origin=webreact";
+          "http://ea3-api.upc.edu/api/auth/google?origin=webreact";
       }
     } catch (error) {
       console.error(t("googleRegisterError"), error);

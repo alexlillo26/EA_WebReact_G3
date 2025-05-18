@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken, refreshAccessToken, logout } from './authService';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:9000/api',
+  baseURL: 'http://ea3-api.upc.edu/api',
 });
 
 let isRefreshing = false;

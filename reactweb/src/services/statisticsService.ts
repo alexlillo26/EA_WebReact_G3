@@ -1,6 +1,6 @@
 import axiosInstance from './axiosInstance';
 
-const API_BASE_URL = 'http://localhost:9000/api';
+const API_BASE_URL = 'http://ea3-api.upc.edu/api';
 
 export interface Combat {
     id: string;
