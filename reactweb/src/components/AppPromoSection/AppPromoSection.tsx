@@ -60,9 +60,12 @@ const AppPromoSectionGym: React.FC = () => {
 
         {/* Contenido promocional */}
         <div className="app-promo-content">
-          <h2 className="app-promo-title">¡Gestiona tu gimnasio con nuestra App!</h2>
+          <h2 className="app-promo-title">
+            ¡Gestiona tu gimnasio con nuestra App!
+          </h2>
           <p className="app-promo-testimonial">
-            ★★★★★ 'La mejor app para gimnasios. Ahora puedo gestionar inscripciones y eventos fácilmente.'
+            ★★★★★ 'La mejor app para gimnasios. Ahora puedo gestionar
+            inscripciones y eventos fácilmente.'
           </p>
           <ul className="app-benefits">
             <li>📢 Promociona tus eventos y actividades.</li>
@@ -94,4 +97,4 @@ const AppPromoSectionGym: React.FC = () => {
   );
 };
 
-export default AppPromoSectionGym;
+export { AppPromoSectionGym, AppPromoSection };

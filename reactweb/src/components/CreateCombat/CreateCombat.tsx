@@ -39,7 +39,7 @@ const CreateCombat: React.FC = () => {
   );
 
   const handleCreateCombat = async () => {
-    if (!date || !time || !gymName || !level) {
+    if (!date || !time || !gym || !level) {
       alert(t("fillAllFields"));
       return;
     }
@@ -124,12 +124,18 @@ const CreateCombat: React.FC = () => {
               value={gymName}
               onChange={(e) => {
                 setGymName(e.target.value);
+                setGym("");
                 setShowSuggestions(true);
               }}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
               onFocus={() => setShowSuggestions(true)}
               autoComplete="off"
             />
+            {gymName && !gym && (
+              <div style={{ color: "red", fontSize: "0.9em" }}>
+                {"Selecciona un gimnasio de la lista"}
+              </div>
+            )}
             <button
               type="button"
               className="see-gyms-btn"
@@ -137,35 +143,40 @@ const CreateCombat: React.FC = () => {
             >
               {showAllGyms ? t("hideGyms") : t("seeGyms")}
             </button>
-            {showSuggestions && gymName && filteredGyms.length > 0 && (
-              <ul className="gym-suggestions">
-                {filteredGyms.map((g) => (
-                  <li
-                    key={g.id || g.name}
-                    onMouseDown={() => {
-                      if (g.id) {
-                        setGym(g.id);
-                        setGymName(g.name);
-                        setShowSuggestions(false);
-                      }
-                    }}
-                  >
-                    {g.name}
-                  </li>
-                ))}
-              </ul>
-            )}
+            {showSuggestions &&
+              !showAllGyms &&
+              gymName &&
+              filteredGyms.length > 0 && (
+                <ul className="gym-suggestions">
+                  {filteredGyms.map((g) => (
+                    <li
+                      key={g._id || g.name}
+                      onClick={() => {
+                        console.log("Gym clicked:", g);
+                        if (g._id) {
+                          setGym(g._id);
+                          setGymName(g.name);
+                          setShowSuggestions(false);
+                        }
+                      }}
+                    >
+                      {g.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
           </div>
         </label>
         {showAllGyms && (
           <div className="all-gyms-grid">
             {gyms.map((g) => (
               <div
-                key={g.id || g.name}
+                key={g._id || g.name}
                 className="gym-grid-item"
-                onMouseDown={() => {
-                  if (g.id) {
-                    setGym(g.id);
+                onClick={() => {
+                  console.log("Gym clicked:", g);
+                  if (g._id) {
+                    setGym(g._id);
                     setGymName(g.name);
                     setShowAllGyms(false);
                   }
@@ -184,7 +195,6 @@ const CreateCombat: React.FC = () => {
           className="combat-form-confirm"
           type="submit"
           onClick={handleCreateCombat}
-          disabled={!date || !time || !gym || !level}
         >
           {t("createCombatButton")}
         </button>

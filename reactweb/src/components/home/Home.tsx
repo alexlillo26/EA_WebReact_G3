@@ -3,11 +3,11 @@ import { getGyms } from "../../services/gymService";
 import { Gym } from "../../models/Gym";
 import { searchUsers } from "../../services/userService";
 import { getToken } from "../../services/authService";
-import StepsSection from "../StepsSection/SteptsSection";
+import { StepsSection } from "../StepsSection/SteptsSection";
 import AboutSection from "../AboutSection/AboutSection"; // Importa el nuevo componente
 import GymMap from "../Geolocalization/GymMap"; // Importa el componente del mapa
 import "./Home.css";
-import AppPromoSection from "../AppPromoSection/AppPromoSection"; // Importa el nuevo componente
+import { AppPromoSection } from "../AppPromoSection/AppPromoSection"; // Importa el nuevo componente
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext"; // Importa el contexto de idioma
 

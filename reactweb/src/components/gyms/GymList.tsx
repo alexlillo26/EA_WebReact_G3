@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { getGyms } from '../../services/gymService';
-import { Gym } from '../../models/Gym';
-import './GymList.css';
+import React, { useEffect, useState } from "react";
+import { getGyms } from "../../services/gymService";
+import { Gym } from "../../models/Gym";
+import "./GymList.css";
 
 const GymList: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);
@@ -15,7 +15,7 @@ const GymList: React.FC = () => {
         setGyms(gyms);
         setTotalPages(totalPages);
       } catch (error) {
-        console.error('Error al obtener los gimnasios:', error);
+        console.error("Error al obtener los gimnasios:", error);
       }
     };
     fetchGyms();
@@ -26,17 +26,25 @@ const GymList: React.FC = () => {
       <h2>Lista de Gimnasios</h2>
       <ul>
         {gyms.map((gym) => (
-          <li key={gym.id}>
+          <li key={gym._id}>
             <strong>{gym.name}</strong> - {gym.place} (${gym.price})
           </li>
         ))}
       </ul>
       <div className="pagination">
-        <button disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((prev) => prev - 1)}
+        >
           Anterior
         </button>
-        <span>Página {currentPage} de {totalPages}</span>
-        <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+        <span>
+          Página {currentPage} de {totalPages}
+        </span>
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+        >
           Siguiente
         </button>
       </div>

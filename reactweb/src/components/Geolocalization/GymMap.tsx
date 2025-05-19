@@ -47,7 +47,7 @@ const GymMap: React.FC<GymMapProps> = ({ gyms }) => {
         gyms.map(async (gym) => {
           const position = await geocodeAddress(gym.place);
           if (position) {
-            return { id: gym.id, name: gym.name, place: gym.place, position };
+            return { id: gym._id, name: gym.name, place: gym.place, position };
           }
           return null;
         })
