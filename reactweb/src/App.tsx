@@ -125,7 +125,7 @@ function App() {
           <Route
             path="/login"
             element={
-              <Login onLogin={(name) => setUser({ id: "temp-id", name })} />
+              <Login onLogin={(name) => setUser(name)} />
             }
           />
           <Route path="/register" element={<Register />} />

@@ -132,6 +132,8 @@ export const translations = {
     adhdModeLabel: "ADHD Mode",
     on: "ON",
     off: "OFF",
+    closeChat: "Close Chat", // Agregar esta clave
+
   },
   es: {
     appName: "Face2Face",
@@ -266,6 +268,8 @@ export const translations = {
     adhdModeLabel: "Modo para TDAH",
     on: "ON",
     off: "OFF",
+    closeChat: "Cerrar Chat", // Agregar esta clave
+
   },
   ca: {
     appName: "Face2Face",
@@ -400,6 +404,8 @@ export const translations = {
     adhdModeLabel: "Mode per a TDAH",
     on: "ON",
     off: "OFF",
+    closeChat: "Tanca el Xat", // Agregar esta clave
+
   },
   eu: {
     appName: "Face2Face",
@@ -534,5 +540,7 @@ registrationError: "Errorea erregistratzean, saiatu berriro.",
     adhdModeLabel: "TDAHrako modua",
     on: "ON",
     off: "OFF",
+    closeChat: "Itxi Txata", // Agregar esta clave
+
   },
 };

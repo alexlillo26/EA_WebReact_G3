@@ -1,38 +1,34 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login, getToken } from "../../services/authService"; // Added getToken import
+import { login, LoginServiceData } from "../../services/authService"; // Importa LoginServiceData
 import "./login.css";
 import { useLanguage } from "../../context/LanguageContext";
 
-const Login: React.FC<{ onLogin: (name: string) => void }> = ({ onLogin }) => {
+interface LoginProps {
+  onLogin: (userData: { name: string; id: string }) => void; // onLogin espera name e id
+}
+
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
-
-  console.log("Current language:", language);
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
     try {
-      console.log("Attempting login with email:", email);
-      await login(email, password);
-      const token = getToken();
-      console.log("Token after login:", token);
-      if (token) {
-        const decoded = JSON.parse(atob(token.split(".")[1]));
-        console.log("Decoded token payload:", decoded);
-        const userData = { id: decoded.id, name: decoded.name || "Usuario" };
-        onLogin(userData.name); // Update user state
-        localStorage.setItem("userData", JSON.stringify(userData));
-        navigate("/"); // Redirect to home
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setErrorMessage(t("loginError"));
+      // authService.login ahora devuelve {id, name} y ya guardó todo en localStorage
+      const loginData: LoginServiceData = await login(email, password);
+
+      // No es necesario verificar loginData.success si la función login lanza error en caso de fallo
+      onLogin({ name: loginData.name, id: loginData.id });
+      navigate("/");
+    } catch (error: any) {
+      console.error("Error en el handleSubmit de Login:", error.message);
+      setErrorMessage(error.message || t("loginError"));
     }
   };
 

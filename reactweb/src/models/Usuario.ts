@@ -4,7 +4,7 @@ export interface Usuario {
     birthDate: Date;
     email: string;
     phone: string; // Nuevo campo opcional
-    password: string;
+    password?: string;
     weight: string; // Nuevo campo
     city: string; // Nuevo campo
     gender: string;

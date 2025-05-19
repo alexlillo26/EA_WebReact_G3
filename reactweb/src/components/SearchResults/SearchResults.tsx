@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { searchUsers } from "../../services/userService";
 import "./SearchResults.css";
 import { useLanguage } from "../../context/LanguageContext";
+import CombatChat from "../Chat/Chat"; // Importa el componente del chat
 
 const SearchResults = () => {
   const { t } = useLanguage();
@@ -16,6 +17,10 @@ const SearchResults = () => {
     location.state?.results || []
   );
   const [error, setError] = useState("");
+
+  // Estado para manejar el chat
+  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [isChatVisible, setIsChatVisible] = useState(false);
 
   const translateWeight = (weight: string) => {
     switch (weight) {
@@ -54,6 +59,44 @@ const SearchResults = () => {
       setError(t("searchErrorGeneral2"));
       setSearchResults([]);
     }
+  };
+
+   const handleConnect = (userToConnectWith: any) => {
+    console.log("[handleConnect] User to connect with:", userToConnectWith);
+
+    const localUserId = localStorage.getItem("userId");
+
+    if (!localUserId) {
+      console.error("[handleConnect] Error: Current user ID not found in localStorage.");
+      setError("No se pudo iniciar el chat: falta tu ID de usuario."); // Informar al usuario
+      return;
+    }
+
+    if (!userToConnectWith || !userToConnectWith.id) {
+      console.error("[handleConnect] Error: Selected user is invalid or has no ID.", userToConnectWith);
+      setError("No se pudo iniciar el chat: usuario seleccionado inválido."); // Informar al usuario
+      return;
+    }
+
+    const partnerId = userToConnectWith.id;
+
+    // Crear un ID de sala de chat único y consistente para estos dos usuarios
+    // Ordenar los IDs alfabéticamente y unirlos con un guion bajo (o cualquier separador)
+    const generatedCombatId = [localUserId, partnerId].sort().join('_');
+
+    console.log("[handleConnect] Generated Combat ID for chat:", generatedCombatId);
+
+    // Guardar tanto la información del usuario como el ID de combate generado
+    setSelectedUser({
+      ...userToConnectWith, // Mantener la información del usuario contactado
+      chatRoomId: generatedCombatId // Añadir el ID de la sala de chat
+    });
+    setIsChatVisible(true);
+  };
+
+  const handleCloseChat = () => {
+    setIsChatVisible(false);
+    setSelectedUser(null);
   };
 
   return (
@@ -99,13 +142,35 @@ const SearchResults = () => {
                   {t("levelLabel")}: {user.level}
                 </p>
               </div>
-              <button className="contact-button">{t("contactButton")}</button>
+              <button
+                className="contact-button"
+                onClick={() => handleConnect(user)} // Maneja el clic en "Contactar"
+              >
+                {t("contactButton")}
+              </button>
             </div>
           ))
         ) : (
           <p className="no-results">{t("noResultsFound")}</p>
         )}
       </div>
+
+      {/* Renderiza el chat si está visible */}
+      {isChatVisible && selectedUser && (
+        <div className="chat-overlay">
+          <div className="chat-container">
+            <button className="close-chat" onClick={handleCloseChat}>
+              {t("closeChat")}
+            </button>
+            <CombatChat
+              combatId={selectedUser.chatRoomId} // Asegúrate de que `selectedUser.id` no sea undefined
+              userToken={localStorage.getItem("token") || ""}
+              currentUserId={localStorage.getItem("userId") || ""} // Asegúrate de que el ID del usuario esté almacenado
+              currentUsername={localStorage.getItem("username") || ""} // Asegúrate de que el nombre del usuario esté almacenado
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
