@@ -42,9 +42,9 @@ const Login: React.FC<{
   };
 
   const handleGoogleLogin = () => {
-    const webReactOrigin = 'http://ea3-back.upc.edu'; // O window.location.origin si siempre es el mismo
+    const webReactOrigin = 'https://ea3-back.upc.edu'; // O window.location.origin si siempre es el mismo
     window.location.href =
-      `http://ea3-api.upc.edu/api/auth/google?origin=${encodeURIComponent(webReactOrigin)}`;
+      `https://ea3-api.upc.edu/api/auth/google?origin=${encodeURIComponent(webReactOrigin)}`;
   };
 
   return (

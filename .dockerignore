@@ -1,0 +1,35 @@
+# Ignorar dependencias de Node.js (se instalarán dentro de Docker)
+node_modules
+reactweb/node_modules
+
+# Ignorar la carpeta de build de la aplicación React (se genera dentro de Docker)
+reactweb/build
+reactweb/dist 
+
+# Ignorar archivos de Git
+.git
+.gitignore
+
+# Ignorar archivos y carpetas de configuración de editores/IDEs
+.vscode
+.idea
+
+# Ignorar archivos de sistema operativo (macOS)
+.DS_Store
+._*
+
+# Ignorar logs locales
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignorar archivos de entorno locales si no quieres que se incluyan por defecto
+# en el contexto (aunque usualmente .env para el backend SÍ se copia explícitamente)
+# .env
+# .env.local
+# .env.*.local
+
+# Ignorar reportes de cobertura de tests
+coverage
+reactweb/coverage

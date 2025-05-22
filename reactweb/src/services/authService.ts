@@ -1,7 +1,7 @@
 import axios from "axios"; // Asumo que axios está en tus dependencias
 
 // AHORA: Usamos la URL del proxy para tu backend
-const API_BASE_URL = "http://ea3-api.upc.edu/api";
+const API_BASE_URL = "https://ea3-api.upc.edu/api";
 
 interface LoginResponse {
   token: string;
@@ -32,7 +32,7 @@ export const clearTokens = (): void => {
 };
 
 export const login = async (email: string, password: string): Promise<void> => {
-  // La petición irá a: http://ea3-api.upc.edu/api/users/login
+  // La petición irá a: https://ea3-api.upc.edu/api/users/login
   const response = await axios.post<LoginResponse>(`${API_BASE_URL}/users/login`, { email, password });
   const { token, refreshToken } = response.data;
   setTokens(token, refreshToken);
@@ -42,7 +42,7 @@ export const login = async (email: string, password: string): Promise<void> => {
 
 export const handleGoogleOAuth = async (code: string): Promise<{ id: string; name: string }> => {
   console.log("WebReact - Handling Google OAuth with code:", code);
-  // La petición irá a: http://ea3-api.upc.edu/api/auth/google
+  // La petición irá a: https://ea3-api.upc.edu/api/auth/google
   const response = await axios.post<LoginResponse>(`${API_BASE_URL}/auth/google`, { code });
   const { token, refreshToken } = response.data;
   console.log("WebReact - Received token:", token);
@@ -69,7 +69,7 @@ export const refreshAccessToken = async (): Promise<string> => {
   }
 
   try {
-    // La petición irá a: http://ea3-api.upc.edu/api/users/refresh-token (o /auth/refresh-token si cambiaste la ruta en el backend)
+    // La petición irá a: https://ea3-api.upc.edu/api/users/refresh-token (o /auth/refresh-token si cambiaste la ruta en el backend)
     const response = await axios.post<{ token: string }>(`${API_BASE_URL}/users/refresh-token`, {
       refreshToken,
     });

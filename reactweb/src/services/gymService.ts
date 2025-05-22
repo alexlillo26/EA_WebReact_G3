@@ -1,7 +1,7 @@
 import axiosInstance from './axiosInstance';
 import { Gym } from '../models/Gym';
 
-const API_BASE_URL = 'http://ea3-api.upc.edu/api';
+const API_BASE_URL = 'https://ea3-api.upc.edu/api';
 
 interface GetGymsResponse {
   gyms: Gym[];

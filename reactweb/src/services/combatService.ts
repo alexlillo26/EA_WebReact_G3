@@ -1,6 +1,6 @@
 import { Combat } from '../models/Combat';
 
-const API_BASE_URL = 'http://ea3-api.upc.edu/api';
+const API_BASE_URL = 'https://ea3-api.upc.edu/api';
 
 // Obtener todos los combates con paginación
 export const getCombats = async (page: number = 1, pageSize: number = 10): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {

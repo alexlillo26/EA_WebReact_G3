@@ -3,14 +3,14 @@ import { getToken } from './authService';
 import axiosInstance from './axiosInstance';
 
 // Definir las rutas de la API
-const API_BASE_URL = 'http://ea3-api.upc.edu/api'; // Asegúrate de que coincida con el backend
+const API_BASE_URL = 'https://ea3-api.upc.edu/api'; // Asegúrate de que coincida con el backend
 const REGISTER_URL = `${API_BASE_URL}/users/register`; // Cambiar a /users/register
 const GET_USER_BY_ID_URL = (id: string) => `${API_BASE_URL}/users/${id}`; // Cambiar a /users/:id
 
 // Servicio para iniciar sesión
 export const loginUser = async (email: string, password: string): Promise<{ name: string } | null> => {
   try {
-    const response = await fetch('http://ea3-api.upc.edu/api/users/login', {
+    const response = await fetch('https://ea3-api.upc.edu/api/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
