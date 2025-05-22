@@ -1,9 +1,8 @@
 import { Usuario } from '../models/Usuario';
 import { getToken } from './authService';
 import axiosInstance from './axiosInstance';
+import { API_BASE_URL } from './apiConfig';
 
-// Definir las rutas de la API
-const API_BASE_URL = 'https://ea3-api.upc.edu/api'; // Asegúrate de que coincida con el backend
 const REGISTER_URL = `${API_BASE_URL}/users/register`; // Cambiar a /users/register
 const GET_USER_BY_ID_URL = (id: string) => `${API_BASE_URL}/users/${id}`; // Cambiar a /users/:id
 

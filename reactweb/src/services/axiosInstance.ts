@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { getToken, refreshAccessToken, logout } from './authService';
+import { API_BASE_URL } from './apiConfig';
 
 const axiosInstance = axios.create({
-  baseURL: 'ea3-api.upc.edu/api',
+  baseURL: API_BASE_URL,
 });
 
 let isRefreshing = false;
