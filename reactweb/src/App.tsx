@@ -21,6 +21,10 @@ import CreateCombat from "./components/CreateCombat/CreateCombat";
 import GymCombats from "./components/GymCombats/GymCombats";
 import GymProfile from "./components/GymProfile/GymProfile";
 import HomeGym from "./components/home/HomeGym";
+import { socket } from "./socket";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import MyCombats from "./components/MyCombats";
 
 interface User {
   id: string;
@@ -105,8 +109,29 @@ function App() {
       document.removeEventListener("mousedown", handleClickOutside);
     }
 
+    // Socket.IO listeners
+    socket.on("combat_invitation", (combat) => {
+      console.log("[Socket] combat_invitation recibido:", combat);
+      // Aquí podrías actualizar el estado global de invitaciones si usas contexto o redux
+      toast.info("¡Has recibido una nueva invitación de combate!");
+    });
+    socket.on("combat_response", ({ combatId, status }) => {
+      console.log("[Socket] combat_response recibido:", combatId, status);
+      toast.info(`Respuesta a tu combate: ${status}`);
+    });
+
+    // Escucha el evento personalizado del backend para nuevas invitaciones
+    socket.on("newCombatInvitation", (combatData) => {
+      console.log("[Socket] newCombatInvitation recibido:", combatData);
+      toast.info("¡Nueva invitación de combate recibida!");
+      // Aquí podrías actualizar el estado global de invitaciones
+    });
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      socket.off("combat_invitation");
+      socket.off("combat_response");
+      socket.off("newCombatInvitation");
     };
   }, [searchParams, isAccessibilityPanelOpen]);
 
@@ -137,6 +162,7 @@ function App() {
           <Route path="/gym-toggle" element={<GymToggleCard />} />
           <Route path="/gyms" element={<GymList />} />
           <Route path="/combats" element={<CombatList />} />
+          <Route path="/combates" element={<MyCombats />} />
           <Route
             path="/estadisticas"
             element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
@@ -156,6 +182,7 @@ function App() {
           isOpen={isAccessibilityPanelOpen}
           onClose={() => setIsAccessibilityPanelOpen(false)}
         />
+        <ToastContainer position="top-right" autoClose={4000} />
       </div>
     </LanguageProvider>
   );

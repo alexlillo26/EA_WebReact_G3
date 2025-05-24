@@ -4,13 +4,18 @@ import "./CreateCombat.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { getGyms } from "../../services/gymService";
 import { Gym } from "../../models/Gym";
-import { registerCombat } from "../../services/combatService";
+import { createCombat, getCombats } from "../../services/combatService";
+import { socket } from "../../socket";
 
+// --- CAMBIO PRINCIPAL: Lee combatState de localStorage si no viene por location.state
 const CreateCombat: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const { creator, opponent, creatorName, opponentName } = location.state || {}; // Datos pasados desde SearchResults
+  const locationState =
+    location.state ||
+    JSON.parse(localStorage.getItem("combatState") || "{}");
+  const { creator, opponent, creatorName, opponentName } = locationState;
 
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -20,6 +25,7 @@ const CreateCombat: React.FC = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [showAllGyms, setShowAllGyms] = useState(false);
+  const [userCombats, setUserCombats] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchGyms = async () => {
@@ -34,6 +40,21 @@ const CreateCombat: React.FC = () => {
     fetchGyms();
   }, []);
 
+  useEffect(() => {
+    if (!opponent) {
+      console.warn("⚠️ No se recibió un ID de oponente. No se podrá crear combate.");
+    }
+  }, [opponent]);
+
+  useEffect(() => {
+    // Cargar combates del usuario para validar fecha
+    if (creator) {
+      getCombats({ user: creator }).then(res => {
+        setUserCombats(res.combats || []);
+      });
+    }
+  }, [creator]);
+
   const filteredGyms = gyms.filter((g) =>
     g.name.toLowerCase().includes(gymName.toLowerCase())
   );
@@ -43,19 +64,70 @@ const CreateCombat: React.FC = () => {
       alert(t("fillAllFields"));
       return;
     }
+    if (!opponent) {
+      alert("Selecciona un oponente antes de continuar");
+      return;
+    }
+    // Validar fecha futura
+    const selectedDateTime = new Date(`${date}T${time}`);
+    if (selectedDateTime <= new Date()) {
+      alert("No puedes crear un combate en el pasado.");
+      return;
+    }
+    // Validar que no haya otro combate el mismo día
+    const hasCombatSameDay = userCombats.some(
+      (c) => new Date(c.date).toDateString() === new Date(date).toDateString()
+    );
+    if (hasCombatSameDay) {
+      alert("Ya tienes un combate ese día.");
+      return;
+    }
+    // Validar que no exista ya una invitación pendiente con ese oponente
+    const hasPendingWithOpponent = userCombats.some(
+      (c) =>
+        c.status === "pending" &&
+        ((c.creator === creator && c.opponent === opponent) ||
+         (c.creator === opponent && c.opponent === creator))
+    );
+    if (hasPendingWithOpponent) {
+      alert("Ya tienes una invitación pendiente con este usuario.");
+      return;
+    }
+    // Debug logs para verificar los valores
+    console.log("creator", creator); // debe ser un ObjectId como string
+    console.log("opponent", opponent);
+    console.log("gym", gym);         // también
 
     try {
-      await registerCombat({
-        boxers: [creator, opponent],
-        date: new Date(date),
+      const combatData = {
+        creator,
+        opponent,
+        date,
         time,
         gym,
         level,
-      });
+        status: "pending" as "pending",
+      };
+      console.log("Sending combat with:", combatData);
+      const combat = await createCombat(combatData);
+      // Emitir evento de invitación al oponente
+      socket.emit("sendCombatInvitation", { opponentId: opponent, combat });
+      socket.emit("create_combat", combat); // Notifica por socket (legacy)
+      localStorage.removeItem("combatState"); // Limpia el estado temporal tras crear el combate
       alert(t("combatCreated"));
       navigate("/");
     } catch (error) {
+      console.error("Error al crear el combate:", error);
       alert("Error al crear el combate");
+    }
+  };
+
+  const handleGymSelect = (g: Gym) => {
+    console.log("Gym clicked:", g);
+    if (g._id) {
+      setGym(g._id);
+      setGymName(g.name);
+      setShowAllGyms(false);
     }
   };
 
@@ -70,6 +142,12 @@ const CreateCombat: React.FC = () => {
           <strong>{t("opponentLabel")}:</strong> {opponentName}
         </p>
       </div>
+      {/* Advertencia visual si falta oponente */}
+      {!opponent && (
+        <div style={{ color: "red", marginTop: "10px" }}>
+          ⚠️ No se ha definido un oponente. No podrás crear el combate.
+        </div>
+      )}
       <form className="combat-form" onSubmit={(e) => e.preventDefault()}>
         <label>
           {t("levelLabel")}
@@ -173,14 +251,7 @@ const CreateCombat: React.FC = () => {
               <div
                 key={g._id || g.name}
                 className="gym-grid-item"
-                onClick={() => {
-                  console.log("Gym clicked:", g);
-                  if (g._id) {
-                    setGym(g._id);
-                    setGymName(g.name);
-                    setShowAllGyms(false);
-                  }
-                }}
+                onClick={() => handleGymSelect(g)}
               >
                 <img src="/logo.png" alt={g.name} className="gym-img" />
                 <div className="gym-name">{g.name}</div>
@@ -195,6 +266,7 @@ const CreateCombat: React.FC = () => {
           className="combat-form-confirm"
           type="submit"
           onClick={handleCreateCombat}
+          disabled={!opponent}
         >
           {t("createCombatButton")}
         </button>

@@ -132,7 +132,7 @@ const AccessibilityMenu: React.FC<AccessibilityMenuProps> = ({
         </li>
         <li>
           <label>
-            {t("dyslexiaModeLabel")}
+            {t("dyslexiaModeLabel" as any)}
             <div className="checkbox-wrapper-8">
               <input
                 type="checkbox"
@@ -152,7 +152,7 @@ const AccessibilityMenu: React.FC<AccessibilityMenuProps> = ({
         </li>
         <li>
           <label>
-            {t("adhdModeLabel")}
+            {t("adhdModeLabel" as any)}
             <div className="checkbox-wrapper-8">
               <input
                 type="checkbox"

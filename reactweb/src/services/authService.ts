@@ -62,24 +62,21 @@ export const refreshAccessToken = async (): Promise<string> => {
 
   if (!refreshToken) {
     console.warn("WebReact - No refresh token available. User might need to reauthenticate.");
-    clearTokens(); // Limpiar tokens si no hay refresh token
+    clearTokens();
     throw new Error("No refresh token available. Please login again.");
   }
 
   try {
-    // La petición irá a: https://ea3-api.upc.edu/api/users/refresh-token (o /auth/refresh-token si cambiaste la ruta en el backend)
+    // Cambia la ruta si tu backend usa /auth/refresh-token
     const response = await axios.post<{ token: string }>(`${API_BASE_URL}/users/refresh-token`, {
       refreshToken,
     });
     console.log("WebReact - ✅ Token refreshed successfully:", response.data.token);
-    // El backend debería idealmente devolver también un nuevo refreshToken si la política es de rotación de refresh tokens.
-    // Aquí asumimos que el refreshToken antiguo sigue siendo válido o que el backend no lo rota en esta llamada.
-    setTokens(response.data.token, refreshToken); 
+    setTokens(response.data.token, refreshToken);
     return response.data.token;
   } catch (error: any) {
     console.error("WebReact - ❌ Failed to refresh token:", error.response?.data || error.message);
-    clearTokens(); // Limpiar tokens si falla la actualización
-    // Podrías querer redirigir a login aquí también o manejar el error de forma diferente.
+    clearTokens();
     throw new Error(error.response?.data?.message || "Session expired. Please login again.");
   }
 };

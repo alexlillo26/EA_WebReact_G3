@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { searchUsers } from "../../services/userService";
+import { getCombats } from "../../services/combatService";
 import "./SearchResults.css";
 import { useLanguage } from "../../context/LanguageContext";
 
@@ -19,12 +20,18 @@ const SearchResults = () => {
     name: string;
   } | null>(null);
   const [error, setError] = useState("");
+  const [pendingCombats, setPendingCombats] = useState<any[]>([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userData"); // <-- Cambia aquí
-    console.log("Stored user1:", storedUser);
+    // Solo obtener el usuario logueado, nunca sobrescribirlo aquí
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser));
+      // Cargar combates pendientes para filtrar posibles oponentes
+      const { id } = JSON.parse(storedUser);
+      getCombats({ status: "pending", user: id }).then(res => {
+        setPendingCombats(res.combats || []);
+      });
     }
   }, []);
 
@@ -66,6 +73,15 @@ const SearchResults = () => {
     }
   };
 
+  // Helper: comprobar si ya hay combate pendiente con ese usuario
+  function hasPendingCombatWith(userId: string) {
+    return pendingCombats.some(
+      (c) =>
+        (c.creator === currentUser?.id && c.opponent === userId) ||
+        (c.creator === userId && c.opponent === currentUser?.id)
+    );
+  }
+
   return (
     <div className="search-results-container">
       <div className="search-bar-container">
@@ -89,43 +105,54 @@ const SearchResults = () => {
 
       <div className="results-container">
         {searchResults.length > 0 ? (
-          searchResults.map((user: any) => (
-            <div key={user.id} className="result-card">
-              <div className="user-info">
-                <h3>{user.name}</h3>
-                <p>
-                  {t("cityLabel")}: {user.city}
-                </p>
-                <p>
-                  {t("weightLabel")}: {translateWeight(user.weight)}
-                </p>
+          searchResults
+            .filter((user: any) => user.id !== currentUser?.id && user._id !== currentUser?.id)
+            .map((user: any) => (
+              <div key={user.id || user._id} className="result-card">
+                <div className="user-info">
+                  <h3>{user.name}</h3>
+                  <p>
+                    {t("cityLabel")}: {user.city}
+                  </p>
+                  <p>
+                    {t("weightLabel")}: {translateWeight(user.weight)}
+                  </p>
+                </div>
+                <div className="result-card-buttons">
+                  <button className="contact-button">{t("contactButton")}</button>
+                  <button
+                    className="view-profile-button"
+                    onClick={() => navigate(`/profile/${user.id || user._id}`)}
+                  >
+                    {t("viewProfileButton")}
+                  </button>
+                  {currentUser && !hasPendingCombatWith(user.id || user._id) && (
+                    <button
+                      className="create-combat-button"
+                      onClick={() => {
+                        const opponentId = user.id || user._id;
+                        console.log("✅ opponent id:", opponentId);
+                        const combatState = {
+                          creator: currentUser.id,
+                          creatorName: currentUser.name,
+                          opponent: opponentId,
+                          opponentName: user.name,
+                        };
+                        localStorage.setItem("combatState", JSON.stringify(combatState));
+                        navigate("/create-combat", { state: combatState });
+                      }}
+                    >
+                      {t("createCombatButton")}
+                    </button>
+                  )}
+                  {currentUser && hasPendingCombatWith(user.id || user._id) && (
+                    <span style={{ color: "#d62828", fontWeight: 600, fontSize: "0.95em" }}>
+                      {t("pendingCombatsSentTitle")}
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="result-card-buttons">
-                <button className="contact-button">{t("contactButton")}</button>
-                <button
-                  className="view-profile-button"
-                  onClick={() => navigate(`/profile/${user.id}`)}
-                >
-                  {t("viewProfileButton")}
-                </button>
-                <button
-                  className="create-combat-button"
-                  onClick={() =>
-                    navigate("/create-combat", {
-                      state: {
-                        creator: currentUser?.id,
-                        creatorName: currentUser?.name,
-                        opponent: user.id,
-                        opponentName: user.name,
-                      },
-                    })
-                  }
-                >
-                  {t("createCombatButton")}
-                </button>
-              </div>
-            </div>
-          ))
+            ))
         ) : (
           <p className="no-results">{t("noResultsFound")}</p>
         )}

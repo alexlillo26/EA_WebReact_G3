@@ -1,58 +1,41 @@
 import { Combat } from '../models/Combat';
-import { API_BASE_URL } from './apiConfig';
+import axiosInstance from './axiosInstance';
 
-// Obtener todos los combates con paginación
-export const getCombats = async (page: number = 1, pageSize: number = 10): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
-  const response = await fetch(`${API_BASE_URL}/combat?page=${page}&pageSize=${pageSize}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    throw new Error('Error al obtener los combates');
-  }
-
-  return response.json();
+// Obtener todos los combates con filtros (params)
+export const getCombats = async (params: Record<string, any> = {}): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
+  const response = await axiosInstance.get<any>('/combat', { params });
+  return response.data as { combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number };
 };
 
-// Registrar un combate
-export const registerCombat = async (combatData: Combat): Promise<Combat> => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/combat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify(combatData),
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al registrar el combate');
-    }
-
-    return response.json();
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error al registrar el combate:", error.message);
-    } else {
-      console.error("Error al registrar el combate:", error);
-    }
-    throw error;
-  }
+// Crear un nuevo combate
+export const createCombat = async (combatData: Partial<Combat>) => {
+  const response = await axiosInstance.post<any>('/combat', combatData);
+  return response.data;
 };
 
-// Get combats for a specific gym with pagination
+// Responder a una invitación de combate (aceptar o rechazar)
+export const respondCombat = async (combatId: string, status: 'accepted' | 'rejected') => {
+  const response = await axiosInstance.patch<any>(`/combat/${combatId}/respond`, { status });
+  return response.data;
+};
+
+// Obtener invitaciones de combate recibidas
+export const fetchInvitations = async () => {
+  return axiosInstance.get('/combat/invitations');
+};
+
+// Obtener combates futuros
+export const fetchFutureCombats = async () => {
+  return axiosInstance.get('/combat/future');
+};
+
+// Obtener invitaciones de combate enviadas
+export const fetchSentInvitations = async () => {
+  return axiosInstance.get('/combat/sent-invitations');
+};
+
+// Obtener combates de un gimnasio con paginación
 export const getGymCombats = async (gymId: string, page: number = 1, pageSize: number = 10): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
-  const response = await fetch(`${API_BASE_URL}/combat/gym/${gymId}?page=${page}&pageSize=${pageSize}`, {
-    method: 'GET',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('gymToken')}`
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Error al obtener los combates del gimnasio');
-  }
-
-  return response.json();
+  const response = await axiosInstance.get<any>(`/combat/gym/${gymId}`, { params: { page, pageSize } });
+  return response.data as { combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number };
 };

@@ -1,0 +1,97 @@
+.my-combats-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 32px 24px;
+  background: #232526;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  color: #fff;
+}
+
+.my-combats-section-title {
+  font-size: 1.5em;
+  color: #d62828;
+  margin-bottom: 18px;
+  margin-top: 32px;
+  text-align: left;
+}
+
+.my-combats-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+.my-combats-item {
+  background: #181818;
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  font-size: 1.08em;
+  border: 1.5px solid #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.my-combats-label {
+  color: #d62828;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.my-combats-gym-address {
+  color: #bdbdbd;
+  font-size: 0.97em;
+  margin-left: 8px;
+}
+
+.my-combats-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+}
+
+.my-combats-accept {
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.my-combats-accept:hover {
+  background: #388e3c;
+}
+
+.my-combats-decline {
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.my-combats-decline:hover {
+  background: #b71c1c;
+}
+
+.my-combats-empty {
+  color: #bdbdbd;
+  font-style: italic;
+  margin-bottom: 24px;
+}
+
+.my-combats-loading {
+  text-align: center;
+  color: #d62828;
+  font-size: 1.2em;
+  margin-top: 40px;
+}

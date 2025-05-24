@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getCombatsByBoxer, Combat } from "../../services/statisticsService";
+import { getCombatsByBoxer } from "../../services/statisticsService";
+import { Combat } from "../../models/Combat";
 import { useLanguage } from "../../context/LanguageContext"; // Importa el contexto de idioma
 
 interface StatisticsProps {
@@ -63,12 +64,26 @@ const Statistics: React.FC<StatisticsProps> = ({ boxerId }) => {
       {combats.length > 0 ? (
         <ul>
           {combats.map((combat) => (
-            <li key={combat.id}>
+            <li key={combat._id}>
               <strong>{t("dateLabel")}:</strong>{" "}
-              {new Date(combat.date).toLocaleDateString()} <br />
-              <strong>{t("gymLabel")}:</strong> {combat.gym.name} <br />
+              {new Date(combat.date as string).toLocaleDateString()} <br />
+              <strong>{t("gymLabel")}:</strong>{" "}
+              {(combat as any).gym && typeof (combat as any).gym === "object"
+                ? (combat as any).gym.name
+                : typeof (combat as any).gym === "string"
+                ? (combat as any).gym
+                : "-"}
+              <br />
               <strong>{t("boxersLabel")}:</strong>{" "}
-              {combat.boxers.map((boxer) => boxer.name).join(", ")}
+              {Array.isArray((combat as any).boxers) && (combat as any).boxers.length > 0
+                ? (combat as any).boxers
+                    .map((boxer: any) =>
+                      typeof boxer === "string"
+                        ? boxer
+                        : boxer.name || boxer._id || "-"
+                    )
+                    .join(", ")
+                : "-"}
             </li>
           ))}
         </ul>

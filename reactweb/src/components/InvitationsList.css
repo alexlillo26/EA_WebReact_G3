@@ -1,0 +1,52 @@
+.invitations-container {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  margin: 1rem 0;
+}
+
+.invitations-title {
+  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+}
+
+.no-invitations {
+  font-style: italic;
+  color: #888;
+}
+
+.invitations-list {
+  list-style: none;
+  padding: 0;
+}
+
+.invitation-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.combat-info {
+  flex: 1;
+}
+
+.combat-actions button {
+  margin-left: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.accept-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.reject-btn {
+  background-color: #f44336;
+  color: white;
+}
