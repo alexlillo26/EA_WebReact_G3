@@ -71,7 +71,7 @@ export const updateUser = async (id: string, updateData: Partial<Usuario> | Form
   try {
     const isFormData = updateData instanceof FormData; // Check if updateData is FormData
     const response = await axiosInstance.put<Usuario>(GET_USER_BY_ID_URL(id), updateData, {
-      headers: isFormData ? {} : { "Content-Type": "application/json" },
+      headers: isFormData ? undefined : { "Content-Type": "application/json" },
     });
     console.log("Usuario actualizado:", response.data); // Log the updated user
     return response.data;

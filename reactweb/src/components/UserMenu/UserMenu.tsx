@@ -13,6 +13,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout, isGym }) => {
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [pending, setPending] = useState(0);
 
   const toggleMenu = () => {
     setIsOpen((prev) => !prev);
@@ -25,6 +26,15 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout, isGym }) => {
   };
 
   useEffect(() => {
+    const count = Number(localStorage.getItem("pendingInvitations") || 0);
+    setPending(count);
+    console.log("[UserMenu] Contador de invitaciones pendientes:", count);
+    window.addEventListener("storage", () => {
+      setPending(Number(localStorage.getItem("pendingInvitations") || 0));
+    });
+  }, []);
+
+  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -35,6 +45,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout, isGym }) => {
     <div className="user-menu" ref={menuRef}>
       <span className="user-name" onClick={toggleMenu}>
         {userName}
+        {pending > 0 && <span className="badge">{pending}</span>}
       </span>
       {isOpen && (
         <div className="dropdown">
@@ -44,7 +55,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout, isGym }) => {
               <Link to="/gym-profile" className="dropdown-item">
                 {t("gymProfile")}
               </Link>
-              <button className="dropdown-item logout-button" onClick={onLogout}>
+              <button
+                className="dropdown-item logout-button"
+                onClick={onLogout}
+              >
                 {t("logout")}
               </button>
             </>
@@ -56,11 +70,15 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout, isGym }) => {
               </Link>
               <Link to="/combates" className="dropdown-item">
                 {t("myCombats")}
+                {pending > 0 && <span className="badge">{pending}</span>}
               </Link>
               <Link to="/estadisticas" className="dropdown-item">
                 {t("statistics")}
               </Link>
-              <button className="dropdown-item logout-button" onClick={onLogout}>
+              <button
+                className="dropdown-item logout-button"
+                onClick={onLogout}
+              >
                 {t("logout")}
               </button>
             </>

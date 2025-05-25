@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { login, getToken } from "../../services/authService"; // Added getToken import
 import "./login.css";
 import { useLanguage } from "../../context/LanguageContext";
+import { getCombats } from "../../services/combatService";
+import { toast } from "react-toastify";
 
 const Login: React.FC<{
   onLogin: (user: { id: string; name: string }) => void;
@@ -12,8 +14,6 @@ const Login: React.FC<{
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { t, language } = useLanguage();
-
-  console.log("Current language:", language);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +33,20 @@ const Login: React.FC<{
         };
         onLogin(userData); // Update user state
         localStorage.setItem("userData", JSON.stringify(userData));
-        navigate("/"); // Redirect to home
+        getCombats({ status: "pending", opponent: userData.id }).then((res) => {
+          const count = res.combats ? res.combats.length : 0;
+          localStorage.setItem("pendingInvitations", String(count));
+          window.dispatchEvent(new Event("storage")); // Refresca el menú
+          if (count > 0) {
+            toast.info(
+              `Tienes ${count} ${
+                count === 1 ? "combate pendiente" : "combates pendientes"
+              } de aceptar o rechazar`
+            );
+          }
+          navigate("/"); // Redirige a home SOLO después de actualizar el contador
+        });
+        return;
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -42,9 +55,10 @@ const Login: React.FC<{
   };
 
   const handleGoogleLogin = () => {
-    const webReactOrigin = 'https://ea3-back.upc.edu'; // O window.location.origin si siempre es el mismo
-    window.location.href =
-      `https://ea3-api.upc.edu/api/auth/google?origin=${encodeURIComponent(webReactOrigin)}`;
+    const webReactOrigin = "https://ea3-back.upc.edu"; // O window.location.origin si siempre es el mismo
+    window.location.href = `https://ea3-api.upc.edu/api/auth/google?origin=${encodeURIComponent(
+      webReactOrigin
+    )}`;
   };
 
   return (

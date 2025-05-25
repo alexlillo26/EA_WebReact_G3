@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useLanguage } from "../../context/LanguageContext";
+import { API_BASE_URL } from "../../services/config";
 
 const GymRegistration: React.FC = () => {
   const { t } = useLanguage();

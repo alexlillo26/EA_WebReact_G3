@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import './InvitationsList.css';
-import { toast } from 'react-toastify';
-import { respondCombat, fetchInvitations } from '../services/combatService';
-import { socket } from '../socket';
-import { Combat } from '../models/Combat';
+import React, { useEffect, useState } from "react";
+import "./InvitationsList.css";
+import { toast } from "react-toastify";
+import { respondCombat, fetchInvitations } from "../../services/combatService";
+import { socket } from "../../socket";
+import { Combat } from "../../models/Combat";
 
 // Si ves el error "Cannot find module 'react-toastify'", instala con:
 // npm install react-toastify
@@ -17,13 +17,25 @@ const InvitationsList: React.FC = () => {
       try {
         const data = await fetchInvitations();
         setInvitations(Array.isArray(data) ? data : []);
+        if (Array.isArray(data) && data.length > 0) {
+          toast.info(
+            `Tienes ${data.length} combate(s) pendiente(s) de aceptar o rechazar`
+          );
+        }
       } catch (error) {
-        toast.error('Error carregant invitacions');
+        toast.error("Error carregant invitacions");
       } finally {
         setLoading(false);
       }
     };
     fetchData();
+
+    useEffect(() => {
+      // Guarda el número de invitaciones pendientes en localStorage
+      localStorage.setItem("pendingInvitations", String(invitations.length));
+      // Notifica a otras pestañas (opcional)
+      window.dispatchEvent(new Event("storage"));
+    }, [invitations]);
 
     // Escuchar invitaciones en tiempo real
     const handleNewInvitation = (combat: Combat) => {
@@ -40,12 +52,19 @@ const InvitationsList: React.FC = () => {
 
   const handleResponse = async (combatId: string, accepted: boolean) => {
     try {
-      await respondCombat(combatId, accepted ? 'accepted' : 'rejected');
-      socket.emit('respond_combat', { combatId, status: accepted ? 'accepted' : 'rejected' });
+      await respondCombat(combatId, accepted ? "accepted" : "rejected");
+      socket.emit("respond_combat", {
+        combatId,
+        status: accepted ? "accepted" : "rejected",
+      });
       setInvitations((prev) => prev.filter((c) => c._id !== combatId));
-      toast(accepted ? '✅ Has acceptat la invitació' : '❌ Has rebutjat la invitació');
+      toast(
+        accepted
+          ? "✅ Has acceptat la invitació"
+          : "❌ Has rebutjat la invitació"
+      );
     } catch {
-      toast.error('Error al respondre la invitació');
+      toast.error("Error al respondre la invitació");
     }
   };
 
@@ -61,12 +80,15 @@ const InvitationsList: React.FC = () => {
           {invitations.map((combat: any) => (
             <li key={combat._id} className="invitation-item">
               <div className="combat-info">
-                <strong>Gimnàs:</strong> {
-                  combat.gym && typeof combat.gym === 'object'
-                    ? (combat.gym.name || combat.gym._id)
-                    : (typeof combat.gym === 'string' ? combat.gym : '-')
-                } <br />
-                <strong>Data:</strong> {new Date(combat.date).toLocaleDateString()} <br />
+                <strong>Gimnàs:</strong>{" "}
+                {combat.gym && typeof combat.gym === "object"
+                  ? combat.gym.name || combat.gym._id
+                  : typeof combat.gym === "string"
+                  ? combat.gym
+                  : "-"}{" "}
+                <br />
+                <strong>Data:</strong>{" "}
+                {new Date(combat.date).toLocaleDateString()} <br />
                 <strong>Nivell:</strong> {combat.level}
               </div>
               <div className="combat-actions">
@@ -78,7 +100,9 @@ const InvitationsList: React.FC = () => {
                   ✅ Acceptar
                 </button>
                 <button
-                  onClick={() => combat._id && handleResponse(combat._id, false)}
+                  onClick={() =>
+                    combat._id && handleResponse(combat._id, false)
+                  }
                   className="reject-btn"
                   disabled={!combat._id}
                 >

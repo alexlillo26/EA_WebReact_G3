@@ -24,7 +24,8 @@ import HomeGym from "./components/home/HomeGym";
 import { socket } from "./socket";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import MyCombats from "./components/MyCombats";
+import MyCombats from "./components/MyCombats/MyCombats";
+import { getCombats } from "./services/combatService";
 
 interface User {
   id: string;
@@ -37,12 +38,30 @@ function App() {
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] =
     useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const [pendingInvitations, setPendingInvitations] = useState(0);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
       setIsAccessibilityPanelOpen(false);
     }
   };
+
+  useEffect(() => {
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      const { id } = JSON.parse(userData);
+      getCombats({ status: "pending", opponent: id }).then((res) => {
+        const count = res.combats ? res.combats.length : 0;
+        setPendingInvitations(count);
+        localStorage.setItem("pendingInvitations", String(count));
+        if (count > 0) {
+          toast.info(
+            `Tienes ${count} combate(s) pendiente(s) de aceptar o rechazar`
+          );
+        }
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const initializeUser = async () => {

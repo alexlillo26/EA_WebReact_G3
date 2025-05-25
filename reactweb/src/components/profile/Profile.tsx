@@ -80,13 +80,17 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         ...formData,
         birthDate: new Date(formData.birthdate), // Convierte la fecha a formato Date
       };
+      let result;
       if (profilePictureFile) {
         const formDataToSend = new FormData();
         formDataToSend.append("profilePicture", profilePictureFile);
         formDataToSend.append("data", JSON.stringify(updatedUser));
-        await updateUser(user.id, formDataToSend);
+        result = await updateUser(user.id, formDataToSend);
       } else {
-        await updateUser(user.id, updatedUser); // Llama al servicio para actualizar el usuario
+        result = await updateUser(user.id, updatedUser); // Llama al servicio para actualizar el usuario
+      }
+      if (!result) {
+        throw new Error("No se pudo actualizar el usuario");
       }
       alert(t("saveSuccess"));
       await fetchUserData(); // Refresca los datos del usuario después de guardar
