@@ -20,18 +20,6 @@ export const createRating = async (data: Omit<Rating, '_id' | 'createdAt'>): Pro
   }
 };
 
-// Obtener todas las calificaciones recibidas por un usuario (boxeador)
-export const getRatingsByUser = async (userId: string): Promise<Rating[]> => {
-  try {
-    const response = await axiosInstance.get<{ ratings: Rating[] }>(GET_RATINGS_BY_USER_URL(userId));
-    // Si tu backend devuelve un array directo, usa: response.data
-    return response.data.ratings || [];
-  } catch (error) {
-    console.error("Error en getRatingsByUser:", error);
-    return [];
-  }
-};
-
 // Obtener la calificación que un usuario ha dado a otro (si existe)
 export const getRatingFromTo = async (fromId: string, toId: string): Promise<Rating | null> => {
   try {
@@ -41,5 +29,16 @@ export const getRatingFromTo = async (fromId: string, toId: string): Promise<Rat
   } catch (error) {
     console.error("Error en getRatingFromTo:", error);
     return null;
+  }
+};
+
+export const getRatingsByUser = async (userId: string): Promise<Rating[]> => {
+  try {
+    const url = `${API_BASE_URL}/ratings/user/${userId}`;
+    const response = await axiosInstance.get<Rating[]>(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener ratings para el usuario:", error);
+    return [];
   }
 };

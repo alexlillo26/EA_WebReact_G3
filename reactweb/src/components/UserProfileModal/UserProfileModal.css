@@ -1,0 +1,99 @@
+/* Estilos para el modal */
+.profile-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: auto; /* Para contenido largo */
+  padding: 20px; /* Espacio alrededor del modal */
+}
+
+.profile-modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+.profile-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #777;
+  transition: color 0.3s;
+}
+
+.profile-modal-close:hover {
+  color: #d62828;
+}
+
+/* Encabezado */
+.profile-modal-content h2 {
+  color: #d62828;
+  font-size: 28px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Información del usuario */
+.profile-modal-content p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.profile-modal-content b {
+  font-weight: 600;
+  color: #555;
+  margin-right: 5px;
+}
+
+/* Valoraciones */
+.profile-modal-content hr {
+  border: none;
+  border-bottom: 1px solid #eee;
+  margin: 20px 0;
+}
+
+.profile-modal-content h4 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #777;
+}
+
+.profile-modal-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.profile-modal-content li {
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.profile-modal-content li b {
+  color: #d62828;
+  margin-right: 8px;
+}

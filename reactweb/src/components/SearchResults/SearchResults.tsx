@@ -5,6 +5,7 @@ import { getCombats } from "../../services/combatService";
 import "./SearchResults.css";
 import { useLanguage } from "../../context/LanguageContext";
 import SimpleModal from "../SimpleModal/SimpleModal";
+import SeeProfile from "../SeeProfile/SeeProfile";
 
 const SearchResults = () => {
   const { t } = useLanguage();
@@ -21,9 +22,16 @@ const SearchResults = () => {
   const [currentUser, setCurrentUser] = useState<{
     id: string;
     name: string;
+    city: string;
   } | null>(null);
   const [error, setError] = useState("");
   const [pendingCombats, setPendingCombats] = useState<any[]>([]);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  useEffect(() => {
+    console.log("Resultados de búsqueda:", searchResults);
+  }, [searchResults]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userData"); // <-- Cambia aquí
@@ -132,7 +140,11 @@ const SearchResults = () => {
                   </button>
                   <button
                     className="view-profile-button"
-                    onClick={() => navigate(`/profile/${user.id || user._id}`)}
+                    onClick={() => {
+                      console.log("Usuario seleccionado:", user);
+                      setSelectedUser(user);
+                      setProfileModalOpen(true);
+                    }}
                   >
                     {t("viewProfileButton")}
                   </button>
@@ -177,6 +189,12 @@ const SearchResults = () => {
           <p className="no-results">{t("noResultsFound")}</p>
         )}
       </div>
+      <SeeProfile
+        open={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        user={selectedUser}
+        currentUserCity={currentUser?.city}
+      />
       <SimpleModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

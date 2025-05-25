@@ -1,0 +1,16 @@
+/* Botón Ver Ruta */
+.ver-ruta-button {
+  background-color: #d62828;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-left: 15px;
+  font-size: 15px;
+  transition: background-color 0.3s;
+}
+
+.ver-ruta-button:hover {
+  background-color: #a31f1f;
+}

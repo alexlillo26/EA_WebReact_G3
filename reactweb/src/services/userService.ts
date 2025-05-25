@@ -82,11 +82,12 @@ export const updateUser = async (id: string, updateData: Partial<Usuario> | Form
 };
 
 // Servicio para buscar usuarios
-export const searchUsers = async (city?: string, weight?: string): Promise<any[]> => {
+export const searchUsers = async (email?: string, weight?: string, city?: string): Promise<any[]> => {
   try {
     const params: Record<string, string> = {};
     if (city) params.city = city;
     if (weight) params.weight = weight;
+    if (email) params.email = email;
 
     const response = await axiosInstance.get<{ users: any[] }>(`${API_BASE_URL}/users/search`, { params });
     console.log('Search results:', response.data); // Debug log
