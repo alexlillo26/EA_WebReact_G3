@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { getUserById, updateUser } from "../../services/userService"; // Importa el servicio para actualizar el usuario
 import { useLanguage } from "../../context/LanguageContext";
+import SimpleModal from "../SimpleModal/SimpleModal"; // Importa el componente modal
 
 interface ProfileProps {
   user: { id: string; name: string } | null; // Include user ID
@@ -22,6 +23,8 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   });
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMsg, setModalMsg] = useState("");
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
     null
   );
@@ -90,13 +93,17 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         result = await updateUser(user.id, updatedUser); // Llama al servicio para actualizar el usuario
       }
       if (!result) {
-        throw new Error("No se pudo actualizar el usuario");
+        setModalMsg(t("saveError"));
+        setModalOpen(true);
+        return;
       }
-      alert(t("saveSuccess"));
+      setModalMsg(t("saveSuccess"));
+      setModalOpen(true);
       await fetchUserData(); // Refresca los datos del usuario después de guardar
     } catch (error) {
       console.error(t("saveError"), error);
-      alert(t("saveError"));
+      setModalMsg(t("saveError"));
+      setModalOpen(true);
     }
   };
 
@@ -194,6 +201,12 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           {t("saveButton")}
         </button>
       </div>
+      <SimpleModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        message={modalMsg}
+      />
+      ;
     </StyledProfile>
   );
 };

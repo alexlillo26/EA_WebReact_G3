@@ -1,0 +1,42 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85); /* Fondo más oscuro */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal-content {
+  background: #111; /* Fondo negro */
+  padding: 2em;
+  border-radius: 8px;
+  min-width: 300px;
+  text-align: center;
+  border: 2.5px solid #d62828;
+  /* Efecto neón rojo menos intenso */
+  box-shadow:
+    0 0 4px #d62828,
+    0 0 8px #d62828,
+    0 0 16px #a31f1f;
+}
+.modal-content p {
+  color: #faf8f8; /* Texto rojo */
+  font-size: 1.1em;
+  margin-bottom: 1.5em;
+  font-weight: bold;
+}
+.modal-content button {
+  background-color: #d62828;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.modal-content button:hover {
+  background-color: #a31f1f;
+}

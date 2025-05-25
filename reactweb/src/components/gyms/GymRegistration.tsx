@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useLanguage } from "../../context/LanguageContext";
 import { API_BASE_URL } from "../../services/config";
+import SimpleModal from "../SimpleModal/SimpleModal";
 
 const GymRegistration: React.FC = () => {
   const { t } = useLanguage();
@@ -13,6 +14,9 @@ const GymRegistration: React.FC = () => {
     price: "",
     password: "",
   });
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMsg, setModalMsg] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,7 +37,8 @@ const GymRegistration: React.FC = () => {
       if (response.ok) {
         const result = await response.json();
         console.log(t("registrationSuccess"), result);
-        alert(t("registrationSuccess"));
+        setModalMsg(t("registrationSuccess"));
+        setModalOpen(true);
         setGymData({
           name: "",
           email: "",
@@ -44,11 +49,13 @@ const GymRegistration: React.FC = () => {
         }); // Limpia el formulario
       } else {
         console.error(t("registrationError"), response.statusText);
-        alert(t("registrationError"));
+        setModalMsg(t("registrationError"));
+        setModalOpen(true);
       }
     } catch (error) {
       console.error(t("serverError"), error);
-      alert(t("serverError"));
+      setModalMsg(t("serverError"));
+      setModalOpen(true);
     }
   };
 
@@ -108,6 +115,11 @@ const GymRegistration: React.FC = () => {
           <button type="submit">{t("registerButton")}</button>
         </form>
       </div>
+      <SimpleModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        message={modalMsg}
+      />
     </StyledRegistration>
   );
 };

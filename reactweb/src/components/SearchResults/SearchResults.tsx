@@ -4,11 +4,14 @@ import { searchUsers } from "../../services/userService";
 import { getCombats } from "../../services/combatService";
 import "./SearchResults.css";
 import { useLanguage } from "../../context/LanguageContext";
+import SimpleModal from "../SimpleModal/SimpleModal";
 
 const SearchResults = () => {
   const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMsg, setModalMsg] = useState("");
   const queryParams = new URLSearchParams(location.search);
   const [city, setCity] = useState(queryParams.get("city") || "");
   const [weight, setWeight] = useState(queryParams.get("weight") || "");
@@ -29,7 +32,7 @@ const SearchResults = () => {
       setCurrentUser(JSON.parse(storedUser));
       // Cargar combates pendientes para filtrar posibles oponentes
       const { id } = JSON.parse(storedUser);
-      getCombats({ status: "pending", user: id }).then(res => {
+      getCombats({ status: "pending", user: id }).then((res) => {
         setPendingCombats(res.combats || []);
       });
     }
@@ -53,7 +56,8 @@ const SearchResults = () => {
     setError("");
 
     if (!city && !weight) {
-      setError(t("searchErrorEmpty2"));
+      setModalMsg(t("searchErrorEmpty2"));
+      setModalOpen(true);
       return;
     }
 
@@ -68,7 +72,8 @@ const SearchResults = () => {
         replace: true,
       });
     } catch (err) {
-      setError(t("searchErrorGeneral2"));
+      setModalMsg(t("searchErrorGeneral2"));
+      setModalOpen(true);
       setSearchResults([]);
     }
   };
@@ -106,7 +111,10 @@ const SearchResults = () => {
       <div className="results-container">
         {searchResults.length > 0 ? (
           searchResults
-            .filter((user: any) => user.id !== currentUser?.id && user._id !== currentUser?.id)
+            .filter(
+              (user: any) =>
+                user.id !== currentUser?.id && user._id !== currentUser?.id
+            )
             .map((user: any) => (
               <div key={user.id || user._id} className="result-card">
                 <div className="user-info">
@@ -119,34 +127,46 @@ const SearchResults = () => {
                   </p>
                 </div>
                 <div className="result-card-buttons">
-                  <button className="contact-button">{t("contactButton")}</button>
+                  <button className="contact-button">
+                    {t("contactButton")}
+                  </button>
                   <button
                     className="view-profile-button"
                     onClick={() => navigate(`/profile/${user.id || user._id}`)}
                   >
                     {t("viewProfileButton")}
                   </button>
-                  {currentUser && !hasPendingCombatWith(user.id || user._id) && (
-                    <button
-                      className="create-combat-button"
-                      onClick={() => {
-                        const opponentId = user.id || user._id;
-                        console.log("✅ opponent id:", opponentId);
-                        const combatState = {
-                          creator: currentUser.id,
-                          creatorName: currentUser.name,
-                          opponent: opponentId,
-                          opponentName: user.name,
-                        };
-                        localStorage.setItem("combatState", JSON.stringify(combatState));
-                        navigate("/create-combat", { state: combatState });
+                  {currentUser &&
+                    !hasPendingCombatWith(user.id || user._id) && (
+                      <button
+                        className="create-combat-button"
+                        onClick={() => {
+                          const opponentId = user.id || user._id;
+                          console.log("✅ opponent id:", opponentId);
+                          const combatState = {
+                            creator: currentUser.id,
+                            creatorName: currentUser.name,
+                            opponent: opponentId,
+                            opponentName: user.name,
+                          };
+                          localStorage.setItem(
+                            "combatState",
+                            JSON.stringify(combatState)
+                          );
+                          navigate("/create-combat", { state: combatState });
+                        }}
+                      >
+                        {t("createCombatButton")}
+                      </button>
+                    )}
+                  {currentUser && hasPendingCombatWith(user.id || user._id) && (
+                    <span
+                      style={{
+                        color: "#d62828",
+                        fontWeight: 600,
+                        fontSize: "0.95em",
                       }}
                     >
-                      {t("createCombatButton")}
-                    </button>
-                  )}
-                  {currentUser && hasPendingCombatWith(user.id || user._id) && (
-                    <span style={{ color: "#d62828", fontWeight: 600, fontSize: "0.95em" }}>
                       {t("pendingCombatsSentTitle")}
                     </span>
                   )}
@@ -157,6 +177,11 @@ const SearchResults = () => {
           <p className="no-results">{t("noResultsFound")}</p>
         )}
       </div>
+      <SimpleModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        message={modalMsg}
+      />
     </div>
   );
 };

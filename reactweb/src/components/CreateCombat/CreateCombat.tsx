@@ -6,6 +6,7 @@ import { getGyms } from "../../services/gymService";
 import { Gym } from "../../models/Gym";
 import { createCombat, getCombats } from "../../services/combatService";
 import { socket } from "../../socket";
+import SimpleModal from "../SimpleModal/SimpleModal";
 
 // --- CAMBIO PRINCIPAL: Lee combatState de localStorage si no viene por location.state
 const CreateCombat: React.FC = () => {
@@ -13,8 +14,7 @@ const CreateCombat: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState =
-    location.state ||
-    JSON.parse(localStorage.getItem("combatState") || "{}");
+    location.state || JSON.parse(localStorage.getItem("combatState") || "{}");
   const { creator, opponent, creatorName, opponentName } = locationState;
 
   const [date, setDate] = useState("");
@@ -26,6 +26,8 @@ const CreateCombat: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [showAllGyms, setShowAllGyms] = useState(false);
   const [userCombats, setUserCombats] = useState<any[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMsg, setModalMsg] = useState("");
 
   useEffect(() => {
     const fetchGyms = async () => {
@@ -42,14 +44,16 @@ const CreateCombat: React.FC = () => {
 
   useEffect(() => {
     if (!opponent) {
-      console.warn("⚠️ No se recibió un ID de oponente. No se podrá crear combate.");
+      console.warn(
+        "⚠️ No se recibió un ID de oponente. No se podrá crear combate."
+      );
     }
   }, [opponent]);
 
   useEffect(() => {
     // Cargar combates del usuario para validar fecha
     if (creator) {
-      getCombats({ user: creator }).then(res => {
+      getCombats({ user: creator }).then((res) => {
         setUserCombats(res.combats || []);
       });
     }
@@ -61,17 +65,20 @@ const CreateCombat: React.FC = () => {
 
   const handleCreateCombat = async () => {
     if (!date || !time || !gym || !level) {
-      alert(t("fillAllFields"));
+      setModalMsg(t("fillAllFields"));
+      setModalOpen(true);
       return;
     }
     if (!opponent) {
-      alert("Selecciona un oponente antes de continuar");
+      setModalMsg(t("selectOpponentAlert"));
+      setModalOpen(true);
       return;
     }
     // Validar fecha futura
     const selectedDateTime = new Date(`${date}T${time}`);
     if (selectedDateTime <= new Date()) {
-      alert("No puedes crear un combate en el pasado.");
+      setModalMsg(t("futureDateAlert"));
+      setModalOpen(true);
       return;
     }
     // Validar que no haya otro combate el mismo día
@@ -79,7 +86,8 @@ const CreateCombat: React.FC = () => {
       (c) => new Date(c.date).toDateString() === new Date(date).toDateString()
     );
     if (hasCombatSameDay) {
-      alert("Ya tienes un combate ese día.");
+      setModalMsg(t("sameDayAlert"));
+      setModalOpen(true);
       return;
     }
     // Validar que no exista ya una invitación pendiente con ese oponente
@@ -87,16 +95,17 @@ const CreateCombat: React.FC = () => {
       (c) =>
         c.status === "pending" &&
         ((c.creator === creator && c.opponent === opponent) ||
-         (c.creator === opponent && c.opponent === creator))
+          (c.creator === opponent && c.opponent === creator))
     );
     if (hasPendingWithOpponent) {
-      alert("Ya tienes una invitación pendiente con este usuario.");
+      setModalMsg(t("pendingWithOpponentAlert"));
+      setModalOpen(true);
       return;
     }
     // Debug logs para verificar los valores
     console.log("creator", creator); // debe ser un ObjectId como string
     console.log("opponent", opponent);
-    console.log("gym", gym);         // también
+    console.log("gym", gym); // también
 
     try {
       const combatData = {
@@ -114,11 +123,13 @@ const CreateCombat: React.FC = () => {
       socket.emit("sendCombatInvitation", { opponentId: opponent, combat });
       socket.emit("create_combat", combat); // Notifica por socket (legacy)
       localStorage.removeItem("combatState"); // Limpia el estado temporal tras crear el combate
-      alert(t("combatCreated"));
+      setModalMsg(t("combatCreated"));
+      setModalOpen(true);
       navigate("/");
     } catch (error) {
       console.error("Error al crear el combate:", error);
-      alert("Error al crear el combate");
+      setModalMsg(t("combatCreateError"));
+      setModalOpen(true);
     }
   };
 
@@ -278,6 +289,11 @@ const CreateCombat: React.FC = () => {
           {t("cancelButton")}
         </button>
       </form>
+      <SimpleModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        message={modalMsg}
+      />
     </div>
   );
 };

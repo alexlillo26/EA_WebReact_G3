@@ -3,6 +3,7 @@ import { registerUser } from "../../services/userService";
 import { handleGoogleOAuth, login } from "../../services/authService";
 import "./register.css";
 import { useLanguage } from "../../context/LanguageContext";
+import SimpleModal from "../SimpleModal/SimpleModal";
 
 const Register: React.FC = () => {
   const { t } = useLanguage();
@@ -16,6 +17,8 @@ const Register: React.FC = () => {
   const [gender, setGender] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMsg, setModalMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,29 +34,28 @@ const Register: React.FC = () => {
       !phone ||
       !gender
     ) {
-      setErrorMessage(t("allFieldsRequired"));
+      setModalMsg(t("allFieldsRequired"));
+      setModalOpen(true);
       return;
     }
 
     if (!/^\d{9}$/.test(phone)) {
-      setErrorMessage("El teléfono debe tener 9 dígitos.");
-      return;
-    }
-
-    if (!/^\d{9}$/.test(phone)) {
-      setErrorMessage("El teléfono debe tener 9 dígitos.");
+      setModalMsg(t("phoneError"));
+      setModalOpen(true);
       return;
     }
 
     const passwwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwwordRegex.test(password)) {
-      setErrorMessage(t("passwordRequirements"));
+      setModalMsg(t("passwordRequirements"));
+      setModalOpen(true);
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage(t("passwordsDoNotMatch"));
+      setModalMsg(t("passwordsDoNotMatch"));
+      setModalOpen(true);
       return;
     }
 
@@ -71,7 +73,8 @@ const Register: React.FC = () => {
       });
 
       if (user) {
-        alert(t("registrationSuccess"));
+        setModalMsg(t("registrationSuccess"));
+        setModalOpen(true);
         // Inicia sesión automáticamente
         await login(email, password);
         localStorage.setItem(
@@ -80,11 +83,13 @@ const Register: React.FC = () => {
         );
         window.location.href = "/"; // Redirige al inicio
       } else {
-        setErrorMessage(t("registrationError"));
+        setModalMsg(t("registrationError"));
+        setModalOpen(true);
       }
     } catch (error) {
       console.error(t("serverError"), error);
-      setErrorMessage(t("serverError"));
+      setModalMsg(t("serverError"));
+      setModalOpen(true);
     }
   };
 
@@ -95,14 +100,18 @@ const Register: React.FC = () => {
       );
       if (googleCode) {
         const userData = await handleGoogleOAuth(googleCode);
-        alert(t("googleRegisterSuccess").replace("{name}", userData.name));
+        setModalMsg(
+          t("googleRegisterSuccess").replace("{name}", userData.name)
+        );
+        setModalOpen(true);
       } else {
         window.location.href =
           "https://ea3-api.upc.edu/api/auth/google?origin=webreact";
       }
     } catch (error) {
       console.error(t("googleRegisterError"), error);
-      alert(t("googleRegisterError"));
+      setModalMsg(t("googleRegisterError"));
+      setModalOpen(true);
     }
   };
 
@@ -218,6 +227,11 @@ const Register: React.FC = () => {
         </svg>
         {t("googleRegisterButton")}
       </button>
+      <SimpleModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        message={modalMsg}
+      />
     </div>
   );
 };
