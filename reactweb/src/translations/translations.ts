@@ -168,6 +168,7 @@ export const translations = {
     combatCreateError: "Error creating combat. Please try again.",
     closeButton: "Close",
     phoneError: "Phone number must have 9 digits.",
+    rateOpponent: "Rate Opponent",
   },
   es: {
     appName: "Face2Face",
@@ -338,6 +339,7 @@ export const translations = {
     combatCreateError: "Error al crear el combate. Por favor, inténtalo de nuevo.",
     closeButton: "Cerrar",
     phoneError: "El teléfono debe tener 9 dígitos.",
+    rateOpponent: "Valorar Oponente",
   },
   ca: {
     appName: "Face2Face",
@@ -508,6 +510,7 @@ export const translations = {
     combatCreateError: "Error en crear el combat. Si us plau, torna-ho a intentar.",
     closeButton: "Tancar",
     phoneError: "El telèfon ha de tenir 9 dígits.",
+    rateOpponent: "Valora l'Oponent",
   },
   eu: {
     appName: "Face2Face",
@@ -678,5 +681,6 @@ export const translations = {
     combatCreateError: "Errorea borroka sortzean. Mesedez, saiatu berriro.",
     closeButton: "Itxi",
     phoneError: "Telefono zenbakiak 9 digituko luzera izan behar du.",
+    rateOpponent: "Baloratu Aurkarie",
   },
 };

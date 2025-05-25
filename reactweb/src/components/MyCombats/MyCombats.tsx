@@ -3,6 +3,9 @@ import { getCombats, respondCombat } from "../../services/combatService";
 import { Combat } from "../../models/Combat";
 import { toast } from "react-toastify";
 import { useLanguage } from "../../context/LanguageContext";
+import { RatingModal } from "../RatingModal/RatingModal";
+import { createRating, getRatingFromTo } from "../../services/ratingService";
+import { Rating } from "../../models/Rating";
 import "./MyCombats.css";
 
 const MyCombats: React.FC = () => {
@@ -11,6 +14,11 @@ const MyCombats: React.FC = () => {
   const [receivedInvitations, setReceivedInvitations] = useState<Combat[]>([]);
   const [sentInvitations, setSentInvitations] = useState<Combat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [combatToRate, setCombatToRate] = useState<Combat | null>(null);
+  const [ratedCombats, setRatedCombats] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   // Obtener el id y nombre del usuario actual
   const userData = (() => {
@@ -163,6 +171,37 @@ const MyCombats: React.FC = () => {
     window.dispatchEvent(new Event("storage")); // Para refrescar el menú en otras pestañas
   }, [receivedInvitations]);
 
+  function canRateCombat(combat: Combat) {
+    const combatDate = new Date(combat.date);
+    const combatTime = combat.time || "00:00";
+    const [hours, minutes] = combatTime.split(":").map(Number);
+    combatDate.setHours(hours, minutes, 0, 0);
+    const combatEnd = new Date(combatDate.getTime() + 60 * 60 * 1000); // +1h
+    return new Date() > combatEnd;
+  }
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      if (!userId || futureCombats.length === 0) return;
+      const ratings = await Promise.all(
+        futureCombats.map(async (c) => {
+          const opponentId = c.creator === userId ? c.opponent : c.creator;
+          const rating = await getRatingFromTo(userId, opponentId);
+          return { combatId: c._id, rated: !!rating };
+        })
+      );
+      setRatedCombats(
+        ratings.reduce((acc, curr) => {
+          if (curr.combatId) {
+            acc[String(curr.combatId)] = curr.rated;
+          }
+          return acc;
+        }, {} as { [key: string]: boolean })
+      );
+    };
+    fetchRatings();
+  }, [futureCombats, userId]);
+
   const handleInvitationResponse = async (
     combatId: string,
     status: "accepted" | "rejected"
@@ -183,6 +222,47 @@ const MyCombats: React.FC = () => {
     } catch {
       toast.error("Error al responder la invitación");
     }
+  };
+
+  const handleRateSubmit = async (score: number, comment: string) => {
+    if (!combatToRate || !userId) {
+      console.log("No hay combate para calificar o no hay userId");
+      return;
+    }
+    let opponentId: string;
+    if (combatToRate.creator === userId) {
+      opponentId =
+        typeof combatToRate.opponent === "object" &&
+        combatToRate.opponent !== null &&
+        "_id" in combatToRate.opponent
+          ? (combatToRate.opponent as { _id: string })._id
+          : (combatToRate.opponent as string);
+    } else {
+      opponentId =
+        typeof combatToRate.creator === "object" &&
+        combatToRate.creator !== null &&
+        "_id" in combatToRate.creator
+          ? (combatToRate.creator as { _id: string })._id
+          : (combatToRate.creator as string);
+    }
+    console.log("Enviando rating:", {
+      combat: combatToRate._id,
+      from: userId,
+      to: opponentId,
+      score,
+      comment,
+    });
+    const result = await createRating({
+      combat: combatToRate._id!,
+      from: userId,
+      to: opponentId,
+      score,
+      comment,
+    });
+    console.log("Rating result:", result);
+    setRatingModalOpen(false);
+    setCombatToRate(null);
+    setFutureCombats((prev) => prev.filter((c) => c._id !== combatToRate._id));
   };
 
   if (loading)
@@ -215,12 +295,30 @@ const MyCombats: React.FC = () => {
                 <span className="my-combats-label">{t("opponent")}:</span>{" "}
                 {getOpponentForFuture(c)}
               </div>
+              {canRateCombat(c) && !ratedCombats[String(c._id)] && (
+                <button
+                  className="rate-opponent-btn"
+                  onClick={() => {
+                    setCombatToRate(c);
+                    setRatingModalOpen(true);
+                  }}
+                >
+                  {t("rateOpponent")}
+                </button>
+              )}
             </li>
           ))}
         </ul>
       ) : (
         <p className="my-combats-empty">{t("noFutureCombats")}</p>
       )}
+
+      <RatingModal
+        open={ratingModalOpen}
+        onClose={() => setRatingModalOpen(false)}
+        onSubmit={handleRateSubmit}
+        opponentName={combatToRate ? getOpponentForFuture(combatToRate) : ""}
+      />
 
       <h2 className="my-combats-section-title">📩 {t("invitationsTitle")}</h2>
       {receivedInvitations.length > 0 ? (
