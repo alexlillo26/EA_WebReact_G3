@@ -180,6 +180,13 @@ const MyCombats: React.FC = () => {
     return new Date() > combatEnd;
   }
 
+  function getUserId(user: any): string {
+    if (user && typeof user === "object" && "_id" in user) {
+      return user._id;
+    }
+    return user;
+  }
+
   useEffect(() => {
     const fetchRatings = async () => {
       if (!userId || futureCombats.length === 0) return;
@@ -230,20 +237,13 @@ const MyCombats: React.FC = () => {
       return;
     }
     let opponentId: string;
-    if (combatToRate.creator === userId) {
-      opponentId =
-        typeof combatToRate.opponent === "object" &&
-        combatToRate.opponent !== null &&
-        "_id" in combatToRate.opponent
-          ? (combatToRate.opponent as { _id: string })._id
-          : (combatToRate.opponent as string);
+
+    if (getUserId(combatToRate.creator) === userId) {
+      // El usuario logueado es el creador, puntúa al oponente
+      opponentId = getUserId(combatToRate.opponent);
     } else {
-      opponentId =
-        typeof combatToRate.creator === "object" &&
-        combatToRate.creator !== null &&
-        "_id" in combatToRate.creator
-          ? (combatToRate.creator as { _id: string })._id
-          : (combatToRate.creator as string);
+      // El usuario logueado es el oponente, puntúa al creador
+      opponentId = getUserId(combatToRate.creator);
     }
     console.log("Enviando rating:", {
       combat: combatToRate._id,
