@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useLanguage } from "../../context/LanguageContext";
-import { API_BASE_URL } from '../../services/config';
+import { API_BASE_URL } from '../../services/apiConfig';
 
 const GymLogin: React.FC = () => {
   const { t } = useLanguage();
@@ -30,8 +30,9 @@ const GymLogin: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // Store both token and gym data
-        localStorage.setItem("gymToken", data.token);
+        // 存储 token 和 refreshToken，和普通用户一致
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("userData", JSON.stringify({
           id: data.gym._id || data.gym.id, // handle both possible id fields
           name: data.gym.name,
