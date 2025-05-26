@@ -30,7 +30,7 @@ const GymLogin: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // 存储 token 和 refreshToken，和普通用户一致
+
         localStorage.setItem("token", data.token);
         localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("userData", JSON.stringify({

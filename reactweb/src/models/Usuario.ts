@@ -9,5 +9,5 @@ export interface Usuario {
     city: string; // Nuevo campo
     gender: string;
     profilePicture?: string; // URL de la imagen de perfil
-    confirmPassword?: string; // 新增，注册时用于确认密码
+    confirmPassword?: string; 
 }

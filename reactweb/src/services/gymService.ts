@@ -41,7 +41,7 @@ export const deleteGym = async (id: string): Promise<void> => {
   await axiosInstance.delete(`${API_BASE_URL}/gym/${id}`);
 };
 
-// 获取当前登录的健身房信息
+// Obtener información sobre el gimnasio conectado actualmente
 export const getCurrentGym = async (): Promise<Gym> => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -70,7 +70,7 @@ export const getCurrentGym = async (): Promise<Gym> => {
   return response.json();
 };
 
-// 更新健身房信息
+// Update gym profile
 export const updateGymProfile = async (gymId: string, updateData: Partial<Gym>): Promise<Gym> => {
   const token = localStorage.getItem('token');
   if (!token) {
