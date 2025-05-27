@@ -32,11 +32,7 @@ const GymLogin: React.FC = () => {
         const data = await response.json();
         // Store both token and gym data
         localStorage.setItem("gymToken", data.token);
-        localStorage.setItem("userData", JSON.stringify({
-          id: data.gym._id || data.gym.id, // handle both possible id fields
-          name: data.gym.name,
-          isGym: true,
-        }));
+        localStorage.setItem("userData", JSON.stringify(data.gym));
         alert(t("loginSuccess"));
         window.location.href = "/gym-home";
       } else {

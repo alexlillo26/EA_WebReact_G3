@@ -273,41 +273,49 @@ const MyCombats: React.FC = () => {
       <h2 className="my-combats-section-title">🗓️ {t("futureCombatsTitle")}</h2>
       {futureCombats.length > 0 ? (
         <ul className="my-combats-list">
-          {futureCombats.map((c) => (
-            <li key={c._id} className="my-combats-item">
-              <div>
-                <span className="my-combats-label">{t("date")}:</span>{" "}
-                {formatDate(String(c.date))}
-                <span className="my-combats-label"> | {t("time")}:</span>{" "}
-                {formatTime(c.time)}
-              </div>
-              <div>
-                <span className="my-combats-label">{t("gym")}:</span>{" "}
-                {(c as any).gym?.name || (c as any).gym || "-"}
-                {getGymAddress(c) && (
-                  <span className="my-combats-gym-address">
-                    {" "}
-                    ({getGymAddress(c)})
-                  </span>
+          {futureCombats
+            .slice()
+            .sort((a, b) => {
+              // Ordena por fecha y hora ascendente (más reciente primero)
+              const dateA = new Date(`${a.date}T${a.time || "00:00"}`).getTime();
+              const dateB = new Date(`${b.date}T${b.time || "00:00"}`).getTime();
+              return dateA - dateB;
+            })
+            .map((c) => (
+              <li key={c._id} className="my-combats-item">
+                <div>
+                  <span className="my-combats-label">{t("date")}:</span>{" "}
+                  {formatDate(String(c.date))}
+                  <span className="my-combats-label"> | {t("time")}:</span>{" "}
+                  {formatTime(c.time)}
+                </div>
+                <div>
+                  <span className="my-combats-label">{t("gym")}:</span>{" "}
+                  {(c as any).gym?.name || (c as any).gym || "-"}
+                  {getGymAddress(c) && (
+                    <span className="my-combats-gym-address">
+                      {" "}
+                      ({getGymAddress(c)})
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <span className="my-combats-label">{t("opponent")}:</span>{" "}
+                  {getOpponentForFuture(c)}
+                </div>
+                {canRateCombat(c) && !ratedCombats[String(c._id)] && (
+                  <button
+                    className="rate-opponent-btn"
+                    onClick={() => {
+                      setCombatToRate(c);
+                      setRatingModalOpen(true);
+                    }}
+                  >
+                    {t("rateOpponent")}
+                  </button>
                 )}
-              </div>
-              <div>
-                <span className="my-combats-label">{t("opponent")}:</span>{" "}
-                {getOpponentForFuture(c)}
-              </div>
-              {canRateCombat(c) && !ratedCombats[String(c._id)] && (
-                <button
-                  className="rate-opponent-btn"
-                  onClick={() => {
-                    setCombatToRate(c);
-                    setRatingModalOpen(true);
-                  }}
-                >
-                  {t("rateOpponent")}
-                </button>
-              )}
-            </li>
-          ))}
+              </li>
+            ))}
         </ul>
       ) : (
         <p className="my-combats-empty">{t("noFutureCombats")}</p>

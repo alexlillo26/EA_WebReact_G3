@@ -1,5 +1,6 @@
 import axios from "axios"; // Asumo que axios está en tus dependencias
 import { API_BASE_URL } from "./apiConfig"; // Importa la baseURL centralizada
+import axiosInstance from "./axiosInstance";
 
 interface LoginResponse {
   token: string;
@@ -87,4 +88,9 @@ export const logout = (): void => {
   // Si este authService no es un componente React, window.location.href es una forma de forzarlo.
   // Considera manejar la navegación en el componente que llama a logout().
   window.location.href = "/login"; 
+};
+
+export const fetchMyProfile = async () => {
+  const response = await axiosInstance.get("/users/me");
+  return response.data;
 };

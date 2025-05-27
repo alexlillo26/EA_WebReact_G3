@@ -89,6 +89,8 @@ const InvitationsList: React.FC = () => {
                 <br />
                 <strong>Data:</strong>{" "}
                 {new Date(combat.date).toLocaleDateString()} <br />
+                <strong>Hora:</strong>{" "}
+                {combat.time ? combat.time : "-"} <br />
                 <strong>Nivell:</strong> {combat.level}
               </div>
               <div className="combat-actions">

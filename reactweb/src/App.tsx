@@ -12,7 +12,7 @@ import "./App.css";
 import GymLogin from "./components/gyms/GymLogin";
 import GymToggleCard from "./components/gyms/GymToggleCard";
 import Statistics from "./components/Statistics/Statistics";
-import { getToken, handleGoogleOAuth } from "./services/authService";
+import { getToken, handleGoogleOAuth, fetchMyProfile, logout } from "./services/authService";
 import SearchResults from "./components/SearchResults/SearchResults";
 import { LanguageProvider } from "./context/LanguageContext";
 import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";

@@ -29,9 +29,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     null
   );
   const fetchUserData = React.useCallback(async () => {
-    if (!user) return; // Ensure user is logged in
+    // No uses el id del usuario pasado por props, siempre usa el autenticado
     try {
-      const userData = await getUserById(); // Always fetch fresh data from the backend
+      const userData = await getUserById(); // Siempre obtiene el usuario autenticado
       if (userData) {
         setFormData({
           name: userData.name || "",
@@ -87,7 +87,14 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
       if (profilePictureFile) {
         const formDataToSend = new FormData();
         formDataToSend.append("profilePicture", profilePictureFile);
-        formDataToSend.append("data", JSON.stringify(updatedUser));
+
+        // Añade todos los campos del usuario uno a uno al FormData
+        Object.entries(updatedUser).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            formDataToSend.append(key, value.toString());
+          }
+        });
+
         result = await updateUser(user.id, formDataToSend);
       } else {
         result = await updateUser(user.id, updatedUser); // Llama al servicio para actualizar el usuario
@@ -183,7 +190,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           <label>{t("cityLabel")}</label>
           <input
             type="text"
-            name="location"
+            name="city" // ✅ Corregido de "location" a "city"
             value={formData.city}
             onChange={handleChange}
           />
