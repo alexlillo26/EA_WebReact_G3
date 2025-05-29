@@ -28,6 +28,8 @@ const CreateCombat: React.FC = () => {
   const [userCombats, setUserCombats] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMsg, setModalMsg] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchGyms = async () => {
@@ -62,6 +64,12 @@ const CreateCombat: React.FC = () => {
   const filteredGyms = gyms.filter((g) =>
     g.name.toLowerCase().includes(gymName.toLowerCase())
   );
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
 
   const handleCreateCombat = async () => {
     if (!date || !time || !gym || !level) {
@@ -117,6 +125,16 @@ const CreateCombat: React.FC = () => {
         level,
         status: "pending" as "pending",
       };
+      if (imageFile) {
+        const formData = new FormData();
+        Object.entries(combatData).forEach(([key, value]) =>
+          formData.append(key, value)
+        );
+        formData.append("image", imageFile);
+        await createCombat(formData);
+      } else {
+        await createCombat(combatData);
+      }
       console.log("Sending combat with:", combatData);
       const combat = await createCombat(combatData);
       // Emitir evento de invitación al oponente
@@ -271,6 +289,38 @@ const CreateCombat: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        <div style={{ marginBottom: "12px" }}>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleImageChange}
+          />
+          <button
+            type="button"
+            className="file-upload-btn"
+            onClick={() => fileInputRef.current?.click()}
+            style={{ marginBottom: "8px" }}
+          >
+            Añadir imagen
+          </button>
+        </div>
+        {imageFile && (
+          <div style={{ margin: "10px 0" }}>
+            <strong>Previsualización</strong>
+            <br />
+            <img
+              src={URL.createObjectURL(imageFile)}
+              alt="Previsualización"
+              style={{
+                maxWidth: "200px",
+                maxHeight: "120px",
+                borderRadius: "8px",
+              }}
+            />
           </div>
         )}
         <button

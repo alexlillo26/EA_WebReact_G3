@@ -6,6 +6,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { RatingModal } from "../RatingModal/RatingModal";
 import { createRating, getRatingFromTo } from "../../services/ratingService";
 import { Rating } from "../../models/Rating";
+import { updateCombatImage } from "../../services/combatService";
 import "./MyCombats.css";
 
 const MyCombats: React.FC = () => {
@@ -19,6 +20,8 @@ const MyCombats: React.FC = () => {
   const [ratedCombats, setRatedCombats] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const [selectedCombatId, setSelectedCombatId] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Obtener el id y nombre del usuario actual
   const userData = (() => {
@@ -231,6 +234,16 @@ const MyCombats: React.FC = () => {
     }
   };
 
+  const handleImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    combatId: string
+  ) => {
+    if (e.target.files && e.target.files[0]) {
+      await updateCombatImage(combatId, e.target.files[0]);
+      refreshCombats(); // Refresca la lista tras actualizar
+    }
+  };
+
   const handleRateSubmit = async (score: number, comment: string) => {
     if (!combatToRate || !userId) {
       console.log("No hay combate para calificar o no hay userId");
@@ -277,13 +290,40 @@ const MyCombats: React.FC = () => {
             .slice()
             .sort((a, b) => {
               // Ordena por fecha y hora ascendente (más reciente primero)
-              const dateA = new Date(`${a.date}T${a.time || "00:00"}`).getTime();
-              const dateB = new Date(`${b.date}T${b.time || "00:00"}`).getTime();
+              const dateA = new Date(
+                `${a.date}T${a.time || "00:00"}`
+              ).getTime();
+              const dateB = new Date(
+                `${b.date}T${b.time || "00:00"}`
+              ).getTime();
               return dateA - dateB;
             })
             .map((c) => (
-              <li key={c._id} className="my-combats-item">
-                <div>
+              <li
+                key={c._id}
+                className="my-combats-item"
+                style={
+                  c.image
+                    ? {
+                        backgroundImage: `url(http://localhost:9000/${
+                          c.image
+                        }?${Date.now()})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
+                      }
+                    : undefined
+                }
+              >
+                <div
+                  style={{
+                    background: "none",
+                    padding: "8px",
+                    borderRadius: "8px",
+                    color: "#fff",
+                    textShadow: "1px 1px 6px #000",
+                  }}
+                >
                   <span className="my-combats-label">{t("date")}:</span>{" "}
                   {formatDate(String(c.date))}
                   <span className="my-combats-label"> | {t("time")}:</span>{" "}
@@ -314,6 +354,19 @@ const MyCombats: React.FC = () => {
                     {t("rateOpponent")}
                   </button>
                 )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  id={`file-input-${c._id}`}
+                  onChange={(e) => handleImageChange(e, c._id!)}
+                />
+                <label
+                  htmlFor={`file-input-${c._id}`}
+                  className="file-upload-btn2"
+                >
+                  {c.image ? "Cambiar foto" : "Añadir foto"}
+                </label>
               </li>
             ))}
         </ul>

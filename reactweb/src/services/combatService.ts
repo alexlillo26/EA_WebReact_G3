@@ -8,9 +8,18 @@ export const getCombats = async (params: Record<string, any> = {}): Promise<{ co
 };
 
 // Crear un nuevo combate
-export const createCombat = async (combatData: Partial<Combat>) => {
-  const response = await axiosInstance.post<any>('/combat', combatData);
-  return response.data;
+export const createCombat = async (combatData: Partial<Combat> | FormData) => {
+  if (combatData instanceof FormData) {
+    const response = await axiosInstance.post<any>('/combat', combatData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } else{
+    const response = await axiosInstance.post<any>('/combat', combatData);
+    return response.data;
+  }
 };
 
 // Responder a una invitación de combate (aceptar o rechazar)
@@ -38,4 +47,20 @@ export const fetchSentInvitations = async () => {
 export const getGymCombats = async (gymId: string, page: number = 1, pageSize: number = 10): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
   const response = await axiosInstance.get<any>(`/combat/gym/${gymId}`, { params: { page, pageSize } });
   return response.data as { combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number };
+};
+
+export const updateCombatImage = async (combatId: string, imageFile: File) => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+
+  const response = await axiosInstance.put<any>(
+    `/combat/${combatId}/image`, // Asegúrate de tener este endpoint en el backend
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
+  return response.data;
 };

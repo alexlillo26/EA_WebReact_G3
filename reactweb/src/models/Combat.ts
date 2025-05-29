@@ -22,5 +22,6 @@ export interface Combat {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   boxers?: (string | Boxer)[];
+  image?: string;
   // ...otros campos opcionales...
 }
