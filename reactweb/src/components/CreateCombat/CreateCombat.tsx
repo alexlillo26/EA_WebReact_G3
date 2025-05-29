@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CreateCombat.css";
 import { useLanguage } from "../../context/LanguageContext";
@@ -7,6 +6,7 @@ import { Gym } from "../../models/Gym";
 import { createCombat, getCombats } from "../../services/combatService";
 import { socket } from "../../socket";
 import SimpleModal from "../SimpleModal/SimpleModal";
+import React, { useEffect, useState, useCallback } from 'react';
 
 // --- CAMBIO PRINCIPAL: Lee combatState de localStorage si no viene por location.state
 const CreateCombat: React.FC = () => {

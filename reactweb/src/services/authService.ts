@@ -32,7 +32,7 @@ export const clearTokens = (): void => {
 
 export const login = async (email: string, password: string): Promise<void> => {
   // La petición irá a: https://ea3-api.upc.edu/api/users/login
-  const response = await axios.post<LoginResponse>(`${API_BASE_URL}/users/login`, { email, password });
+  const response = await axios.post<LoginResponse>(`${API_BASE_URL}/api/users/login`, { email, password });
   const { token, refreshToken } = response.data;
   setTokens(token, refreshToken);
   // Nota: En tu login.tsx, decodificas el token para obtener los datos del usuario.
@@ -42,7 +42,7 @@ export const login = async (email: string, password: string): Promise<void> => {
 export const handleGoogleOAuth = async (code: string): Promise<{ id: string; name: string }> => {
   console.log("WebReact - Handling Google OAuth with code:", code);
   // La petición irá a: https://ea3-api.upc.edu/api/auth/google
-  const response = await axios.post<LoginResponse>(`${API_BASE_URL}/auth/google`, { code });
+  const response = await axios.post<LoginResponse>(`${API_BASE_URL}/api/auth/google`, { code });
   const { token, refreshToken } = response.data;
   console.log("WebReact - Received token:", token);
   console.log("WebReact - Received refreshToken:", refreshToken);
@@ -69,7 +69,7 @@ export const refreshAccessToken = async (): Promise<string> => {
 
   try {
     // Cambia la ruta si tu backend usa /auth/refresh-token
-    const response = await axios.post<{ token: string }>(`${API_BASE_URL}/users/refresh-token`, {
+    const response = await axios.post<{ token: string }>(`${API_BASE_URL}/api/users/refresh-token`, {
       refreshToken,
     });
     console.log("WebReact - ✅ Token refreshed successfully:", response.data.token);
@@ -91,6 +91,6 @@ export const logout = (): void => {
 };
 
 export const fetchMyProfile = async () => {
-  const response = await axiosInstance.get("/users/me");
+  const response = await axiosInstance.get("/api/users/me");
   return response.data;
 };
