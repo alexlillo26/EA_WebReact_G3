@@ -111,3 +111,46 @@
 .rate-opponent-btn:hover {
   background-color: #a31f1f;
 }
+
+.combat-map-section {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.combats-list {
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .combat-map-section {
+    margin-top: 1rem;
+  }
+}
+
+.leaflet-popup-content {
+  margin: 10px;
+}
+
+.leaflet-popup-content h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.leaflet-popup-content p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.leaflet-popup-content ul {
+  margin: 5px 0;
+  padding-left: 20px;
+}
+
+.leaflet-popup-content li {
+  font-size: 14px;
+  margin: 2px 0;
+}

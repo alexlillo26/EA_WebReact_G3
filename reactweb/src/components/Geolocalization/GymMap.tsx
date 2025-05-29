@@ -3,22 +3,22 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Gym } from "../../models/Gym";
 import { geocodeAddress } from "../../services/geocodingService";
-import L, { Icon } from "leaflet"; // Ensure correct import
+import L, { Icon } from "leaflet"; // Asegúrate de importar correctamente
 import { useLanguage } from "../../context/LanguageContext";
 
-const redIcon: Icon = L.icon({
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png", // URL del icono
-  iconSize: [25, 41], // Tamaño del icono
-  iconAnchor: [12, 41], // Punto de anclaje del icono
-  popupAnchor: [1, -34], // Punto donde se abre el popup
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png", // Sombra del icono
-  shadowSize: [41, 41], // Tamaño de la sombra
+// Icono azul para los gimnasios sin combates
+const blueIcon: Icon = L.icon({
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  shadowSize: [41, 41],
 });
 
 interface GymMapProps {
   gyms: Gym[];
+  combats?: any[]; // Parámetro opcional para combates
 }
 
 // Componente para actualizar dinámicamente el centro y el zoom del mapa
@@ -33,7 +33,7 @@ const SetMapView: React.FC<{ center: [number, number]; zoom: number }> = ({
   return null;
 };
 
-const GymMap: React.FC<GymMapProps> = ({ gyms }) => {
+const GymMap: React.FC<GymMapProps> = ({ gyms, combats = [] }) => {
   const { t } = useLanguage();
   const [gymLocations, setGymLocations] = useState<
     { id: string; name: string; place: string; position: [number, number] }[]
@@ -56,20 +56,49 @@ const GymMap: React.FC<GymMapProps> = ({ gyms }) => {
         (location) => location !== null
       ) as any;
       setGymLocations(validLocations);
-
       // Si hay ubicaciones válidas, actualiza el centro al primer gimnasio
       if (validLocations.length > 0) {
         setCenter(validLocations[0].position);
-        setZoom(12); // Ajusta el zoom al nivel deseado
+        setZoom(12); // Ajusta el nivel de zoom
       }
     };
-
     fetchGymLocations();
   }, [gyms]);
 
   // Si el centro aún no está definido, muestra un mensaje de carga
   if (!center) {
     return <div>{t("loadingMap")}</div>;
+  }
+
+  // Función auxiliar: determina el oponente según los campos creator y opponent
+  function getOpponentName(combat: any): string {
+    let userId = "";
+    try {
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const user = JSON.parse(userData);
+        userId = user.id;
+      }
+    } catch {}
+    if (combat.creator && combat.creator._id && combat.creator._id !== userId) {
+      return combat.creator.name || combat.creator._id;
+    }
+    if (combat.opponent && combat.opponent._id && combat.opponent._id !== userId) {
+      return combat.opponent.name || combat.opponent._id;
+    }
+    return "-";
+  }
+
+  // Función auxiliar: obtiene todos los combates de un gimnasio
+  function getCombatsForGym(gymId: string) {
+    return combats.filter((combat) => {
+      if (typeof combat.gym === 'string') {
+        return combat.gym === gymId;
+      } else if (combat.gym && combat.gym._id) {
+        return combat.gym._id === gymId;
+      }
+      return false;
+    });
   }
 
   return (
@@ -103,18 +132,37 @@ const GymMap: React.FC<GymMapProps> = ({ gyms }) => {
         }}
       >
         <MapContainer style={{ height: "100%", width: "100%" }}>
-          <SetMapView center={center} zoom={zoom} />{" "}
-          {/* Actualiza dinámicamente el centro y el zoom */}
+          <SetMapView center={center} zoom={zoom} />
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          {gymLocations.map((gym) => (
-            <Marker key={gym.id} position={gym.position} icon={redIcon as Icon}>
-              <Popup>
-                <strong>{gym.name}</strong>
-                <br />
-                {gym.place}
-              </Popup>
-            </Marker>
-          ))}
+          {/* Renderiza los marcadores de los gimnasios */}
+          {gymLocations.map((gym) => {
+            return (
+              <Marker key={gym.id} position={gym.position} icon={blueIcon as Icon}>
+                <Popup>
+                  <div>
+                    <strong>{gym.name}</strong>
+                    <br />
+                    {gym.place}
+                    {getCombatsForGym(gym.id).length > 0 && (
+                      <div style={{ marginTop: 10 }}>
+                        <hr />
+                        <strong>{t("combatListTitle")}</strong>
+                        <ul style={{ margin: 0, paddingLeft: 18 }}>
+                          {getCombatsForGym(gym.id).map((combat) => (
+                            <li key={combat._id}>
+                              <span>{t("date")}:</span> {String(combat.date).slice(0, 10)}<br />
+                              <span>{t("time")}:</span> {combat.time}<br />
+                              <span>{t("opponent")}:</span> {getOpponentName(combat)}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
     </div>

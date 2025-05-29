@@ -272,6 +272,8 @@ const MyCombats: React.FC = () => {
     <div className="my-combats-container">
       <h2 className="my-combats-section-title">🗓️ {t("futureCombatsTitle")}</h2>
       {futureCombats.length > 0 ? (
+        <>
+          <div className="combats-list">
         <ul className="my-combats-list">
           {futureCombats
             .slice()
@@ -317,6 +319,8 @@ const MyCombats: React.FC = () => {
               </li>
             ))}
         </ul>
+          </div>
+        </>
       ) : (
         <p className="my-combats-empty">{t("noFutureCombats")}</p>
       )}

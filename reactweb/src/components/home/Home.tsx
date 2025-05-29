@@ -10,10 +10,13 @@ import "./Home.css";
 import { AppPromoSection } from "../AppPromoSection/AppPromoSection"; // Importa el nuevo componente
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext"; // Importa el contexto de idioma
+import { getCombats } from "../../services/combatService";
+import { Combat } from "../../models/Combat";
 
 const Home: React.FC = () => {
   const { t } = useLanguage();
   const [gyms, setGyms] = useState<Gym[]>([]);
+  const [combats, setCombats] = useState<Combat[]>([]);
   const [city, setCity] = useState("");
   const [weight, setWeight] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -23,7 +26,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchGyms = async () => {
       try {
-        const response = await getGyms(); // Explicitly typed response
+        const response = await getGyms();
         setGyms(response.gyms);
       } catch (error) {
         if (error instanceof Error) {
@@ -34,6 +37,18 @@ const Home: React.FC = () => {
       }
     };
     fetchGyms();
+  }, []);
+
+  useEffect(() => {
+    const fetchCombats = async () => {
+      try {
+        const res = await getCombats({ status: "accepted" });
+        setCombats(res.combats || []);
+      } catch (error) {
+
+      }
+    };
+    fetchCombats();
   }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -132,7 +147,7 @@ const Home: React.FC = () => {
 
       <StepsSection />
       <AboutSection />
-      <GymMap gyms={gyms} />
+      <GymMap gyms={gyms} combats={combats} />
       <AppPromoSection />
     </>
   );
