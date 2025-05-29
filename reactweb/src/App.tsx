@@ -32,6 +32,22 @@ interface User {
   name: string;
 }
 
+// Usa la clave pública VAPID real del backend (.env)
+const VAPID_PUBLIC_KEY = "BFXmSopn7qLS5OrzYStJH8mRYfAm75vwQRP1Ws-XL48p699t1TobmBBvcSnhqxH0ZZ4IpMoN7DnNzPhm-eJVQl0";
+
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [searchParams] = useSearchParams();
@@ -146,11 +162,53 @@ function App() {
       // Aquí podrías actualizar el estado global de invitaciones
     });
 
+    // NUEVO: Notificación cuando un usuario seguido crea o acepta un combate
+    socket.on("new_combat_from_followed", ({ combat, createdBy }) => {
+      // Puedes obtener el nombre del usuario seguido si viene en el objeto combat
+      const followedName =
+        (combat.creator && combat.creator.name) ||
+        (combat.creator && typeof combat.creator === "string" ? combat.creator : "Un usuario seguido");
+      toast.info(
+        `¡${followedName} ha creado o aceptado un nuevo combate!`
+      );
+    });
+
+    // REGISTRO SERVICE WORKER Y SUSCRIPCIÓN PUSH
+    if ("serviceWorker" in navigator && "PushManager" in window) {
+      navigator.serviceWorker
+        .register("/push-sw.js")
+        .then(async (registration) => {
+          // Solicita permiso al usuario
+          const permission = await Notification.requestPermission();
+          if (permission !== "granted") return;
+
+          // Suscribe al usuario
+          const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+          });
+
+          // Envía la suscripción al backend (endpoint correcto y formato correcto)
+          await fetch(`${process.env.REACT_APP_API_BASE_URL || "/api"}/followers/push-subscription`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+            },
+            body: JSON.stringify({ subscription }),
+          });
+        })
+        .catch((err) => {
+          console.error("Error registrando el Service Worker o suscribiendo a push:", err);
+        });
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       socket.off("combat_invitation");
       socket.off("combat_response");
       socket.off("newCombatInvitation");
+      socket.off("new_combat_from_followed");
     };
   }, [searchParams, isAccessibilityPanelOpen]);
 
