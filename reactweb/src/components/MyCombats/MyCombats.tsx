@@ -305,9 +305,9 @@ const MyCombats: React.FC = () => {
                 style={
                   c.image
                     ? {
-                        backgroundImage: `url(http://localhost:9000/${
-                          c.image
-                        }?${Date.now()})`,
+                        backgroundImage: `url(${c.image}${
+                          c.image.includes("cloudinary") ? "" : `?${Date.now()}`
+                        })`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                         backgroundRepeat: "no-repeat",
