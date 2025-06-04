@@ -79,10 +79,15 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const handleSave = async () => {
     if (!user) return; // Ensure user is logged in
     try {
-      const updatedUser = {
+      // Prepara el objeto actualizado, pero solo incluye password si no está vacío
+      const updatedUser: any = {
         ...formData,
         birthDate: new Date(formData.birthdate), // Convierte la fecha a formato Date
       };
+      if (!formData.password) {
+        delete updatedUser.password;
+      }
+
       let result;
       if (profilePictureFile) {
         const formDataToSend = new FormData();
@@ -107,6 +112,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
       setModalMsg(t("saveSuccess"));
       setModalOpen(true);
       await fetchUserData(); // Refresca los datos del usuario después de guardar
+      setFormData((prev) => ({ ...prev, password: "" })); // Limpia el campo password tras guardar
     } catch (error) {
       console.error(t("saveError"), error);
       setModalMsg(t("saveError"));
