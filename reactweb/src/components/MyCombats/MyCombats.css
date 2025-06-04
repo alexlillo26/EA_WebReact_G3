@@ -140,3 +140,35 @@
 .file-upload-btn2:hover {
   background-color: #a31f1f;
 }
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0 10px 0;
+}
+
+.pagination-controls button {
+  background-color: #0418f7;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pagination-controls button:disabled {
+  background-color: #bfc4d1;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.pagination-controls span {
+  font-size: 15px;
+  font-weight: 500;
+  color: #222;
+}

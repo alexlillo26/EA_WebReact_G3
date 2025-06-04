@@ -125,18 +125,17 @@ const CreateCombat: React.FC = () => {
         level,
         status: "pending" as "pending",
       };
+      let combat;
       if (imageFile) {
         const formData = new FormData();
         Object.entries(combatData).forEach(([key, value]) =>
           formData.append(key, value)
         );
         formData.append("image", imageFile);
-        await createCombat(formData);
+        combat = await createCombat(formData);
       } else {
-        await createCombat(combatData);
+        combat = await createCombat(combatData);
       }
-      console.log("Sending combat with:", combatData);
-      const combat = await createCombat(combatData);
       // Emitir evento de invitación al oponente
       socket.emit("sendCombatInvitation", { opponentId: opponent, combat });
       socket.emit("create_combat", combat); // Notifica por socket (legacy)

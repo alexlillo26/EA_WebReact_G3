@@ -22,6 +22,8 @@ const MyCombats: React.FC = () => {
   );
   const [selectedCombatId, setSelectedCombatId] = useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Obtener el id y nombre del usuario actual
   const userData = (() => {
@@ -145,12 +147,13 @@ const MyCombats: React.FC = () => {
     }
     setLoading(true);
     Promise.all([
-      getCombats({ status: "accepted", user: userId }),
+      getCombats({ status: "accepted", user: userId, page: currentPage }), // <-- añade page aquí
       getCombats({ status: "pending", opponent: userId }),
       getCombats({ status: "pending", creator: userId }),
     ])
       .then(([futureRes, receivedRes, sentRes]) => {
         setFutureCombats(futureRes.combats || []);
+        setTotalPages(futureRes.totalPages || 1); // <-- guarda el total de páginas
         setReceivedInvitations(receivedRes.combats || []);
         setSentInvitations(sentRes.combats || []);
       })
@@ -163,7 +166,7 @@ const MyCombats: React.FC = () => {
   useEffect(() => {
     refreshCombats();
     // eslint-disable-next-line
-  }, [userId]);
+  }, [userId, currentPage]);
 
   useEffect(() => {
     // Actualiza el contador de invitaciones pendientes en localStorage
@@ -285,91 +288,117 @@ const MyCombats: React.FC = () => {
     <div className="my-combats-container">
       <h2 className="my-combats-section-title">🗓️ {t("futureCombatsTitle")}</h2>
       {futureCombats.length > 0 ? (
-        <ul className="my-combats-list">
-          {futureCombats
-            .slice()
-            .sort((a, b) => {
-              // Ordena por fecha y hora ascendente (más reciente primero)
-              const dateA = new Date(
-                `${a.date}T${a.time || "00:00"}`
-              ).getTime();
-              const dateB = new Date(
-                `${b.date}T${b.time || "00:00"}`
-              ).getTime();
-              return dateA - dateB;
-            })
-            .map((c) => (
-              <li
-                key={c._id}
-                className="my-combats-item"
-                style={
-                  c.image
-                    ? {
-                        backgroundImage: `url(${c.image}${
-                          c.image.includes("cloudinary") ? "" : `?${Date.now()}`
-                        })`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        backgroundRepeat: "no-repeat",
-                      }
-                    : undefined
-                }
-              >
-                <div
-                  style={{
-                    background: "none",
-                    padding: "8px",
-                    borderRadius: "8px",
-                    color: "#fff",
-                    textShadow: "1px 1px 6px #000",
-                  }}
+        <>
+          <ul className="my-combats-list">
+            {futureCombats
+              .slice()
+              .sort((a, b) => {
+                // Ordena por fecha y hora ascendente (más reciente primero)
+                const dateA = new Date(
+                  `${a.date}T${a.time || "00:00"}`
+                ).getTime();
+                const dateB = new Date(
+                  `${b.date}T${b.time || "00:00"}`
+                ).getTime();
+                return dateA - dateB;
+              })
+              .map((c) => (
+                <li
+                  key={c._id}
+                  className="my-combats-item"
+                  style={
+                    c.image
+                      ? {
+                          backgroundImage: `url(${c.image}${
+                            c.image.includes("cloudinary")
+                              ? ""
+                              : `?${Date.now()}`
+                          })`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          backgroundRepeat: "no-repeat",
+                        }
+                      : undefined
+                  }
                 >
-                  <span className="my-combats-label">{t("date")}:</span>{" "}
-                  {formatDate(String(c.date))}
-                  <span className="my-combats-label"> | {t("time")}:</span>{" "}
-                  {formatTime(c.time)}
-                </div>
-                <div>
-                  <span className="my-combats-label">{t("gym")}:</span>{" "}
-                  {(c as any).gym?.name || (c as any).gym || "-"}
-                  {getGymAddress(c) && (
-                    <span className="my-combats-gym-address">
-                      {" "}
-                      ({getGymAddress(c)})
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <span className="my-combats-label">{t("opponent")}:</span>{" "}
-                  {getOpponentForFuture(c)}
-                </div>
-                {canRateCombat(c) && !ratedCombats[String(c._id)] && (
-                  <button
-                    className="rate-opponent-btn"
-                    onClick={() => {
-                      setCombatToRate(c);
-                      setRatingModalOpen(true);
+                  <div
+                    style={{
+                      background: "none",
+                      padding: "8px",
+                      borderRadius: "8px",
+                      color: "#fff",
+                      textShadow: "1px 1px 6px #000",
                     }}
                   >
-                    {t("rateOpponent")}
-                  </button>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  id={`file-input-${c._id}`}
-                  onChange={(e) => handleImageChange(e, c._id!)}
-                />
-                <label
-                  htmlFor={`file-input-${c._id}`}
-                  className="file-upload-btn2"
-                >
-                  {c.image ? "Cambiar foto" : "Añadir foto"}
-                </label>
-              </li>
-            ))}
-        </ul>
+                    <span className="my-combats-label">{t("date")}:</span>{" "}
+                    {formatDate(String(c.date))}
+                    <span className="my-combats-label">
+                      {" "}
+                      | {t("time")}:
+                    </span>{" "}
+                    {formatTime(c.time)}
+                  </div>
+                  <div>
+                    <span className="my-combats-label">{t("gym")}:</span>{" "}
+                    {(c as any).gym?.name || (c as any).gym || "-"}
+                    {getGymAddress(c) && (
+                      <span className="my-combats-gym-address">
+                        {" "}
+                        ({getGymAddress(c)})
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <span className="my-combats-label">{t("opponent")}:</span>{" "}
+                    {getOpponentForFuture(c)}
+                  </div>
+                  {canRateCombat(c) && !ratedCombats[String(c._id)] && (
+                    <button
+                      className="rate-opponent-btn"
+                      onClick={() => {
+                        setCombatToRate(c);
+                        setRatingModalOpen(true);
+                      }}
+                    >
+                      {t("rateOpponent")}
+                    </button>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    id={`file-input-${c._id}`}
+                    onChange={(e) => handleImageChange(e, c._id!)}
+                  />
+                  <label
+                    htmlFor={`file-input-${c._id}`}
+                    className="file-upload-btn2"
+                  >
+                    {c.image ? "Cambiar foto" : "Añadir foto"}
+                  </label>
+                </li>
+              ))}
+          </ul>
+          <div className="pagination-controls">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            >
+              Anterior
+            </button>
+            <span>
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+            >
+              Siguiente
+            </button>
+          </div>
+        </>
       ) : (
         <p className="my-combats-empty">{t("noFutureCombats")}</p>
       )}
