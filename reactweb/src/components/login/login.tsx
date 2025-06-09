@@ -32,6 +32,7 @@ const Login: React.FC<{
           name: decoded.username,
         };
         onLogin(userData); // Update user state
+        // No sobrescribas userData aquí si App.tsx ya lo hace tras fetchMyProfile
         localStorage.setItem("userData", JSON.stringify(userData));
         getCombats({ status: "pending", opponent: userData.id }).then((res) => {
           const count = res.combats ? res.combats.length : 0;

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Route, Routes, useSearchParams } from "react-router-dom";
+import React, { useState, useEffect, useRef, JSX } from "react";
+import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import Header from "./components/header/Header";
 import Home from "./components/home/Home";
 import Login from "./components/login/login";
@@ -11,8 +11,7 @@ import CombatList from "./components/CombatList/CombatList";
 import "./App.css";
 import GymLogin from "./components/gyms/GymLogin";
 import GymToggleCard from "./components/gyms/GymToggleCard";
-import Statistics from "./components/Statistics/Statistics";
-import { getToken, handleGoogleOAuth } from "./services/authService";
+import { getToken, handleGoogleOAuth, fetchMyProfile, logout } from "./services/authService";
 import SearchResults from "./components/SearchResults/SearchResults";
 import { LanguageProvider } from "./context/LanguageContext";
 import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
@@ -26,12 +25,28 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MyCombats from "./components/MyCombats/MyCombats";
 import { getCombats } from "./services/combatService";
+import CombatHistoryPage from './pages/CombatHistoryPage/CombatHistoryPage';
 
 interface User {
   id: string;
   name: string;
 }
 
+const ProtectedRoute = ({ user, children }: { user: User | null, children: JSX.Element }) => {
+  // getToken() es tu función de authService que recupera el token de localStorage
+  const tokenExists = getToken(); 
+
+  // Si no hay 'user' en el estado de App Y no hay 'token' en localStorage, redirige a login
+  if (!user && !tokenExists) {
+    console.log("ProtectedRoute: No user state and no token, redirecting to login.");
+    return <Navigate to="/login" replace />;
+  }
+  // Si hay token, pero el estado user aún no se ha cargado (podría ser el render inicial),
+  // podrías querer mostrar un loader o permitir el acceso asumiendo que el token se validará.
+  // Para este ejemplo, si hay user en el estado o un token, permitimos el acceso.
+  // Una lógica más robusta podría validar el token aquí también si fuera necesario.
+  return children;
+};
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [searchParams] = useSearchParams();
@@ -184,7 +199,11 @@ function App() {
           <Route path="/combates" element={<MyCombats />} />
           <Route
             path="/estadisticas"
-            element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
+            element={
+              <ProtectedRoute user={user}>
+                <CombatHistoryPage />
+              </ProtectedRoute>
+            }
           />
           <Route path="/search-results" element={<SearchResults />} />
           <Route path="/create-combat" element={<CreateCombat />} />

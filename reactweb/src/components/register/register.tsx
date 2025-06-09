@@ -79,7 +79,7 @@ const Register: React.FC = () => {
         await login(email, password);
         localStorage.setItem(
           "userData",
-          JSON.stringify({ id: user.id, name: user.name })
+          JSON.stringify(user)
         );
         window.location.href = "/"; // Redirige al inicio
       } else {
