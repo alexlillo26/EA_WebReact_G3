@@ -10,11 +10,29 @@ export const RatingModal = ({
 }: {
   open: boolean;
   onClose: () => void;
-  onSubmit: (score: number, comment: string) => void;
+  onSubmit: (values: {
+    punctuality: number;
+    attitude: number;
+    intensity: number;
+    sportmanship: number;
+    technique: number;
+    comment: string;
+  }) => void;
   opponentName: string;
 }) => {
-  const [score, setScore] = useState(0);
+  const [punctuality, setPunctuality] = useState(0);
+  const [attitude, setAttitude] = useState(0);
+  const [intensity, setIntensity] = useState(0);
+  const [sportmanship, setSportmanship] = useState(0);
+  const [technique, setTechnique] = useState(0);
   const [comment, setComment] = useState("");
+
+  const canSubmit =
+    punctuality > 0 &&
+    attitude > 0 &&
+    intensity > 0 &&
+    sportmanship > 0 &&
+    technique > 0;
 
   if (!open) return null;
 
@@ -25,7 +43,26 @@ export const RatingModal = ({
     >
       <div className="modal-content">
         <h3>Califica a {opponentName}</h3>
-        <RatingStars value={score} onChange={setScore} />
+        <div>
+          <label>Puntualidad:</label>
+          <RatingStars value={punctuality} onChange={setPunctuality} />
+        </div>
+        <div>
+          <label>Actitud:</label>
+          <RatingStars value={attitude} onChange={setAttitude} />
+        </div>
+        <div>
+          <label>Intensidad:</label>
+          <RatingStars value={intensity} onChange={setIntensity} />
+        </div>
+        <div>
+          <label>Deportividad:</label>
+          <RatingStars value={sportmanship} onChange={setSportmanship} />
+        </div>
+        <div>
+          <label>Técnica:</label>
+          <RatingStars value={technique} onChange={setTechnique} />
+        </div>
         <textarea
           placeholder="Deja un comentario (opcional)"
           value={comment}
@@ -34,8 +71,18 @@ export const RatingModal = ({
           style={{ width: "100%", margin: "10px 0" }}
         />
         <button
-          onClick={() => score > 0 && onSubmit(score, comment)}
-          disabled={score === 0}
+          onClick={() =>
+            canSubmit &&
+            onSubmit({
+              punctuality,
+              attitude,
+              intensity,
+              sportmanship,
+              technique,
+              comment,
+            })
+          }
+          disabled={!canSubmit}
         >
           Enviar
         </button>

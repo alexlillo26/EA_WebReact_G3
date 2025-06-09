@@ -24,7 +24,7 @@ const SeeProfile: React.FC<Props> = ({
     if (open && userId) {
       setLoading(true);
       getRatingsByUser(userId).then((res) => {
-        setRatings(res);
+        setRatings(Array.isArray(res) ? res : []);
         setLoading(false);
       });
     }
@@ -32,16 +32,17 @@ const SeeProfile: React.FC<Props> = ({
 
   if (!open || !user) return null;
 
-  const avg =
+  // Calcular promedios de cada campo
+  const avgField = (field: keyof Rating) =>
     ratings.length > 0
-      ? (ratings.reduce((acc, r) => acc + r.score, 0) / ratings.length).toFixed(
-          2
-        )
+      ? (
+          ratings.reduce((acc, r) => acc + Number(r[field] ?? 0), 0) /
+          ratings.length
+        ).toFixed(2)
       : "-";
 
   const getDirections = () => {
     if (!currentUserCity || !user.city) return;
-
     const origin = encodeURIComponent(currentUserCity);
     const destination = encodeURIComponent(user.city);
     const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
@@ -66,9 +67,29 @@ const SeeProfile: React.FC<Props> = ({
         <p>
           <b>Peso:</b> {user.weight}
         </p>
-        <p>
-          <b>Valoración media:</b> {avg} ⭐ ({ratings.length} valoraciones)
-        </p>
+        <div style={{ margin: "18px 0 10px 0" }}>
+          <b>Valoraciones medias:</b>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            <li>
+              Puntualidad: <b>{avgField("punctuality")}</b> ⭐
+            </li>
+            <li>
+              Actitud: <b>{avgField("attitude")}</b> ⭐
+            </li>
+            <li>
+              Intensidad: <b>{avgField("intensity")}</b> ⭐
+            </li>
+            <li>
+              Deportividad: <b>{avgField("sportmanship")}</b> ⭐
+            </li>
+            <li>
+              Técnica: <b>{avgField("technique")}</b> ⭐
+            </li>
+          </ul>
+          <span style={{ color: "#888", fontSize: "0.95em" }}>
+            ({ratings.length} valoraciones)
+          </span>
+        </div>
         <hr />
         <h4>Comentarios recientes:</h4>
         {loading ? (
@@ -76,10 +97,35 @@ const SeeProfile: React.FC<Props> = ({
         ) : ratings.length === 0 ? (
           <p>Sin valoraciones aún.</p>
         ) : (
-          <ul style={{ textAlign: "left", maxHeight: 200, overflowY: "auto" }}>
+          <ul
+            style={{
+              textAlign: "left",
+              maxHeight: 200,
+              overflowY: "auto",
+              padding: 0,
+            }}
+          >
             {ratings.slice(0, 5).map((r) => (
-              <li key={r._id}>
-                <b>{r.score}⭐</b> {r.comment && `- "${r.comment}"`}
+              <li
+                key={r._id}
+                style={{
+                  marginBottom: 10,
+                  background: "#fafafa",
+                  borderRadius: 6,
+                  padding: 8,
+                }}
+              >
+                <div>
+                  <b>Puntualidad:</b> {r.punctuality} ⭐ | <b>Actitud:</b>{" "}
+                  {r.attitude} ⭐ | <b>Intensidad:</b> {r.intensity} ⭐ |{" "}
+                  <b>Deportividad:</b> {r.sportmanship} ⭐ | <b>Técnica:</b>{" "}
+                  {r.technique ?? "-"} ⭐
+                </div>
+                {r.comment && (
+                  <div style={{ marginTop: 4, color: "#444" }}>
+                    <i>"{r.comment}"</i>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
