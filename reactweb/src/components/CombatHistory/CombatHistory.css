@@ -1,98 +1,172 @@
-/* Variables de color (opcional, pero útil para consistencia) */
+/* Propuesta de Diseño: "Línea de Tiempo de Combates"
+  Un estilo más moderno y visual para el historial.
+*/
+
+/* --- Variables de Color (Mismas que proporcionaste con leves ajustes) --- */
 :root {
-    --color-bg-dark: #1a1a1a; /* Un negro o gris muy oscuro para el fondo */
-    --color-text-primary: #f0f0f0; /* Texto principal claro para contraste */
-    --color-text-secondary: #b0b0b0; /* Texto secundario un poco más oscuro */
-    --color-accent-red: #e50914;   /* Un rojo vibrante (como el de Netflix, o elige el tuyo) */
-    --color-border-light: #333333; /* Un borde sutil */
-    --color-item-bg: #282828;     /* Fondo para cada item del historial */
-  }
-  
-  /* Contenedor principal del historial de combates */
-  .combat-history-container {
-    background-color: var(--color-bg-dark);
-    color: var(--color-text-primary);
-    padding: 20px;
-    border-radius: 8px;
-    margin: 20px auto; /* Centrar y dar margen si está dentro de otra página */
-    max-width: 700px; /* Limitar el ancho para mejor lectura */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  }
-  
-  .combat-history-container h3 {
-    color: var(--color-accent-red);
-    text-align: center;
-    text-transform: uppercase;
-    margin-bottom: 25px;
-    border-bottom: 2px solid var(--color-accent-red);
-    padding-bottom: 10px;
-  }
-  
-  /* Estilo para la lista de combates */
-  .combat-history-container ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  /* Estilo para cada ítem del historial */
-  .combat-history-item {
-    background-color: var(--color-item-bg);
-    border: 1px solid var(--color-border-light);
-    border-left: 5px solid var(--color-accent-red); /* Acento rojo a la izquierda */
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  }
-  
-  .combat-history-item p {
-    margin: 8px 0;
-    line-height: 1.6;
-  }
-  
-  .combat-history-item strong {
-    color: var(--color-accent-red); /* Hace las etiquetas (Fecha, Oponente, etc.) rojas */
-    margin-right: 8px;
-  }
-  
-  /* Mensajes (no hay combates, cargando, error) */
-  .combat-history-container p {
-    color: var(--color-text-secondary);
-  }
-  
-  /* Controles de paginación */
-  .pagination-controls {
-    text-align: center;
-    margin-top: 25px;
-    padding-top: 15px;
-    border-top: 1px solid var(--color-border-light);
-  }
-  
-  .pagination-controls button {
-    background-color: var(--color-accent-red);
-    color: var(--color-text-primary);
-    border: none;
-    padding: 10px 15px;
-    margin: 0 5px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    text-transform: uppercase;
-    transition: background-color 0.3s ease;
-  }
-  
-  .pagination-controls button:hover:not(:disabled) {
-    background-color: #f70a18; /* Un rojo un poco más brillante al pasar el ratón */
-  }
-  
-  .pagination-controls button:disabled {
-    background-color: #555;
-    color: #888;
-    cursor: not-allowed;
-  }
-  
-  .pagination-controls span {
-    margin: 0 15px;
-    color: var(--color-text-primary);
-    font-weight: bold;
-  }
+  --color-bg-dark: #121212; /* Un negro ligeramente más suave */
+  --color-text-primary: #f0f0f0;
+  --color-text-secondary: #a0a0a0; /* Un gris un poco más claro para mejor lectura */
+  --color-accent-red: #e50914;
+  --color-border-light: #444444; /* Borde un poco más visible */
+  --color-item-bg: #1e1e1e;     /* Fondo del item para que contraste con el fondo general */
+  --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Tipografía más moderna */
+}
+
+/* --- Contenedor Principal --- */
+.combat-history-container {
+  background: linear-gradient(145deg, #1a1a1a, #101010); /* Gradiente sutil para dar profundidad */
+  color: var(--color-text-primary);
+  font-family: var(--font-main);
+  padding: 30px;
+  border-radius: 12px;
+  margin: 60px auto;
+  max-width: 700px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--color-border-light);
+}
+
+/* --- Título Principal (h3) --- */
+.combat-history-container h3 {
+  color: var(--color-text-primary);
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1.8em;
+  letter-spacing: 4px; /* Aumentamos el espaciado para un look más de "título" */
+  margin-bottom: 35px;
+  position: relative;
+}
+
+/* Línea decorativa para el título, más elegante que un borde completo */
+.combat-history-container h3::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 3px;
+  background-color: var(--color-accent-red);
+  margin: 15px auto 0;
+  border-radius: 2px;
+}
+
+/* --- Lista de Combates (ul) - Estilo de Línea de Tiempo --- */
+.combat-history-container ul {
+  list-style-type: none;
+  padding: 0;
+  position: relative;
+  /* La línea vertical central de nuestra línea de tiempo */
+  border-left: 2px solid var(--color-border-light);
+  margin-left: 20px; /* Espacio para los puntos de la línea de tiempo */
+}
+
+/* --- Ítem del Historial (li) --- */
+.combat-history-item {
+  background-color: var(--color-item-bg);
+  border: 1px solid transparent; /* Borde que aparecerá al hacer hover */
+  padding: 20px;
+  margin-bottom: 25px;
+  margin-left: 40px; /* Empuja el item a la derecha de la línea */
+  border-radius: 8px;
+  position: relative;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.combat-history-item:hover {
+  transform: translateX(10px); /* Efecto de "salida" al pasar el ratón */
+  border-color: var(--color-accent-red);
+  box-shadow: 0 5px 20px rgba(229, 9, 20, 0.25);
+}
+
+/* El círculo que marca el punto en la línea de tiempo */
+.combat-history-item::before {
+  content: '';
+  position: absolute;
+  top: 25px;
+  left: -52px; /* Posiciona el círculo sobre la línea vertical */
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-bg-dark);
+  border: 4px solid var(--color-accent-red);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.combat-history-item p {
+  margin: 10px 0;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+.combat-history-item strong {
+  color: var(--color-text-primary); /* El texto en negrita más blanco para destacar */
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+/* --- Controles de Paginación --- */
+.pagination-controls {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.pagination-controls button {
+  background-color: transparent; /* Botones estilo "fantasma" */
+  color: var(--color-accent-red);
+  border: 2px solid var(--color-accent-red);
+  padding: 10px 20px;
+  margin: 0 8px;
+  border-radius: 50px; /* Botones totalmente redondeados */
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: var(--color-accent-red);
+  color: var(--color-text-primary);
+  box-shadow: 0 0 15px var(--color-accent-red);
+}
+
+.pagination-controls button:disabled {
+  border-color: #444;
+  color: #555;
+  cursor: not-allowed;
+}
+
+.pagination-controls span {
+  margin: 0 15px;
+  color: var(--color-text-primary);
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+/* Estilos para los botones de acción de resultado */
+.result-actions {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border-light); /* Asumiendo que tienes esta variable de color */
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espacio entre los elementos */
+}
+
+.result-actions strong {
+    color: var(--color-text-secondary); /* Asumiendo que tienes esta variable */
+    font-size: 0.9em;
+}
+
+.result-actions button {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.result-actions button:hover {
+  background-color: var(--color-accent-red); /* Asumiendo que tienes esta variable */
+  color: #fff;
+}

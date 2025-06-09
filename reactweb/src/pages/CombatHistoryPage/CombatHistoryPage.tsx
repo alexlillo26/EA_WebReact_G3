@@ -43,7 +43,7 @@ const CombatHistoryPage: React.FC = () => {
   return (
     <div className="page-container combat-history-page">
       <header>
-        <h1>{t('statisticsTitle')}</h1> {/* Asume que 'statisticsTitle' está en translations.ts */}
+       {/* <h1>{t('statisticsTitle')}</h1> */}
       </header>
       <main>
         {authError && <p style={{ color: 'red' }}>{authError}</p>}

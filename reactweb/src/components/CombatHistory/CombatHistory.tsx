@@ -1,54 +1,27 @@
 import React, { useEffect, useState, useCallback } from 'react';
+// Se elimina la importación de 'setCombatResult'
 import { fetchCombatHistory, FetchCombatHistoryReturn } from '../../services/combatService';
 import { CombatHistoryEntry } from '../../models/Combat';
-import { useLanguage } from '../../context/LanguageContext'; // Asumo que LanguageKey es el tipo de tus claves de traducción
-import './CombatHistory.css'; // Asegúrate de que este archivo CSS exista y tenga los estilos necesarios
+import { useLanguage } from '../../context/LanguageContext';
+import './CombatHistory.css';
 
 interface CombatHistoryProps {
   boxerId: string | null;
 }
 
-// Definimos el tipo específico para las claves de resultado que hemos añadido
-// Esto es para que TypeScript sepa que estas son claves válidas.
-// Asegúrate que estas coincidan EXACTAMENTE con las claves en tu translations.ts
-type CombatResultTranslationKey = 
-  | 'combatHistory.result.victoria'
-  | 'combatHistory.result.derrota'
-  | 'combatHistory.result.empate';
+// Ya no necesitamos las funciones getResultClass ni getResultTranslationKey
 
 const CombatHistory: React.FC<CombatHistoryProps> = ({ boxerId }) => {
-  // Asumimos que tu t() function está tipada para aceptar LanguageKey
-  // y LanguageKey es la unión de todas tus claves de translations.ts
   const { t } = useLanguage();
-
   const [combats, setCombats] = useState<CombatHistoryEntry[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  // ... (otros estados sin cambios) ...
   const [totalCombats, setTotalCombats] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
   const PAGE_SIZE = 10;
 
-  // --- NUEVA FUNCIÓN HELPER PARA OBTENER LA CLAVE DE TRADUCCIÓN DEL RESULTADO ---
-  const getResultTranslationKey = (resultValue: 'Victoria' | 'Derrota' | 'Empate'): CombatResultTranslationKey => {
-    switch (resultValue.toLowerCase()) {
-      case 'victoria':
-        return 'combatHistory.result.victoria';
-      case 'derrota':
-        return 'combatHistory.result.derrota';
-      case 'empate':
-        return 'combatHistory.result.empate';
-      default:
-        // Esto no debería ocurrir si combat.result siempre es uno de los tres valores esperados
-        // pero es bueno tener un fallback. Podrías retornar una clave genérica de error o la de empate.
-        return 'combatHistory.result.empate';
-    }
-  };
-
   const loadCombatHistory = useCallback(async (pageToFetch: number) => {
-    // ... (sin cambios en la lógica interna de loadCombatHistory)
     if (!boxerId) {
       setCombats([]);
       setTotalPages(1);
@@ -73,13 +46,14 @@ const CombatHistory: React.FC<CombatHistoryProps> = ({ boxerId }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [boxerId, t, PAGE_SIZE]); // t ahora es dependencia de useCallback
+  }, [boxerId, t, PAGE_SIZE]);
 
   useEffect(() => {
     loadCombatHistory(currentPage);
   }, [boxerId, currentPage, loadCombatHistory]);
 
-  // ... (handlePreviousPage, handleNextPage, y los returns de !boxerId, isLoading, error sin cambios) ...
+  // Ya no necesitamos la función handleSetResult
+
   if (!boxerId) {
     return <p>{t('combatHistory.noUserSelected')}</p>;
   }
@@ -91,12 +65,10 @@ const CombatHistory: React.FC<CombatHistoryProps> = ({ boxerId }) => {
   }
 
   const handlePreviousPage = () => {
-    // No es necesario pasar _event si no lo usas
     setCurrentPage((prevPage) => Math.max(1, prevPage - 1));
   };
 
   const handleNextPage = () => {
-    // No es necesario pasar _event si no lo usas
     setCurrentPage((prevPage) => Math.min(totalPages, prevPage + 1));
   };
 
@@ -119,11 +91,7 @@ const CombatHistory: React.FC<CombatHistoryProps> = ({ boxerId }) => {
                     <strong>{t('combatHistory.opponent')}:</strong> {combat.opponent.username}
                   </p>
                 )}
-                <p>
-                  <strong>{t('combatHistory.result')}:</strong> 
-                  {/* --- USA LA NUEVA FUNCIÓN HELPER AQUÍ --- */}
-                  {t(getResultTranslationKey(combat.result))}
-                </p>
+                {/* Se elimina el párrafo que mostraba el resultado */}
                 {combat.gym && combat.gym.name && (
                   <p>
                     <strong>{t('combatHistory.gym')}:</strong> {combat.gym.name}
@@ -134,6 +102,7 @@ const CombatHistory: React.FC<CombatHistoryProps> = ({ boxerId }) => {
                     <strong>{t('combatHistory.level')}:</strong> {combat.level}
                   </p>
                 )}
+                {/* Se elimina la sección de botones para asignar resultado */}
               </li>
             ))}
           </ul>
