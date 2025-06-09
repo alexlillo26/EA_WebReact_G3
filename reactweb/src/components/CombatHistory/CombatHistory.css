@@ -1,0 +1,98 @@
+/* Variables de color (opcional, pero útil para consistencia) */
+:root {
+    --color-bg-dark: #1a1a1a; /* Un negro o gris muy oscuro para el fondo */
+    --color-text-primary: #f0f0f0; /* Texto principal claro para contraste */
+    --color-text-secondary: #b0b0b0; /* Texto secundario un poco más oscuro */
+    --color-accent-red: #e50914;   /* Un rojo vibrante (como el de Netflix, o elige el tuyo) */
+    --color-border-light: #333333; /* Un borde sutil */
+    --color-item-bg: #282828;     /* Fondo para cada item del historial */
+  }
+  
+  /* Contenedor principal del historial de combates */
+  .combat-history-container {
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-primary);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px auto; /* Centrar y dar margen si está dentro de otra página */
+    max-width: 700px; /* Limitar el ancho para mejor lectura */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  }
+  
+  .combat-history-container h3 {
+    color: var(--color-accent-red);
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    border-bottom: 2px solid var(--color-accent-red);
+    padding-bottom: 10px;
+  }
+  
+  /* Estilo para la lista de combates */
+  .combat-history-container ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  /* Estilo para cada ítem del historial */
+  .combat-history-item {
+    background-color: var(--color-item-bg);
+    border: 1px solid var(--color-border-light);
+    border-left: 5px solid var(--color-accent-red); /* Acento rojo a la izquierda */
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  }
+  
+  .combat-history-item p {
+    margin: 8px 0;
+    line-height: 1.6;
+  }
+  
+  .combat-history-item strong {
+    color: var(--color-accent-red); /* Hace las etiquetas (Fecha, Oponente, etc.) rojas */
+    margin-right: 8px;
+  }
+  
+  /* Mensajes (no hay combates, cargando, error) */
+  .combat-history-container p {
+    color: var(--color-text-secondary);
+  }
+  
+  /* Controles de paginación */
+  .pagination-controls {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-border-light);
+  }
+  
+  .pagination-controls button {
+    background-color: var(--color-accent-red);
+    color: var(--color-text-primary);
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+  }
+  
+  .pagination-controls button:hover:not(:disabled) {
+    background-color: #f70a18; /* Un rojo un poco más brillante al pasar el ratón */
+  }
+  
+  .pagination-controls button:disabled {
+    background-color: #555;
+    color: #888;
+    cursor: not-allowed;
+  }
+  
+  .pagination-controls span {
+    margin: 0 15px;
+    color: var(--color-text-primary);
+    font-weight: bold;
+  }
