@@ -56,3 +56,33 @@ export interface Combat { // Esta es la que tus otras funciones de servicio ya u
   updatedAt?: Date | string;
   // ... otros campos si los tienes de antes
 }
+
+// Añadir al final de reactweb/src/models/Combat.ts
+
+export interface FrequentOpponent {
+  opponent: {
+    id: string;
+    name: string;
+  };
+  count: number;
+}
+
+export interface FrequentGym {
+  gym: {
+    id: string;
+    name: string;
+  };
+  count: number;
+}
+
+export interface CombatsPerMonth {
+  year: number;
+  month: number;
+  count: number;
+}
+
+export interface IUserStatistics {
+  mostFrequentOpponent: FrequentOpponent | null;
+  frequentGyms: FrequentGym[];
+  combatsPerMonth: CombatsPerMonth[];
+}

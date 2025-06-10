@@ -84,9 +84,6 @@ export const refreshAccessToken = async (): Promise<string> => {
 
 export const logout = (): void => {
   clearTokens();
-  // Para React Router v6+, la redirección programática se hace usualmente con el hook useNavigate
-  // Si este authService no es un componente React, window.location.href es una forma de forzarlo.
-  // Considera manejar la navegación en el componente que llama a logout().
   window.location.href = "/login"; 
 };
 

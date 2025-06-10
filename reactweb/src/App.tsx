@@ -26,6 +26,8 @@ import "react-toastify/dist/ReactToastify.css";
 import MyCombats from "./components/MyCombats/MyCombats";
 import { getCombats } from "./services/combatService";
 import CombatHistoryPage from './pages/CombatHistoryPage/CombatHistoryPage';
+import UserStatisticsPage from "./components/Statistics/UserStatisticsPage";
+
 
 interface User {
   id: string;
@@ -33,20 +35,16 @@ interface User {
 }
 
 const ProtectedRoute = ({ user, children }: { user: User | null, children: JSX.Element }) => {
-  // getToken() es tu función de authService que recupera el token de localStorage
   const tokenExists = getToken(); 
 
-  // Si no hay 'user' en el estado de App Y no hay 'token' en localStorage, redirige a login
   if (!user && !tokenExists) {
     console.log("ProtectedRoute: No user state and no token, redirecting to login.");
     return <Navigate to="/login" replace />;
   }
-  // Si hay token, pero el estado user aún no se ha cargado (podría ser el render inicial),
-  // podrías querer mostrar un loader o permitir el acceso asumiendo que el token se validará.
-  // Para este ejemplo, si hay user en el estado o un token, permitimos el acceso.
-  // Una lógica más robusta podría validar el token aquí también si fuera necesario.
+  
   return children;
 };
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [searchParams] = useSearchParams();
@@ -64,17 +62,21 @@ function App() {
   useEffect(() => {
     const userData = localStorage.getItem("userData");
     if (userData) {
-      const { id } = JSON.parse(userData);
-      getCombats({ status: "pending", opponent: id }).then((res) => {
-        const count = res.combats ? res.combats.length : 0;
-        setPendingInvitations(count);
-        localStorage.setItem("pendingInvitations", String(count));
-        if (count > 0) {
-          toast.info(
-            `Tienes ${count} combate(s) pendiente(s) de aceptar o rechazar`
-          );
-        }
-      });
+      try {
+        const { id } = JSON.parse(userData);
+        getCombats({ status: "pending", opponent: id }).then((res) => {
+          const count = res.combats ? res.combats.length : 0;
+          setPendingInvitations(count);
+          localStorage.setItem("pendingInvitations", String(count));
+          if (count > 0) {
+            toast.info(
+              `Tienes ${count} combate(s) pendiente(s) de aceptar o rechazar`
+            );
+          }
+        });
+      } catch (error) {
+        console.error("Error processing combat invitations on mount:", error);
+      }
     }
   }, []);
 
@@ -105,16 +107,14 @@ function App() {
       }
     };
 
-    const googleCode = searchParams.get("code");
     const googleToken = searchParams.get("token");
-    const googleRefreshToken = searchParams.get("refreshToken"); // Extract refreshToken from URL
-    console.log("Google OAuth code:", googleCode);
+    const googleRefreshToken = searchParams.get("refreshToken");
     console.log("Google OAuth token:", googleToken);
     console.log("Google OAuth refreshToken:", googleRefreshToken);
 
     if (googleToken && googleRefreshToken) {
-      localStorage.setItem("token", googleToken); // Save token to localStorage
-      localStorage.setItem("refreshToken", googleRefreshToken); // Save refreshToken to localStorage
+      localStorage.setItem("token", googleToken);
+      localStorage.setItem("refreshToken", googleRefreshToken);
       console.log("✅ Tokens guardados tras login con Google.");
       try {
         const decoded = JSON.parse(atob(googleToken.split(".")[1]));
@@ -122,17 +122,11 @@ function App() {
         const userData = { id: decoded.id, name: decoded.name || "Usuario" };
         setUser(userData);
         localStorage.setItem("userData", JSON.stringify(userData));
+        // Redirige para limpiar los tokens de la URL
+        window.history.replaceState({}, document.title, window.location.pathname);
       } catch (error) {
         console.error("Error decoding token from URL:", error);
       }
-    } else if (googleCode) {
-      handleGoogleOAuth(googleCode)
-        .then((userData) => {
-          console.log("User data from Google OAuth:", userData);
-          setUser(userData);
-          localStorage.setItem("userData", JSON.stringify(userData));
-        })
-        .catch((error) => console.error("Google OAuth error:", error));
     } else {
       initializeUser();
     }
@@ -146,7 +140,6 @@ function App() {
     // Socket.IO listeners
     socket.on("combat_invitation", (combat) => {
       console.log("[Socket] combat_invitation recibido:", combat);
-      // Aquí podrías actualizar el estado global de invitaciones si usas contexto o redux
       toast.info("¡Has recibido una nueva invitación de combate!");
     });
     socket.on("combat_response", ({ combatId, status }) => {
@@ -154,11 +147,9 @@ function App() {
       toast.info(`Respuesta a tu combate: ${status}`);
     });
 
-    // Escucha el evento personalizado del backend para nuevas invitaciones
     socket.on("newCombatInvitation", (combatData) => {
       console.log("[Socket] newCombatInvitation recibido:", combatData);
       toast.info("¡Nueva invitación de combate recibida!");
-      // Aquí podrías actualizar el estado global de invitaciones
     });
 
     return () => {
@@ -187,29 +178,28 @@ function App() {
       <div className="landing-page">
         <Header user={user} onLogout={handleLogout} />
         <Routes>
+          {/* Rutas Públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile user={user} />} />
           <Route path="/gym-registration" element={<GymRegistration />} />
           <Route path="/gym-login" element={<GymLogin />} />
-          <Route path="/gym-toggle" element={<GymToggleCard />} />
           <Route path="/gyms" element={<GymList />} />
           <Route path="/combats" element={<CombatList />} />
-          <Route path="/combates" element={<MyCombats />} />
-          <Route
-            path="/estadisticas"
-            element={
-              <ProtectedRoute user={user}>
-                <CombatHistoryPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/search-results" element={<SearchResults />} />
-          <Route path="/create-combat" element={<CreateCombat />} />
-          <Route path="/gym-combats" element={<GymCombats />} />
-          <Route path="/gym-profile" element={<GymProfile />} />
-          <Route path="/gym-home" element={<HomeGym />} />
+
+          {/* Rutas Protegidas */}
+          <Route path="/profile" element={<ProtectedRoute user={user}><Profile user={user} /></ProtectedRoute>} />
+          <Route path="/combates" element={<ProtectedRoute user={user}><MyCombats /></ProtectedRoute>} />
+          <Route path="/estadisticas" element={<ProtectedRoute user={user}><CombatHistoryPage /></ProtectedRoute>} />
+          <Route path="/search-results" element={<ProtectedRoute user={user}><SearchResults /></ProtectedRoute>} />
+          <Route path="/create-combat" element={<ProtectedRoute user={user}><CreateCombat /></ProtectedRoute>} />
+          <Route path="/gym-combats" element={<ProtectedRoute user={user}><GymCombats /></ProtectedRoute>} />
+          <Route path="/gym-profile" element={<ProtectedRoute user={user}><GymProfile /></ProtectedRoute>} />
+          <Route path="/gym-home" element={<ProtectedRoute user={user}><HomeGym /></ProtectedRoute>} />
+          
+          {/* CAMBIO: Nueva ruta para las estadísticas del usuario */}
+          <Route path="/my-statistics" element={<ProtectedRoute user={user}><UserStatisticsPage /></ProtectedRoute>} />
+
         </Routes>
         <div className="accessibility-button">
           <button onClick={() => setIsAccessibilityPanelOpen(true)}>
