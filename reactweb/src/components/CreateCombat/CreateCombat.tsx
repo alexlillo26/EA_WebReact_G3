@@ -281,7 +281,11 @@ const CreateCombat: React.FC = () => {
                 className="gym-grid-item"
                 onClick={() => handleGymSelect(g)}
               >
-                <img src="/logo.png" alt={g.name} className="gym-img" />
+                <img
+                  src={g.mainPhoto ? g.mainPhoto : "/logo.png"}
+                  alt={g.name}
+                  className="gym-img"
+                />
                 <div className="gym-name">{g.name}</div>
                 <div className="gym-location">
                   {g.place || "Ubicación no disponible"}

@@ -2,7 +2,9 @@ import { Combat } from '../models/Combat';
 import axiosInstance from './axiosInstance';
 
 // Obtener todos los combates con filtros (params)
-export const getCombats = async (params: Record<string, any> = {}): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
+export const getCombats = async (
+  params: { [key: string]: any } = {}
+): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
   const response = await axiosInstance.get<any>('/combat', { params });
   return response.data as { combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number };
 };

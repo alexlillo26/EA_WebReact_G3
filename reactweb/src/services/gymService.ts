@@ -92,3 +92,26 @@ export const updateGymProfile = async (gymId: string, updateData: Partial<Gym>):
 
   return response.json();
 };
+
+export const updateGymPhotos = async (
+  gymId: string,
+  formData: FormData
+): Promise<Gym> => {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found');
+
+  const response = await fetch(`${API_BASE_URL}/gym/${gymId}/photos`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`
+      // No pongas 'Content-Type', fetch lo gestiona con FormData
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update gym photos');
+  }
+
+  return response.json();
+};
