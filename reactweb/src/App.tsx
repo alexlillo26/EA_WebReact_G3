@@ -10,8 +10,7 @@ import GymList from "./components/gyms/GymList";
 import CombatList from "./components/CombatList/CombatList";
 import "./App.css";
 import GymLogin from "./components/gyms/GymLogin";
-import GymToggleCard from "./components/gyms/GymToggleCard";
-import { getToken, handleGoogleOAuth, fetchMyProfile, logout } from "./services/authService";
+import { getToken } from "./services/authService";
 import SearchResults from "./components/SearchResults/SearchResults";
 import { LanguageProvider } from "./context/LanguageContext";
 import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
@@ -25,23 +24,30 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MyCombats from "./components/MyCombats/MyCombats";
 import { getCombats } from "./services/combatService";
-import CombatHistoryPage from './pages/CombatHistoryPage/CombatHistoryPage';
+import CombatHistoryPage from "./pages/CombatHistoryPage/CombatHistoryPage";
 import UserStatisticsPage from "./components/Statistics/UserStatisticsPage";
-
 
 interface User {
   id: string;
   name: string;
 }
 
-const ProtectedRoute = ({ user, children }: { user: User | null, children: JSX.Element }) => {
-  const tokenExists = getToken(); 
+const ProtectedRoute = ({
+  user,
+  children,
+}: {
+  user: User | null;
+  children: JSX.Element;
+}) => {
+  const tokenExists = getToken();
 
   if (!user && !tokenExists) {
-    console.log("ProtectedRoute: No user state and no token, redirecting to login.");
+    console.log(
+      "ProtectedRoute: No user state and no token, redirecting to login."
+    );
     return <Navigate to="/login" replace />;
   }
-  
+
   return children;
 };
 
@@ -123,7 +129,11 @@ function App() {
         setUser(userData);
         localStorage.setItem("userData", JSON.stringify(userData));
         // Redirige para limpiar los tokens de la URL
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
       } catch (error) {
         console.error("Error decoding token from URL:", error);
       }
@@ -188,18 +198,80 @@ function App() {
           <Route path="/combats" element={<CombatList />} />
 
           {/* Rutas Protegidas */}
-          <Route path="/profile" element={<ProtectedRoute user={user}><Profile user={user} /></ProtectedRoute>} />
-          <Route path="/combates" element={<ProtectedRoute user={user}><MyCombats /></ProtectedRoute>} />
-          <Route path="/estadisticas" element={<ProtectedRoute user={user}><CombatHistoryPage /></ProtectedRoute>} />
-          <Route path="/search-results" element={<ProtectedRoute user={user}><SearchResults /></ProtectedRoute>} />
-          <Route path="/create-combat" element={<ProtectedRoute user={user}><CreateCombat /></ProtectedRoute>} />
-          <Route path="/gym-combats" element={<ProtectedRoute user={user}><GymCombats /></ProtectedRoute>} />
-          <Route path="/gym-profile" element={<ProtectedRoute user={user}><GymProfile /></ProtectedRoute>} />
-          <Route path="/gym-home" element={<ProtectedRoute user={user}><HomeGym /></ProtectedRoute>} />
-          
-          {/* CAMBIO: Nueva ruta para las estadísticas del usuario */}
-          <Route path="/my-statistics" element={<ProtectedRoute user={user}><UserStatisticsPage /></ProtectedRoute>} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute user={user}>
+                <Profile user={user} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/combates"
+            element={
+              <ProtectedRoute user={user}>
+                <MyCombats />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/estadisticas"
+            element={
+              <ProtectedRoute user={user}>
+                <CombatHistoryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/search-results"
+            element={
+              <ProtectedRoute user={user}>
+                <SearchResults />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create-combat"
+            element={
+              <ProtectedRoute user={user}>
+                <CreateCombat />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gym-combats"
+            element={
+              <ProtectedRoute user={user}>
+                <GymCombats />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gym-profile"
+            element={
+              <ProtectedRoute user={user}>
+                <GymProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gym-home"
+            element={
+              <ProtectedRoute user={user}>
+                <HomeGym />
+              </ProtectedRoute>
+            }
+          />
 
+          {/* CAMBIO: Nueva ruta para las estadísticas del usuario */}
+          <Route
+            path="/my-statistics"
+            element={
+              <ProtectedRoute user={user}>
+                <UserStatisticsPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         <div className="accessibility-button">
           <button onClick={() => setIsAccessibilityPanelOpen(true)}>

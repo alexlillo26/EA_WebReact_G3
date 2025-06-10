@@ -3,8 +3,8 @@ import { getToken } from './authService';
 import axiosInstance from './axiosInstance';
 import { API_BASE_URL } from './apiConfig';
 
-const REGISTER_URL = `${API_BASE_URL}/users/register`; // Cambiar a /users/register
-const GET_USER_BY_ID_URL = (id: string) => `${API_BASE_URL}/users/${id}`; // Cambiar a /users/:id
+const REGISTER_URL = `${API_BASE_URL}/api/users/register`; // Cambiar a /users/register
+const GET_USER_BY_ID_URL = (id: string) => `${API_BASE_URL}/api/users/${id}`; // Cambiar a /users/:id
 
 // Servicio para iniciar sesión
 export const loginUser = async (email: string, password: string): Promise<{ name: string } | null> => {
@@ -89,7 +89,7 @@ export const searchUsers = async (email?: string, weight?: string, city?: string
     if (weight) params.weight = weight;
     if (email) params.email = email;
 
-    const response = await axiosInstance.get<{ users: any[] }>(`${API_BASE_URL}/users/search`, { params });
+    const response = await axiosInstance.get<{ users: any[] }>(`${API_BASE_URL}/api/users/search`, { params });
     console.log('Search results:', response.data); // Debug log
     return response.data.users || [];
   } catch (error) {
