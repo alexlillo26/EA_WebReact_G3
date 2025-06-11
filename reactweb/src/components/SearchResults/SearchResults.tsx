@@ -16,6 +16,7 @@ const SearchResults = () => {
   const queryParams = new URLSearchParams(location.search);
   const [city, setCity] = useState(queryParams.get("city") || "");
   const [weight, setWeight] = useState(queryParams.get("weight") || "");
+  const [videoModalUrl, setVideoModalUrl] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState(
     location.state?.results || []
   );
@@ -165,7 +166,9 @@ const SearchResults = () => {
                             "combatState",
                             JSON.stringify(combatState)
                           );
-                          navigate("/create-combat", { state: combatState });
+                          navigate("/create-combat", {
+                            state: combatState,
+                          });
                         }}
                       >
                         {t("createCombatButton")}
@@ -182,6 +185,24 @@ const SearchResults = () => {
                       {t("pendingCombatsSentTitle")}
                     </span>
                   )}
+                  <button
+                    className="see-video-btn"
+                    onClick={() => {
+                      console.log("Usuario:", user);
+                      if (
+                        user.boxingVideo &&
+                        typeof user.boxingVideo === "string" &&
+                        user.boxingVideo.trim() !== ""
+                      ) {
+                        setVideoModalUrl(user.boxingVideo);
+                      } else {
+                        setModalMsg("Este usuario no tiene vídeo subido.");
+                        setModalOpen(true);
+                      }
+                    }}
+                  >
+                    Ver video
+                  </button>
                 </div>
               </div>
             ))
@@ -189,6 +210,58 @@ const SearchResults = () => {
           <p className="no-results">{t("noResultsFound")}</p>
         )}
       </div>
+      {videoModalUrl && (
+        <div
+          className="video-modal-overlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setVideoModalUrl(null)}
+        >
+          <div
+            className="video-modal-content"
+            style={{
+              background: "#222",
+              padding: 24,
+              borderRadius: 10,
+              textAlign: "center",
+              position: "relative",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setVideoModalUrl(null)}
+              style={{
+                position: "absolute",
+                top: 12,
+                right: 12,
+                background: "transparent",
+                border: "none",
+                color: "#fff",
+                fontSize: 28,
+                fontWeight: "bold",
+                cursor: "pointer",
+                zIndex: 2,
+                lineHeight: 1,
+              }}
+              aria-label="Cerrar"
+              title="Cerrar"
+            >
+              ×
+            </button>
+            <video src={videoModalUrl} controls width={400} autoPlay />
+          </div>
+        </div>
+      )}
       <SeeProfile
         open={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}

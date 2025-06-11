@@ -169,6 +169,8 @@ export const translations = {
     closeButton: "Close",
     phoneError: "Phone number must have 9 digits.",
     rateOpponent: "Rate Opponent",
+    changeBoxingVideo: "Change Boxing Video",
+    uploadBoxingVideo: "Upload Boxing Video",
   },
   es: {
     appName: "Face2Face",
@@ -340,6 +342,8 @@ export const translations = {
     closeButton: "Cerrar",
     phoneError: "El teléfono debe tener 9 dígitos.",
     rateOpponent: "Valorar Oponente",
+    changeBoxingVideo: "Cambiar Video de Boxeo",
+    uploadBoxingVideo: "Subir Video de Boxeo",
   },
   ca: {
     appName: "Face2Face",
@@ -511,6 +515,8 @@ export const translations = {
     closeButton: "Tancar",
     phoneError: "El telèfon ha de tenir 9 dígits.",
     rateOpponent: "Valora l'Oponent",
+    changeBoxingVideo: "Canvia el Vídeo de Boxa",
+    uploadBoxingVideo: "Puja Vídeo de Boxa",
   },
   eu: {
     appName: "Face2Face",
@@ -682,5 +688,7 @@ export const translations = {
     closeButton: "Itxi",
     phoneError: "Telefono zenbakiak 9 digituko luzera izan behar du.",
     rateOpponent: "Baloratu Aurkarie",
+    changeBoxingVideo: "Aldatu Boxeo Bideoa",
+    uploadBoxingVideo: "Kargatu Boxeo Bideoa",
   },
 };

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getUserById, updateUser } from "../../services/userService"; // Importa el servicio para actualizar el usuario
+import {
+  getUserById,
+  updateUser,
+  updateUserBoxingVideoWithProgress,
+} from "../../services/userService"; // Importa el servicio para actualizar el usuario
 import { useLanguage } from "../../context/LanguageContext";
 import SimpleModal from "../SimpleModal/SimpleModal"; // Importa el componente modal
 
@@ -23,11 +27,15 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   });
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMsg, setModalMsg] = useState("");
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [userVideoUrl, setUserVideoUrl] = useState<string>("");
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
     null
   );
+  const [hovered, setHovered] = useState<"photo" | "video" | null>(null);
   const fetchUserData = React.useCallback(async () => {
     // No uses el id del usuario pasado por props, siempre usa el autenticado
     try {
@@ -47,6 +55,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           gender: userData.gender || "",
         });
         setPreviewImage(userData.profilePicture || null);
+        setUserVideoUrl(userData.boxingVideo || "");
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -120,16 +129,92 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     }
   };
 
+  const handleVideoUpload = async () => {
+    if (!videoFile) return;
+    const userData = localStorage.getItem("userData");
+    if (!userData) return;
+    const { id } = JSON.parse(userData);
+    setUploadProgress(0);
+    try {
+      const res = await updateUserBoxingVideoWithProgress(
+        id,
+        videoFile,
+        setUploadProgress
+      );
+      setUserVideoUrl(res.boxingVideo);
+      setVideoFile(null);
+      setUploadProgress(0);
+    } catch (err) {
+      setModalMsg("Error al subir el video");
+      setModalOpen(true);
+      setUploadProgress(0);
+    }
+  };
+
   return (
     <StyledProfile>
       <h2>{t("profileTitle")}</h2>
-      <div className="profile-picture">
+      <div
+        className="profile-picture"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "18px",
+          marginBottom: "20px",
+          position: "relative",
+          textAlign: "center",
+        }}
+      >
         {previewImage ? (
-          <img
-            src={previewImage}
-            alt={t("profilePictureLabel")}
-            className="profile-img"
-          />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "16px",
+            }}
+          >
+            <img
+              src={previewImage}
+              alt={t("profilePictureLabel")}
+              className="profile-img"
+            />
+            <button
+              type="button"
+              className="delete-photo-btn"
+              style={{
+                position: "static",
+                background: "#d62828",
+                color: "#fff",
+                border: "none",
+                borderRadius: "50%",
+                width: 40,
+                height: 40,
+                cursor: "pointer",
+                fontWeight: "bold",
+                fontSize: 22,
+                zIndex: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 0,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                transition: "background 0.2s",
+              }}
+              onClick={async () => {
+                const userData = localStorage.getItem("userData");
+                if (!userData) return;
+                const { id } = JSON.parse(userData);
+                await updateUser(id, { profilePicture: "" });
+                setPreviewImage("");
+                setProfilePictureFile(null);
+              }}
+              title="Eliminar foto"
+            >
+              🗑️
+            </button>
+          </div>
         ) : (
           <p>{t("noProfilePicture")}</p>
         )}
@@ -146,6 +231,132 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           onChange={handleImageChange}
           style={{ display: "none" }} // Oculta el campo de entrada
         />
+      </div>
+      <div
+        className="profile-video-upload"
+        style={{ textAlign: "center", marginTop: 20 }}
+      >
+        <input
+          id="video-upload"
+          type="file"
+          accept="video/*"
+          style={{ display: "none" }}
+          onChange={(e) => {
+            if (e.target.files && e.target.files[0]) {
+              setVideoFile(e.target.files[0]);
+            }
+          }}
+        />
+        <button
+          type="button"
+          className="custom-file-upload"
+          onClick={() => document.getElementById("video-upload")?.click()}
+          style={{ marginTop: 10 }}
+        >
+          {userVideoUrl ? t("changeBoxingVideo") : t("uploadBoxingVideo")}
+        </button>
+        {videoFile && (
+          <>
+            <button
+              type="button"
+              className="save-button"
+              style={{ marginLeft: 10 }}
+              onClick={async () => {
+                if (!videoFile) return;
+                setUploadProgress(0); // Reinicia la barra antes de subir
+                const userData = localStorage.getItem("userData");
+                if (!userData) return;
+                const { id } = JSON.parse(userData);
+                const res = await updateUserBoxingVideoWithProgress(
+                  id,
+                  videoFile,
+                  setUploadProgress
+                );
+                setUserVideoUrl(res.boxingVideo);
+                setVideoFile(null);
+                setUploadProgress(0); // Opcional: oculta la barra al terminar
+              }}
+            >
+              {t("saveButton")}
+            </button>
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div style={{ width: 320, margin: "10px auto" }}>
+                <div
+                  style={{
+                    width: `${uploadProgress}%`,
+                    height: 8,
+                    background: "#2ecc40",
+                    borderRadius: 4,
+                    transition: "width 0.3s",
+                  }}
+                />
+                <span style={{ color: "#fff", fontSize: 12 }}>
+                  {uploadProgress}%
+                </span>
+              </div>
+            )}
+          </>
+        )}
+        {userVideoUrl && (
+          <div
+            style={{
+              marginTop: 12,
+              position: "relative",
+              display: "inline-block",
+              textAlign: "center",
+            }}
+            onMouseEnter={() => setHovered("video")}
+            onMouseLeave={() => setHovered(null)}
+          >
+            <video src={userVideoUrl} controls width={320} />
+            {hovered === "video" && (
+              <button
+                type="button"
+                className="delete-photo-btn"
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "#d62828",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: 28,
+                  height: 28,
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  fontSize: 16,
+                  zIndex: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                }}
+                onClick={async () => {
+                  const userData = localStorage.getItem("userData");
+                  if (!userData) return;
+                  const { id } = JSON.parse(userData);
+                  await updateUser(id, { boxingVideo: "" });
+                  setUserVideoUrl("");
+                  setVideoFile(null);
+                }}
+                title="Eliminar video"
+              >
+                🗑️
+              </button>
+            )}
+            {!userVideoUrl && (
+              <button
+                type="button"
+                className="custom-file-upload"
+                onClick={() => document.getElementById("video-upload")?.click()}
+                style={{ marginTop: 32, display: "block", width: 320 }}
+              >
+                {t("uploadBoxingVideo")}
+              </button>
+            )}
+          </div>
+        )}
       </div>
       <div className="profile-details">
         <div className="detail">
@@ -219,7 +430,6 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         onClose={() => setModalOpen(false)}
         message={modalMsg}
       />
-      ;
     </StyledProfile>
   );
 };
@@ -396,6 +606,31 @@ const StyledProfile = styled.div`
 
   .custom-file-upload.has-image:hover {
     background-color: #388e3c; /* Cambia el color al pasar el mouse si hay una imagen */
+  }
+
+  .delete-photo-btn {
+    top: 12px;
+    right: 12px;
+    background: #d62828;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 22px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: background 0.2s;
+  }
+
+  .delete-photo-btn:hover {
+    background: #a31f1f;
   }
 `;
 

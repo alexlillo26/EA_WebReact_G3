@@ -82,12 +82,13 @@ export const updateUser = async (id: string, updateData: Partial<Usuario> | Form
 };
 
 // Servicio para buscar usuarios
-export const searchUsers = async (email?: string, weight?: string, city?: string): Promise<any[]> => {
+export const searchUsers = async (email?: string, weight?: string, city?: string, boxingVideo?: string): Promise<any[]> => {
   try {
     const params: Record<string, string> = {};
     if (city) params.city = city;
     if (weight) params.weight = weight;
     if (email) params.email = email;
+    if (boxingVideo) params.boxingVideo = boxingVideo;
 
     const response = await axiosInstance.get<{ users: any[] }>(`${API_BASE_URL}/users/search`, { params });
     console.log('Search results:', response.data); // Debug log
@@ -96,4 +97,38 @@ export const searchUsers = async (email?: string, weight?: string, city?: string
     console.error('Error en searchUsers:', error);
     throw error;
   }
+};
+
+export const updateUserBoxingVideoWithProgress = (
+  userId: string,
+  file: File,
+  onProgress: (percent: number) => void
+) => {
+  return new Promise<any>((resolve, reject) => {
+    const token = localStorage.getItem('token');
+    const formData = new FormData();
+    formData.append('video', file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', `${API_BASE_URL}/users/${userId}/boxing-video`, true);
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        onProgress(percent);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        reject(xhr.responseText || 'Error al subir el video');
+      }
+    };
+
+    xhr.onerror = () => reject('Error al subir el video');
+    xhr.send(formData);
+  });
 };
