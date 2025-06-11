@@ -6,6 +6,7 @@ import "./SearchResults.css";
 import { useLanguage } from "../../context/LanguageContext";
 import SimpleModal from "../SimpleModal/SimpleModal";
 import SeeProfile from "../SeeProfile/SeeProfile";
+import logo from "../../assets/logo.png";
 
 const SearchResults = () => {
   const { t } = useLanguage();
@@ -29,6 +30,7 @@ const SearchResults = () => {
   const [pendingCombats, setPendingCombats] = useState<any[]>([]);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [enlargedImage, setEnlargedImage] = useState<string | null>(null);
 
   useEffect(() => {
     console.log("Resultados de búsqueda:", searchResults);
@@ -127,7 +129,19 @@ const SearchResults = () => {
             .map((user: any) => (
               <div key={user.id || user._id} className="result-card">
                 <div className="user-info">
-                  <h3>{user.name}</h3>
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 12 }}
+                  >
+                    <img
+                      src={user.profilePicture || logo}
+                      alt={`Foto de perfil de ${user.name}`}
+                      className="profile-image"
+                      onClick={() =>
+                        setEnlargedImage(user.profilePicture || logo)
+                      }
+                    />
+                    <h3 style={{ margin: 0 }}>{user.name}</h3>
+                  </div>
                   <p>
                     {t("cityLabel")}: {user.city}
                   </p>
@@ -259,6 +273,26 @@ const SearchResults = () => {
               ×
             </button>
             <video src={videoModalUrl} controls width={400} autoPlay />
+          </div>
+        </div>
+      )}
+      {enlargedImage && (
+        <div
+          className="image-modal-overlay"
+          onClick={() => setEnlargedImage(null)}
+        >
+          <div
+            className="image-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="image-modal-close-btn"
+              onClick={() => setEnlargedImage(null)}
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+            <img src={enlargedImage} alt="Foto de perfil ampliada" />
           </div>
         </div>
       )}
