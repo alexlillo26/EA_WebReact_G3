@@ -163,14 +163,9 @@ function App() {
     });
 
     // NUEVO: Notificación cuando un usuario seguido crea o acepta un combate
-    socket.on("new_combat_from_followed", ({ combat, createdBy }) => {
-      // Puedes obtener el nombre del usuario seguido si viene en el objeto combat
-      const followedName =
-        (combat.creator && combat.creator.name) ||
-        (combat.creator && typeof combat.creator === "string" ? combat.creator : "Un usuario seguido");
-      toast.info(
-        `¡${followedName} ha creado o aceptado un nuevo combate!`
-      );
+    socket.on("new_combat_from_followed", ({ combat, actor }) => {
+      const name = actor.name || "Usuario";
+      toast.info(`¡${name} tiene un nuevo combate programado!`);
     });
 
     // REGISTRO SERVICE WORKER Y SUSCRIPCIÓN PUSH

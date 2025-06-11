@@ -49,39 +49,26 @@ const SeeProfile: React.FC<Props> = ({
 
   // Comprobar si el usuario actual ya sigue al usuario visto
   useEffect(() => {
-    const fetchFollowers = async () => {
-      if (!user || !currentUser || (user._id || user.id) === currentUser.id) {
-        setIsFollowing(false);
-        return;
-      }
-      setCheckingFollow(true);
-      try {
-        const result = await getFollowers(user._id || user.id);
-        if (
-          result &&
-          typeof result === "object" &&
-          "followers" in result &&
-          Array.isArray(result.followers)
-        ) {
-          const isUserFollowed = result.followers.some(
-            (rel: any) =>
-              rel.follower === currentUser.id ||
-              (rel.follower?._id || rel.follower?.id) === currentUser.id
-          );
-          setIsFollowing(isUserFollowed);
-        } else {
-          setIsFollowing(false);
-        }
-      } catch (err) {
-        setIsFollowing(false);
-      } finally {
+    if (!open || !user || !currentUser) return;
+    let mounted = true;
+    setCheckingFollow(true);
+    Promise.resolve(getFollowers(user._id || user.id))
+      .then((result) => {
+        if (!mounted) return;
+        const ids = result.followers.map((rel: any) =>
+          rel.follower?._id || rel.follower
+        );
+        setIsFollowing(ids.includes(currentUser.id));
         setCheckingFollow(false);
-      }
+      })
+      .catch(() => {
+        if (mounted) setIsFollowing(false);
+        setCheckingFollow(false);
+      });
+    return () => {
+      mounted = false;
     };
-    if (open && user && currentUser) {
-      fetchFollowers();
-    }
-  }, [open, user, currentUser]);
+  }, [open]); // Solo se ejecuta al abrir/cerrar el modal
 
   if (!open || !user) return null;
 
