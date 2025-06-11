@@ -247,7 +247,21 @@ const MyCombats: React.FC = () => {
     }
   };
 
-  const handleRateSubmit = async (score: number, comment: string) => {
+  const handleRateSubmit = async ({
+    punctuality,
+    attitude,
+    intensity,
+    sportmanship,
+    technique,
+    comment,
+  }: {
+    punctuality: number;
+    attitude: number;
+    intensity: number;
+    sportmanship: number;
+    technique: number;
+    comment: string;
+  }) => {
     if (!combatToRate || !userId) {
       console.log("No hay combate para calificar o no hay userId");
       return;
@@ -255,24 +269,20 @@ const MyCombats: React.FC = () => {
     let opponentId: string;
 
     if (getUserId(combatToRate.creator) === userId) {
-      // El usuario logueado es el creador, puntúa al oponente
       opponentId = getUserId(combatToRate.opponent);
     } else {
-      // El usuario logueado es el oponente, puntúa al creador
       opponentId = getUserId(combatToRate.creator);
     }
-    console.log("Enviando rating:", {
-      combat: combatToRate._id,
-      from: userId,
-      to: opponentId,
-      score,
-      comment,
-    });
+
     const result = await createRating({
       combat: combatToRate._id!,
       from: userId,
       to: opponentId,
-      score,
+      punctuality,
+      attitude,
+      intensity,
+      sportmanship,
+      technique,
       comment,
     });
     console.log("Rating result:", result);

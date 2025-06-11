@@ -1,0 +1,129 @@
+/* Estilo "Dark & Red" para la página de estadísticas */
+
+/* Definimos las variables de color para consistencia */
+:root {
+    --stats-bg-dark: #141414;
+    --stats-card-bg: #1f1f1f;
+    --stats-text-primary: #ffffff;
+    --stats-text-secondary: #a0a0a0;
+    --stats-accent-red: #e50914;
+    --stats-border-color: #333333;
+}
+
+.statistics-page-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Segoe UI', sans-serif;
+    color: var(--stats-text-primary);
+    background-color: var(--stats-bg-dark);
+    border-radius: 12px;
+}
+
+.statistics-page-container h1 {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+    color: var(--stats-text-primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+.stat-card {
+    background-color: var(--stats-card-bg);
+    border: 1px solid var(--stats-border-color);
+    border-radius: 10px;
+    padding: 25px 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(229, 9, 20, 0.2);
+}
+
+.stat-card h2 {
+    margin-top: 0;
+    border-bottom: 2px solid var(--stats-accent-red);
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    color: var(--stats-accent-red);
+}
+
+.stat-card .main-stat {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--stats-text-primary);
+    text-align: center;
+}
+
+.stat-card .main-stat span {
+    display: block;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--stats-text-secondary);
+    margin-top: 5px;
+}
+
+.stat-card ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.stat-card li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    color: var(--stats-text-secondary);
+    padding: 12px 5px;
+    border-bottom: 1px solid var(--stats-border-color);
+}
+
+.stat-card li:last-child {
+    border-bottom: none;
+}
+
+.stat-card li span {
+    font-weight: 600;
+    color: var(--stats-text-primary);
+}
+
+.stat-card .no-data, .stats-message {
+    color: #888;
+    font-style: italic;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.stats-message.error {
+    color: var(--stats-accent-red);
+    font-weight: bold;
+}
+
+.stat-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.month-year {
+    color: var(--stats-text-secondary);
+    font-weight: normal !important;
+    text-transform: capitalize;
+}
+
+.month-count {
+    background-color: var(--stats-accent-red);
+    color: white !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}

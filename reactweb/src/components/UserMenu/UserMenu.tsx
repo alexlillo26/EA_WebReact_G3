@@ -29,9 +29,15 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout, isGym }) => {
     const count = Number(localStorage.getItem("pendingInvitations") || 0);
     setPending(count);
     console.log("[UserMenu] Contador de invitaciones pendientes:", count);
-    window.addEventListener("storage", () => {
+    const handleStorageChange = () => {
       setPending(Number(localStorage.getItem("pendingInvitations") || 0));
-    });
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    // Limpieza al desmontar el componente
+    return () => {
+        window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -50,36 +56,40 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout, isGym }) => {
       {isOpen && (
         <div className="dropdown">
           {isGym ? (
-            // Gym user menu
+            // Menú para Gimnasios
             <>
               <Link to="/gym-profile" className="dropdown-item">
-                {t("gymProfile")}
+                {t("gymProfile" as any)}
               </Link>
               <button
                 className="dropdown-item logout-button"
                 onClick={onLogout}
               >
-                {t("logout")}
+                {t("logout" as any)}
               </button>
             </>
           ) : (
-            // Regular user menu
+            // Menú para Usuarios normales
             <>
               <Link to="/profile" className="dropdown-item">
-                {t("profile")}
+                {t("profile" as any)}
               </Link>
               <Link to="/combates" className="dropdown-item">
-                {t("myCombats")}
+                {t("myCombats" as any)}
                 {pending > 0 && <span className="badge">{pending}</span>}
               </Link>
               <Link to="/estadisticas" className="dropdown-item">
-                {t("statistics")}
+                {t("statistics" as any)}
+              </Link>
+              {/* CAMBIO: Enlace a la nueva página de estadísticas */}
+              <Link to="/my-statistics" className="dropdown-item">
+                {t("userStats.menuLabel" as any)}
               </Link>
               <button
                 className="dropdown-item logout-button"
                 onClick={onLogout}
               >
-                {t("logout")}
+                {t("logout" as any)}
               </button>
             </>
           )}

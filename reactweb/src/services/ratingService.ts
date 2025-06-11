@@ -3,9 +3,8 @@ import axiosInstance from './axiosInstance';
 import { API_BASE_URL } from './apiConfig';
 
 // Endpoints
-const CREATE_RATING_URL = `${API_BASE_URL}/ratings`;
-const GET_RATINGS_BY_USER_URL = (userId: string) => `${API_BASE_URL}/ratings?to=${userId}`;
-const GET_RATING_FROM_TO_URL = (fromId: string, toId: string) => `${API_BASE_URL}/ratings?from=${fromId}&to=${toId}`;
+const CREATE_RATING_URL = `${API_BASE_URL}/api/ratings`;
+const GET_RATING_FROM_TO_URL = (fromId: string, toId: string) => `${API_BASE_URL}/api/ratings?from=${fromId}&to=${toId}`;
 
 // Crear una calificación (puntuar a un boxeador)
 export const createRating = async (data: Omit<Rating, '_id' | 'createdAt'>): Promise<Rating | null> => {
@@ -34,7 +33,7 @@ export const getRatingFromTo = async (fromId: string, toId: string): Promise<Rat
 
 export const getRatingsByUser = async (userId: string): Promise<Rating[]> => {
   try {
-    const url = `${API_BASE_URL}/ratings/user/${userId}`;
+    const url = `${API_BASE_URL}/api/ratings/user/${userId}`;
     const response = await axiosInstance.get<Rating[]>(url);
     return response.data;
   } catch (error) {

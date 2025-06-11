@@ -6,7 +6,8 @@ type Language = keyof typeof translations;
 interface LanguageContextProps {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: keyof (typeof translations)["en"]) => string;
+  // CAMBIO: La clave ahora es un string genérico para más flexibilidad
+  t: (key: string) => string;
 }
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(
@@ -18,8 +19,15 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [language, setLanguage] = useState<Language>("es");
 
-  const t = (key: keyof (typeof translations)["en"]) => {
-    return translations[language][key] || key;
+  const t = (key: string) => {
+    // Usamos 'any' de forma segura para buscar en el objeto de traducciones
+    const langTranslations = translations[language] as any;
+    
+    // Si la clave existe, la devolvemos. Si no, devolvemos la propia clave como fallback.
+    const translation = langTranslations[key];
+    
+    // Nos aseguramos de devolver siempre un string para evitar errores.
+    return typeof translation === 'string' ? translation : key;
   };
 
   return (

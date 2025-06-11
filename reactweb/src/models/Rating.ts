@@ -3,7 +3,11 @@ export interface Rating {
   combat: string;
   from: string;
   to: string;
-  score: number; // 1 to 5 stars
+  punctuality: number;
+  attitude: number;
+  intensity: number;
+  sportmanship: number;
+  technique: number;
   comment?: string;
   createdAt?: string;
 }
