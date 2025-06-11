@@ -15,21 +15,21 @@ export interface FetchCombatHistoryReturn {
 export const getCombats = async (
   params: { [key: string]: any } = {}
 ): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
-  const response = await axiosInstance.get<any>('/combat', { params });
+  const response = await axiosInstance.get<any>('/api/combat', { params });
   return response.data as { combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number };
 };
 
 // Crear un nuevo combate
 export const createCombat = async (combatData: Partial<Combat> | FormData) => {
   if (combatData instanceof FormData) {
-    const response = await axiosInstance.post<any>('/combat', combatData, {
+    const response = await axiosInstance.post<any>('/api/combat', combatData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;
   } else{
-    const response = await axiosInstance.post<any>('/combat', combatData);
+    const response = await axiosInstance.post<any>('/api/combat', combatData);
     return response.data;
   }
 };
@@ -63,7 +63,7 @@ export const updateCombatImage = async (combatId: string, imageFile: File) => {
   formData.append('image', imageFile);
 
   const response = await axiosInstance.put<any>(
-    `/combat/${combatId}/image`, // Asegúrate de tener este endpoint en el backend
+    `/api/combat/${combatId}/image`, // Asegúrate de tener este endpoint en el backend
     formData,
     {
       headers: {
@@ -83,17 +83,4 @@ export const fetchCombatHistory = async (
         params: { page, pageSize }
     });
     return response.data.data;
-};
-
-// === CAMBIO: NUEVA FUNCIÓN AÑADIDA ===
-/**
- * Llama al endpoint del backend para establecer el ganador de un combate.
- * @param combatId - El ID del combate a actualizar.
- * @param winnerId - El ID del boxeador que ha ganado.
- * @returns El objeto del combate actualizado devuelto por el backend.
- */
-export const setCombatResult = async (combatId: string, winnerId: string) => {
-  const url = `/api/combats/${combatId}/result`;
-  const response = await axiosInstance.post(url, { winnerId });
-  return response.data;
 };
