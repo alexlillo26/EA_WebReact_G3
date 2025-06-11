@@ -10,4 +10,5 @@ export interface Usuario {
     gender: string;
     profilePicture?: string; // URL de la imagen de perfil
     confirmPassword?: string; 
+    boxingVideo?: string; 
 }

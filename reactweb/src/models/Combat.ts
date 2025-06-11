@@ -54,6 +54,10 @@ export interface Combat { // Esta es la que tus otras funciones de servicio ya u
   status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'active' | 'cancelled'; // Asegúrate que este enum esté completo
   createdAt?: Date | string;
   updatedAt?: Date | string;
+  boxers?: (string | Boxer)[];
+  image?: string;
+  // ...otros campos opcionales...
+
   // ... otros campos si los tienes de antes
 }
 

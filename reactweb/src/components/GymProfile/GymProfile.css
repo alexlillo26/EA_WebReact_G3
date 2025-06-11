@@ -1,5 +1,5 @@
 .register-container {
-  max-width: 600px;
+  width: 100vw; 
   margin: 60px auto;
   padding: 30px;
   background: #1f1f1f;
@@ -66,3 +66,61 @@
   margin-bottom: 6px;
   text-align: left;
 } 
+
+.gym-photos-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 10px 0 18px 0;
+}
+
+.gym-photo-item {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.gym-photo-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border 0.2s;
+}
+
+.gym-photo-item img.main-photo {
+  border: 2.5px solid #0418f7;
+}
+
+.gym-photo-item span {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: #0418f7;
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.save-main-photo-btn {
+  background: #2ecc40;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.save-main-photo-btn:hover {
+  background: #27ae36;
+}

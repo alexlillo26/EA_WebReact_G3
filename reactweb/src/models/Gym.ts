@@ -6,4 +6,6 @@ export interface Gym {
     place: string;
     price: number;
     password: string; 
+    photos?: string[]; 
+    mainPhoto?: string; 
   }

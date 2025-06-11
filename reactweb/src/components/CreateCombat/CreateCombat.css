@@ -241,3 +241,19 @@
   background: #f40404;
   color: #fcfdfe;
 }
+
+.file-upload-btn {
+  padding: 9px 18px;
+  background-color: #0418f7;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+  width: auto;
+  margin: 0 auto;
+}
+
+.file-upload-btn:hover {
+  background-color: #22058c;
+}

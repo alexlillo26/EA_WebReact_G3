@@ -28,6 +28,8 @@ const CreateCombat: React.FC = () => {
   const [userCombats, setUserCombats] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMsg, setModalMsg] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchGyms = async () => {
@@ -62,6 +64,12 @@ const CreateCombat: React.FC = () => {
   const filteredGyms = gyms.filter((g) =>
     g.name.toLowerCase().includes(gymName.toLowerCase())
   );
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
 
   const handleCreateCombat = async () => {
     if (!date || !time || !gym || !level) {
@@ -117,8 +125,17 @@ const CreateCombat: React.FC = () => {
         level,
         status: "pending" as "pending",
       };
-      console.log("Sending combat with:", combatData);
-      const combat = await createCombat(combatData);
+      let combat;
+      if (imageFile) {
+        const formData = new FormData();
+        Object.entries(combatData).forEach(([key, value]) =>
+          formData.append(key, value)
+        );
+        formData.append("image", imageFile);
+        combat = await createCombat(formData);
+      } else {
+        combat = await createCombat(combatData);
+      }
       // Emitir evento de invitación al oponente
       socket.emit("sendCombatInvitation", { opponentId: opponent, combat });
       socket.emit("create_combat", combat); // Notifica por socket (legacy)
@@ -264,13 +281,49 @@ const CreateCombat: React.FC = () => {
                 className="gym-grid-item"
                 onClick={() => handleGymSelect(g)}
               >
-                <img src="/logo.png" alt={g.name} className="gym-img" />
+                <img
+                  src={g.mainPhoto ? g.mainPhoto : "/logo.png"}
+                  alt={g.name}
+                  className="gym-img"
+                />
                 <div className="gym-name">{g.name}</div>
                 <div className="gym-location">
                   {g.place || "Ubicación no disponible"}
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        <div style={{ marginBottom: "12px" }}>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleImageChange}
+          />
+          <button
+            type="button"
+            className="file-upload-btn"
+            onClick={() => fileInputRef.current?.click()}
+            style={{ marginBottom: "8px" }}
+          >
+            Añadir imagen
+          </button>
+        </div>
+        {imageFile && (
+          <div style={{ margin: "10px 0" }}>
+            <strong>Previsualización</strong>
+            <br />
+            <img
+              src={URL.createObjectURL(imageFile)}
+              alt="Previsualización"
+              style={{
+                maxWidth: "200px",
+                maxHeight: "120px",
+                borderRadius: "8px",
+              }}
+            />
           </div>
         )}
         <button

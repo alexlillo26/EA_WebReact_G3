@@ -139,3 +139,21 @@
   margin-top: 10px;
   font-weight: 500;
 }
+
+.see-video-btn {
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #d62828;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  width: 150px;
+}
+
+.see-video-btn:hover {
+  background-color: #0f0e0e;
+  color: #fff;
+  border-color: #0b0b0b;
+}

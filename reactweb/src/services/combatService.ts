@@ -11,16 +11,29 @@ export interface FetchCombatHistoryReturn {
   pageSize: number;
 }
 
-// === TUS FUNCIONES EXISTENTES (sin cambios) ===
-export const getCombats = async (params: Record<string, any> = {}): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
-  const response = await axiosInstance.get<any>('/api/combat', { params });
+// Obtener todos los combates con filtros (params)
+export const getCombats = async (
+  params: { [key: string]: any } = {}
+): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
+  const response = await axiosInstance.get<any>('/combat', { params });
   return response.data as { combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number };
 };
 
-export const createCombat = async (combatData: Partial<Combat>) => {
-  const response = await axiosInstance.post<any>('/api/combat', combatData);
-  return response.data;
+// Crear un nuevo combate
+export const createCombat = async (combatData: Partial<Combat> | FormData) => {
+  if (combatData instanceof FormData) {
+    const response = await axiosInstance.post<any>('/combat', combatData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } else{
+    const response = await axiosInstance.post<any>('/combat', combatData);
+    return response.data;
+  }
 };
+
 
 export const respondCombat = async (combatId: string, status: 'accepted' | 'rejected') => {
   const response = await axiosInstance.patch<any>(`/api/combat/${combatId}/respond`, { status });
@@ -42,6 +55,22 @@ export const fetchSentInvitations = async () => {
 export const getGymCombats = async (gymId: string, page: number = 1, pageSize: number = 10): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
   const response = await axiosInstance.get<any>(`/api/combat/gym/${gymId}`, { params: { page, pageSize } });
   return response.data as { combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number };
+};
+
+
+export const updateCombatImage = async (combatId: string, imageFile: File) => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+
+  const response = await axiosInstance.put<any>(
+    `/combat/${combatId}/image`, // Asegúrate de tener este endpoint en el backend
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
 };
 
 export const fetchCombatHistory = async (

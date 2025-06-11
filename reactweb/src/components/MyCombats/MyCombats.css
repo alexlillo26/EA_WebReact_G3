@@ -25,14 +25,23 @@
 .my-combats-item {
   background: #181818;
   border-radius: 8px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
+  padding: 32px 28px;
+  margin-bottom: 18px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  font-size: 1.08em;
+  font-size: 1.15em;
   border: 1.5px solid #2a2a2a;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: darken;
+  background-color: rgba(24, 24, 24, 0.35);
+  text-shadow: 1px 1px 6px #000, 0 0 2px #000;
 }
 
 .my-combats-label {
@@ -110,4 +119,56 @@
 }
 .rate-opponent-btn:hover {
   background-color: #a31f1f;
+}
+
+.file-upload-btn2 {
+  background-color: #f50505;
+  color: #fff;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+.file-upload-btn2:hover {
+  background-color: #a31f1f;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0 10px 0;
+}
+
+.pagination-controls button {
+  background-color: #0418f7;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pagination-controls button:disabled {
+  background-color: #bfc4d1;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.pagination-controls span {
+  font-size: 15px;
+  font-weight: 500;
+  color: #222;
 }
