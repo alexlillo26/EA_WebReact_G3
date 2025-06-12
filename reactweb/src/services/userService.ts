@@ -107,11 +107,11 @@ export const searchUsers = async (
 export const uploadAvatar = async (file: File) => {
   const userData = localStorage.getItem("userData");
   if (!userData) throw new Error("No user data");
-  const { id } = JSON.parse(userData);
+  // const { id } = JSON.parse(userData); // Ya no se usa el id aquí
   const form = new FormData();
-  form.append("avatar", file); // <-- el campo debe llamarse 'avatar'
+  form.append("avatar", file);
   return axiosInstance.put(
-    `${API_BASE_URL}/api/users/${id}/avatar`,
+    `${API_BASE_URL}/api/users/me/avatar`,
     form
   );
 };
@@ -125,7 +125,7 @@ export const uploadBoxingVideo = (
   return new Promise<any>((resolve, reject) => {
     const token = localStorage.getItem('token');
     const formData = new FormData();
-    formData.append('file', file); // <-- el campo debe llamarse 'file'
+    formData.append('video', file);
 
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', `${API_BASE_URL}/api/users/${userId}/boxing-video`, true);
