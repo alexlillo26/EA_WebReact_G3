@@ -4,12 +4,22 @@ import {
   getUserById,
   updateUser,
   updateUserBoxingVideoWithProgress,
-} from "../../services/userService"; // Importa el servicio para actualizar el usuario
+} from "../../services/userService";
 import { useLanguage } from "../../context/LanguageContext";
-import SimpleModal from "../SimpleModal/SimpleModal"; // Importa el componente modal
+import SimpleModal from "../SimpleModal/SimpleModal";
+import {
+  getFollowers,
+  getFollowing,
+  getFollowCounts,
+  followUser,
+  unfollowUser,
+  removeFollower,
+  FollowCounts,
+  FollowerDoc,
+} from "../../services/followService";
 
 interface ProfileProps {
-  user: { id: string; name: string } | null; // Include user ID
+  user: { id: string; name: string } | null;
 }
 
 const Profile: React.FC<ProfileProps> = ({ user }) => {
@@ -32,14 +42,24 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [modalMsg, setModalMsg] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [userVideoUrl, setUserVideoUrl] = useState<string>("");
-  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
-    null
-  );
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [hovered, setHovered] = useState<"photo" | "video" | null>(null);
+
+  // Seguidores/seguidos
+  const [followCounts, setFollowCounts] = useState<FollowCounts>({
+    followers: 0,
+    following: 0,
+  });
+  const [followersList, setFollowersList] = useState<FollowerDoc[]>([]);
+  const [followingList, setFollowingList] = useState<FollowerDoc[]>([]);
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
+  const [loadingFollows, setLoadingFollows] = useState(false);
+  const [loadingFollowAction, setLoadingFollowAction] = useState<string | null>(null);
+
   const fetchUserData = React.useCallback(async () => {
-    // No uses el id del usuario pasado por props, siempre usa el autenticado
     try {
-      const userData = await getUserById(); // Siempre obtiene el usuario autenticado
+      const userData = await getUserById();
       if (userData) {
         setFormData({
           name: userData.name || "",
@@ -50,7 +70,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           birthdate: userData.birthDate
             ? new Date(userData.birthDate).toISOString().split("T")[0]
             : "",
-          password: "", // Do not prefill the password field
+          password: "",
           profilePicture: userData.profilePicture || "",
           gender: userData.gender || "",
         });
@@ -60,11 +80,51 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
-  }, [user]); // Depend on user to refetch when it changes
+  }, [user]);
 
   useEffect(() => {
-    fetchUserData(); // Fetch user data when the component mounts
-  }, [fetchUserData]); // Only fetch once when the component mounts
+    fetchUserData();
+  }, [fetchUserData]);
+
+  // Cargar contadores y listas de seguidores/seguidos
+  useEffect(() => {
+    if (!user) return;
+    getFollowCounts(user.id)
+      .then((res) => {
+        setFollowCounts({
+          followers: res.data.followers,
+          following: res.data.following,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [user]);
+
+  const fetchFollowersList = async () => {
+    if (!user) return;
+    setLoadingFollows(true);
+    try {
+      const res = await getFollowers(user.id);
+      setFollowersList(res.data?.followers || []);
+      // También refresca la lista de following para saber si ya sigues a alguien
+      const resFollowing = await getFollowing(user.id);
+      setFollowingList(resFollowing.data?.following || []);
+    } finally {
+      setLoadingFollows(false);
+    }
+  };
+
+  const fetchFollowingList = async () => {
+    if (!user) return;
+    setLoadingFollows(true);
+    try {
+      const res = await getFollowing(user.id);
+      setFollowingList(res.data?.following || []);
+    } finally {
+      setLoadingFollows(false);
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -78,20 +138,20 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviewImage(reader.result as string); // Mostrar vista previa
+        setPreviewImage(reader.result as string);
       };
       reader.readAsDataURL(file);
-      setProfilePictureFile(file); // Guardar el archivo para enviarlo al backend
+      setProfilePictureFile(file);
     }
   };
 
   const handleSave = async () => {
-    if (!user) return; // Ensure user is logged in
+    if (!user) return;
     try {
-      // Prepara el objeto actualizado, pero solo incluye password si no está vacío
+      // Solo incluye password si no está vacío
       const updatedUser: any = {
         ...formData,
-        birthDate: new Date(formData.birthdate), // Convierte la fecha a formato Date
+        birthDate: new Date(formData.birthdate),
       };
       if (!formData.password) {
         delete updatedUser.password;
@@ -102,7 +162,6 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         const formDataToSend = new FormData();
         formDataToSend.append("profilePicture", profilePictureFile);
 
-        // Añade todos los campos del usuario uno a uno al FormData
         Object.entries(updatedUser).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
             formDataToSend.append(key, value.toString());
@@ -111,7 +170,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
         result = await updateUser(user.id, formDataToSend);
       } else {
-        result = await updateUser(user.id, updatedUser); // Llama al servicio para actualizar el usuario
+        result = await updateUser(user.id, updatedUser);
       }
       if (!result) {
         setModalMsg(t("saveError"));
@@ -120,8 +179,8 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
       }
       setModalMsg(t("saveSuccess"));
       setModalOpen(true);
-      await fetchUserData(); // Refresca los datos del usuario después de guardar
-      setFormData((prev) => ({ ...prev, password: "" })); // Limpia el campo password tras guardar
+      await fetchUserData();
+      setFormData((prev) => ({ ...prev, password: "" }));
     } catch (error) {
       console.error(t("saveError"), error);
       setModalMsg(t("saveError"));
@@ -129,6 +188,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     }
   };
 
+  // VIDEO: Subida y borrado
   const handleVideoUpload = async () => {
     if (!videoFile) return;
     const userData = localStorage.getItem("userData");
@@ -151,8 +211,143 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     }
   };
 
+  // Mostrar lista de seguidores
+  const handleShowFollowers = () => {
+    setShowFollowers((prev) => !prev);
+    setShowFollowing(false);
+    if (!showFollowers) fetchFollowersList();
+  };
+
+  // Mostrar lista de seguidos
+  const handleShowFollowing = () => {
+    setShowFollowing((prev) => !prev);
+    setShowFollowers(false);
+    if (!showFollowing) fetchFollowingList();
+  };
+
+  // Seguir usuario desde lista de seguidores
+  const handleFollowBack = async (followerId: string) => {
+    setLoadingFollowAction(followerId);
+    await followUser(followerId);
+    await fetchFollowersList();
+    await fetchFollowingList();
+    const res = await getFollowCounts(user!.id);
+    const { followers, following } = res.data || {};
+    setFollowCounts({
+      following: following ?? 0,
+      followers: followers ?? 0,
+    });
+    setLoadingFollowAction(null);
+  };
+
+  // Dejar de seguir usuario desde lista de seguidos
+  const handleUnfollow = async (followingId: string) => {
+    setLoadingFollowAction(followingId);
+    await unfollowUser(followingId);
+    await fetchFollowingList();
+    const res = await getFollowCounts(user!.id);
+    const { followers, following } = res.data || {};
+    setFollowCounts({
+      following: following ?? 0,
+      followers: followers ?? 0,
+    });
+    setLoadingFollowAction(null);
+  };
+
+  // Eliminar seguidor
+  const handleRemoveFollower = async (followerId: string) => {
+    setLoadingFollowAction(followerId);
+    await removeFollower(followerId);
+    await fetchFollowersList();
+    const res = await getFollowCounts(user!.id);
+    const { followers, following } = res.data || {};
+    setFollowCounts({
+      following: following ?? 0,
+      followers: followers ?? 0,
+    });
+    setLoadingFollowAction(null);
+  };
+
   return (
     <StyledProfile>
+      {/* --- NUEVA SECCIÓN DE CONTADORES Y LISTAS --- */}
+      <FollowStatsBar>
+        <FollowStat onClick={handleShowFollowing}>
+          <span className="count">{followCounts.following}</span>
+          <span className="label">Siguiendo</span>
+        </FollowStat>
+        <FollowStat onClick={handleShowFollowers}>
+          <span className="count">{followCounts.followers}</span>
+          <span className="label">Seguidores</span>
+        </FollowStat>
+      </FollowStatsBar>
+      {/* Listas desplegables */}
+      {showFollowing && (
+        <FollowList>
+          <h4>Usuarios que sigues</h4>
+          {loadingFollows ? (
+            <p>Cargando...</p>
+          ) : followingList.length === 0 ? (
+            <p>No sigues a nadie aún.</p>
+          ) : (
+            <ul>
+              {followingList.map((rel) => (
+                <li key={rel._id}>
+                  <span>{rel.following.name}</span>
+                  <button
+                    className="unfollow-btn"
+                    onClick={() => handleUnfollow(rel.following._id)}
+                    disabled={loadingFollowAction === rel.following._id}
+                  >
+                    {loadingFollowAction === rel.following._id ? "..." : "Dejar de seguir"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </FollowList>
+      )}
+      {showFollowers && (
+        <FollowList>
+          <h4>Usuarios que te siguen</h4>
+          {loadingFollows ? (
+            <p>Cargando...</p>
+          ) : followersList.length === 0 ? (
+            <p>No tienes seguidores aún.</p>
+          ) : (
+            <ul>
+              {followersList.map((rel) => {
+                const follower = rel.follower;
+                const isFollowing = followingList.some(
+                  (f) => f.following._id === follower._id
+                );
+                return (
+                  <li key={follower._id}>
+                    <span>{follower.name}</span>
+                    {!isFollowing && (
+                      <button
+                        className="follow-btn"
+                        onClick={() => handleFollowBack(follower._id)}
+                        disabled={loadingFollowAction === follower._id}
+                      >
+                        {loadingFollowAction === follower._id ? "..." : "Seguir también"}
+                      </button>
+                    )}
+                    <button
+                      className="remove-follower-btn"
+                      onClick={() => handleRemoveFollower(follower._id)}
+                      disabled={loadingFollowAction === follower._id}
+                    >
+                      {loadingFollowAction === follower._id ? "..." : "Eliminar seguidor"}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </FollowList>
+      )}
+      {/* --- FIN NUEVA SECCIÓN --- */}
       <h2>{t("profileTitle")}</h2>
       <div
         className="profile-picture"
@@ -229,9 +424,10 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           type="file"
           accept="image/*"
           onChange={handleImageChange}
-          style={{ display: "none" }} // Oculta el campo de entrada
+          style={{ display: "none" }}
         />
       </div>
+      {/* VIDEO */}
       <div
         className="profile-video-upload"
         style={{ textAlign: "center", marginTop: 20 }}
@@ -261,21 +457,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
               type="button"
               className="save-button"
               style={{ marginLeft: 10 }}
-              onClick={async () => {
-                if (!videoFile) return;
-                setUploadProgress(0); // Reinicia la barra antes de subir
-                const userData = localStorage.getItem("userData");
-                if (!userData) return;
-                const { id } = JSON.parse(userData);
-                const res = await updateUserBoxingVideoWithProgress(
-                  id,
-                  videoFile,
-                  setUploadProgress
-                );
-                setUserVideoUrl(res.boxingVideo);
-                setVideoFile(null);
-                setUploadProgress(0); // Opcional: oculta la barra al terminar
-              }}
+              onClick={handleVideoUpload}
             >
               {t("saveButton")}
             </button>
@@ -407,7 +589,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           <label>{t("cityLabel")}</label>
           <input
             type="text"
-            name="city" // ✅ Corregido de "location" a "city"
+            name="city"
             value={formData.city}
             onChange={handleChange}
           />
@@ -435,22 +617,23 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 };
 
 const StyledProfile = styled.div`
-  width: 100vw; /* Ocupa todo el ancho de la ventana */
-  height: 100vh; /* Ocupa todo el alto de la ventana */
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Alinea el contenido al inicio */
+  justify-content: flex-start;
   align-items: center;
-  background-color: rgba(26, 26, 26, 0.9); /* Fondo oscuro */
+  background-color: rgba(26, 26, 26, 0.9);
   color: white;
-  position: relative; /* Necesario para posicionar elementos hijos absolutamente */
+  position: relative;
+  margin-top: 60px;
 
   h2 {
     text-align: center;
     margin-bottom: 20px;
-    margin-top: 90px; /* Espacio desde la parte superior */
-    font-size: 24px; /* Tamaño de fuente más grande */
-    color: #d62828; /* Rojo principal */
+    margin-top: 90px;
+    font-size: 24px;
+    color: #d62828;
   }
 
   .tabs {
@@ -473,10 +656,10 @@ const StyledProfile = styled.div`
       cursor: pointer;
       border-radius: 5px;
       transition: all 0.3s ease;
-      height: 50px; /* Asegurar altura uniforme */
+      height: 50px;
       display: flex;
-      align-items: center; /* Centrar contenido verticalmente */
-      justify-content: center; /* Centrar contenido horizontalmente */
+      align-items: center;
+      justify-content: center;
     }
 
     .tab.active {
@@ -491,10 +674,10 @@ const StyledProfile = styled.div`
   }
 
   .profile-details {
-    width: 90%; /* Ocupa todo el ancho */
-    padding: 0 20px; /* Espaciado lateral */
-    margin-top: 20px; /* Espaciado desde la cabecera */
-    margin-bottom: 80px; /* Espacio para evitar que el contenido se solape con los botones */
+    width: 90%;
+    padding: 0 20px;
+    margin-top: 20px;
+    margin-bottom: 80px;
 
     .detail {
       margin-bottom: 15px;
@@ -503,12 +686,12 @@ const StyledProfile = styled.div`
         display: block;
         font-weight: bold;
         margin-bottom: 5px;
-        color: #d62828; /* Rojo principal */
+        color: #d62828;
       }
 
       input,
       select {
-        width: 100%; /* Ocupa todo el ancho disponible */
+        width: 100%;
         background-color: #333;
         padding: 15px;
         border: 1px solid #555;
@@ -520,7 +703,7 @@ const StyledProfile = styled.div`
       input:focus,
       select:focus {
         outline: none;
-        border-color: #d62828; /* Rojo principal */
+        border-color: #d62828;
       }
     }
   }
@@ -537,8 +720,8 @@ const StyledProfile = styled.div`
     transition: background-color 0.3s ease;
     margin-top: 20px;
     display: block;
-    margin-left: auto; /* Alinear a la derecha */
-    margin-right: auto; /* Alinear a la derecha */
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .save-button:hover {
@@ -557,7 +740,7 @@ const StyledProfile = styled.div`
 
   select:focus {
     outline: none;
-    border-color: #d62828; /* Rojo principal */
+    border-color: #d62828;
   }
 
   .profile-picture {
@@ -597,7 +780,7 @@ const StyledProfile = styled.div`
   }
 
   .custom-file-upload.has-image {
-    background-color: #a31f1f; /* Cambia el color cuando hay una imagen */
+    background-color: #a31f1f;
   }
 
   .custom-file-upload:hover {
@@ -605,7 +788,7 @@ const StyledProfile = styled.div`
   }
 
   .custom-file-upload.has-image:hover {
-    background-color: #388e3c; /* Cambia el color al pasar el mouse si hay una imagen */
+    background-color: #388e3c;
   }
 
   .delete-photo-btn {
@@ -631,6 +814,97 @@ const StyledProfile = styled.div`
 
   .delete-photo-btn:hover {
     background: #a31f1f;
+  }
+`;
+
+const FollowStatsBar = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+  margin-bottom: 10px;
+`;
+
+const FollowStat = styled.div`
+  background: #222;
+  border-radius: 10px;
+  padding: 18px 32px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: background 0.2s;
+  &:hover {
+    background: #d62828;
+    color: #fff;
+  }
+  .count {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: #d62828;
+    display: block;
+  }
+  .label {
+    font-size: 1.1em;
+    color: #fff;
+    margin-top: 4px;
+  }
+`;
+
+const FollowList = styled.div`
+  background: #181818;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 20px 30px;
+  margin: 0 auto 20px auto;
+  max-width: 400px;
+  color: #fff;
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #333;
+      &:last-child {
+        border-bottom: none;
+      }
+      span {
+        font-size: 1.1em;
+      }
+      button {
+        margin-left: 10px;
+        padding: 5px 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.95em;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .follow-btn {
+        background: #388e3c;
+        color: #fff;
+      }
+      .unfollow-btn {
+        background: #d62828;
+        color: #fff;
+      }
+      .remove-follower-btn {
+        background: #444;
+        color: #fff;
+      }
+      .follow-btn:hover {
+        background: #2e7031;
+      }
+      .unfollow-btn:hover {
+        background: #a31f1f;
+      }
+      .remove-follower-btn:hover {
+        background: #222;
+      }
+    }
   }
 `;
 

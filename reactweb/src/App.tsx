@@ -10,7 +10,9 @@ import GymList from "./components/gyms/GymList";
 import CombatList from "./components/CombatList/CombatList";
 import "./App.css";
 import GymLogin from "./components/gyms/GymLogin";
-import { getToken } from "./services/authService";
+import GymToggleCard from "./components/gyms/GymToggleCard";
+import Statistics from "./components/Statistics/Statistics";
+import { getToken, handleGoogleOAuth } from "./services/authService";
 import SearchResults from "./components/SearchResults/SearchResults";
 import { LanguageProvider } from "./context/LanguageContext";
 import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
@@ -32,6 +34,23 @@ interface User {
   name: string;
 }
 
+// Usa la clave pública VAPID real del backend (.env)
+const VAPID_PUBLIC_KEY = "BFXmSopn7qLS5OrzYStJH8mRYfAm75vwQRP1Ws-XL48p699t1TobmBBvcSnhqxH0ZZ4IpMoN7DnNzPhm-eJVQl0";
+
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+// ProtectedRoute para rutas privadas
 const ProtectedRoute = ({
   user,
   children,
@@ -113,8 +132,10 @@ function App() {
       }
     };
 
+    const googleCode = searchParams.get("code");
     const googleToken = searchParams.get("token");
     const googleRefreshToken = searchParams.get("refreshToken");
+    console.log("Google OAuth code:", googleCode);
     console.log("Google OAuth token:", googleToken);
     console.log("Google OAuth refreshToken:", googleRefreshToken);
 
@@ -137,6 +158,14 @@ function App() {
       } catch (error) {
         console.error("Error decoding token from URL:", error);
       }
+    } else if (googleCode) {
+      handleGoogleOAuth(googleCode)
+        .then((userData) => {
+          console.log("User data from Google OAuth:", userData);
+          setUser(userData);
+          localStorage.setItem("userData", JSON.stringify(userData));
+        })
+        .catch((error) => console.error("Google OAuth error:", error));
     } else {
       initializeUser();
     }
@@ -162,11 +191,48 @@ function App() {
       toast.info("¡Nueva invitación de combate recibida!");
     });
 
+    // NUEVO: Notificación cuando un usuario seguido crea o acepta un combate
+    socket.on("new_combat_from_followed", ({ combat, actor }) => {
+      const name = actor.name || "Usuario";
+      toast.info(`¡${name} tiene un nuevo combate programado!`);
+    });
+
+    // REGISTRO SERVICE WORKER Y SUSCRIPCIÓN PUSH
+    if ("serviceWorker" in navigator && "PushManager" in window) {
+      navigator.serviceWorker
+        .register("/push-sw.js")
+        .then(async (registration) => {
+          // Solicita permiso al usuario
+          const permission = await Notification.requestPermission();
+          if (permission !== "granted") return;
+
+          // Suscribe al usuario
+          const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+          });
+
+          // Envía la suscripción al backend (endpoint correcto y formato correcto)
+          await fetch(`${process.env.REACT_APP_API_BASE_URL || "/api"}/followers/push-subscription`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+            },
+            body: JSON.stringify({ subscription }),
+          });
+        })
+        .catch((err) => {
+          console.error("Error registrando el Service Worker o suscribiendo a push:", err);
+        });
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       socket.off("combat_invitation");
       socket.off("combat_response");
       socket.off("newCombatInvitation");
+      socket.off("new_combat_from_followed");
     };
   }, [searchParams, isAccessibilityPanelOpen]);
 
@@ -194,6 +260,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/gym-registration" element={<GymRegistration />} />
           <Route path="/gym-login" element={<GymLogin />} />
+          <Route path="/gym-toggle" element={<GymToggleCard />} />
           <Route path="/gyms" element={<GymList />} />
           <Route path="/combats" element={<CombatList />} />
 
@@ -263,7 +330,7 @@ function App() {
             }
           />
 
-          {/* CAMBIO: Nueva ruta para las estadísticas del usuario */}
+          {/* Nueva ruta para estadísticas de usuario */}
           <Route
             path="/my-statistics"
             element={
@@ -271,6 +338,11 @@ function App() {
                 <UserStatisticsPage />
               </ProtectedRoute>
             }
+          />
+          {/* Ruta legacy de estadísticas demo */}
+          <Route
+            path="/statistics-demo"
+            element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
           />
         </Routes>
         <div className="accessibility-button">

@@ -1,5 +1,8 @@
-import { io, Socket } from 'socket.io-client';
-import { API_BASE_URL } from './services/apiConfig';
+import { io, Socket } from "socket.io-client";
+import { API_BASE_URL } from "./services/apiConfig";
+
+// Extrae solo el host (por ej. http://localhost:9000) eliminando “/api”
+const SOCKET_URL = API_BASE_URL.replace("/api", "");
 
 // Siempre lee el token más reciente de localStorage
 function getAuthToken() {
@@ -8,7 +11,7 @@ function getAuthToken() {
 
 // Exporta una función para crear el socket (útil si necesitas reconectar tras login)
 export function createSocket(): Socket {
-  const socket = io(API_BASE_URL.replace('/api', ''), {
+  const socket = io(SOCKET_URL, {
     autoConnect: true,
     transports: ["websocket"],
     auth: {
@@ -27,6 +30,6 @@ export function createSocket(): Socket {
 // Instancia global (puedes usar esta en la app)
 export const socket = createSocket();
 
-// Si quieres reconectar tras login:
+// Si el usuario hace login más tarde (token nuevo), llama a:
 // socket.auth.token = localStorage.getItem("token") || "";
 // socket.connect();
