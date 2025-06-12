@@ -59,7 +59,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
   const fetchUserData = React.useCallback(async () => {
     try {
-      const userData = await getUserById();
+     const userData = user?.id ? await getUserById(user.id) : await getUserById(); // Siempre obtiene el usuario autenticado
       if (userData) {
         setFormData({
           name: userData.name || "",

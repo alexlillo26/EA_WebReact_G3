@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { getRatingsByUser } from "../../services/ratingService";
+import { fetchCombatHistory } from "../../services/combatService";
 import { Rating } from "../../models/Rating";
+import { CombatHistoryEntry } from "../../models/Combat";
 import UserProfileModal from "../UserProfileModal/UserProfileModal";
+import { useLanguage } from "../../context/LanguageContext";
 import {
   followUser,
   unfollowUser,
@@ -24,7 +27,9 @@ const SeeProfile: React.FC<Props> = ({
   user,
   currentUserCity,
 }) => {
+  const { t } = useLanguage();
   const [ratings, setRatings] = useState<Rating[]>([]);
+  const [history, setHistory] = useState<CombatHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [checkingFollow, setCheckingFollow] = useState(false);
@@ -39,12 +44,21 @@ const SeeProfile: React.FC<Props> = ({
     return null;
   })();
 
+  const userId = user?._id || user?.id;
+
   useEffect(() => {
-    const userId = user?._id || user?.id;
     if (open && userId) {
       setLoading(true);
-      getRatingsByUser(userId).then((res) => {
-        setRatings(Array.isArray(res) ? res : []);
+      // Pedimos valoraciones y combates en paralelo
+      Promise.all([
+        getRatingsByUser(userId),
+        fetchCombatHistory(userId, 1, 3)
+      ]).then(([ratingsResponse, historyResponse]) => {
+        setRatings(Array.isArray(ratingsResponse) ? ratingsResponse : []);
+        setHistory(historyResponse.combats || []);
+      }).catch(err => {
+        console.error("Error fetching profile data:", err);
+      }).finally(() => {
         setLoading(false);
       });
       // Cargar contadores de seguidores/seguidos
@@ -59,7 +73,7 @@ const SeeProfile: React.FC<Props> = ({
           console.error(err);
         });
     }
-  }, [open, user]);
+  }, [open, userId]);
 
   // Comprobar si el usuario actual ya sigue al usuario visto
   useEffect(() => {
@@ -69,7 +83,6 @@ const SeeProfile: React.FC<Props> = ({
     getFollowers(user._id || user.id)
       .then((result) => {
         if (!mounted) return;
-        // Accede correctamente a result.data.followers
         const ids = (result.data?.followers || []).map((rel: any) =>
           rel.follower?._id || rel.follower
         );
@@ -83,7 +96,7 @@ const SeeProfile: React.FC<Props> = ({
     return () => {
       mounted = false;
     };
-  }, [open]); // Solo se ejecuta al abrir/cerrar el modal
+  }, [open, user, currentUser]);
 
   if (!open || !user) return null;
 
@@ -93,7 +106,7 @@ const SeeProfile: React.FC<Props> = ({
       ? (
           ratings.reduce((acc, r) => acc + Number(r[field] ?? 0), 0) /
           ratings.length
-        ).toFixed(2)
+        ).toFixed(1)
       : "-";
 
   const getDirections = () => {
@@ -109,7 +122,7 @@ const SeeProfile: React.FC<Props> = ({
     if (!currentUser || !user) return;
     try {
       if (isFollowing) {
-        await unfollowUser(user._id || user.id); // Solo pasa el id del usuario a dejar de seguir
+        await unfollowUser(user._id || user.id);
         setIsFollowing(false);
         toast.info("Has dejado de seguir a este usuario");
       } else {
@@ -124,8 +137,18 @@ const SeeProfile: React.FC<Props> = ({
 
   return (
     <UserProfileModal open={open} onClose={onClose}>
-      <div style={{ color: "#222" }}>
-        <h2 style={{ color: "#d62828" }}>{user.name}</h2>
+      <div className="see-profile-content">
+        <div className="profile-header">
+          <img
+            src={user.profilePicture || '/default-avatar.png'}
+            alt={user.name}
+            className="profile-avatar"
+          />
+          <div className="profile-header-info">
+            <h2>{user.name}</h2>
+            <p>{user.city}</p>
+          </div>
+        </div>
         {/* Mostrar contadores de seguidores/seguidos */}
         <div style={{ marginBottom: 10 }}>
           <span style={{ marginRight: 16 }}>
@@ -155,82 +178,61 @@ const SeeProfile: React.FC<Props> = ({
               {isFollowing ? "Dejar de seguir" : "Seguir"}
             </button>
           )}
-        <p>
-          <b>Email:</b> {user.email}
-        </p>
-        <p>
-          <b>Ciudad:</b> {user.city}
-          {currentUserCity && user.city && (
-            <button className="ver-ruta-button" onClick={getDirections}>
-              Ver ruta
-            </button>
-          )}
-        </p>
-        <p>
-          <b>Peso:</b> {user.weight}
-        </p>
-        <div style={{ margin: "18px 0 10px 0" }}>
-          <b>Valoraciones medias:</b>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            <li>
-              Puntualidad: <b>{avgField("punctuality")}</b> ⭐
-            </li>
-            <li>
-              Actitud: <b>{avgField("attitude")}</b> ⭐
-            </li>
-            <li>
-              Intensidad: <b>{avgField("intensity")}</b> ⭐
-            </li>
-            <li>
-              Deportividad: <b>{avgField("sportmanship")}</b> ⭐
-            </li>
-            <li>
-              Técnica: <b>{avgField("technique")}</b> ⭐
-            </li>
-          </ul>
-          <span style={{ color: "#888", fontSize: "0.95em" }}>
-            ({ratings.length} valoraciones)
-          </span>
+        <div className="profile-stats-grid">
+          <div className="stat-item">
+            <span>Peso</span>
+            <b>{user.weight}</b>
+          </div>
+          <div className="stat-item">
+            <span>Email</span>
+            <b>{user.email}</b>
+          </div>
         </div>
         <hr />
-        <h4>Comentarios recientes:</h4>
+        <h4>Valoraciones Medias ({ratings.length})</h4>
+        <div className="ratings-grid">
+          <div className="rating-item">
+            Puntualidad<br />
+            <b>{avgField("punctuality")} ⭐</b>
+          </div>
+          <div className="rating-item">
+            Actitud<br />
+            <b>{avgField("attitude")} ⭐</b>
+          </div>
+          <div className="rating-item">
+            Intensidad<br />
+            <b>{avgField("intensity")} ⭐</b>
+          </div>
+          <div className="rating-item">
+            Deportividad<br />
+            <b>{avgField("sportmanship")} ⭐</b>
+          </div>
+          <div className="rating-item">
+            Técnica<br />
+            <b>{avgField("technique")} ⭐</b>
+          </div>
+        </div>
+        <hr />
+        <h4>Últimos Sparrings</h4>
         {loading ? (
-          <p>Cargando valoraciones...</p>
-        ) : ratings.length === 0 ? (
-          <p>Sin valoraciones aún.</p>
-        ) : (
-          <ul
-            style={{
-              textAlign: "left",
-              maxHeight: 200,
-              overflowY: "auto",
-              padding: 0,
-            }}
-          >
-            {ratings.slice(0, 5).map((r) => (
-              <li
-                key={r._id}
-                style={{
-                  marginBottom: 10,
-                  background: "#fafafa",
-                  borderRadius: 6,
-                  padding: 8,
-                }}
-              >
-                <div>
-                  <b>Puntualidad:</b> {r.punctuality} ⭐ | <b>Actitud:</b>{" "}
-                  {r.attitude} ⭐ | <b>Intensidad:</b> {r.intensity} ⭐ |{" "}
-                  <b>Deportividad:</b> {r.sportmanship} ⭐ | <b>Técnica:</b>{" "}
-                  {r.technique ?? "-"} ⭐
+          <p>Cargando historial...</p>
+        ) : history.length > 0 ? (
+          <ul className="history-summary-list">
+            {history.map((combat) => (
+              <li key={combat._id}>
+                <div className="history-opponent">
+                  vs {combat.opponent?.username || 'N/A'}
                 </div>
-                {r.comment && (
-                  <div style={{ marginTop: 4, color: "#444" }}>
-                    <i>"{r.comment}"</i>
-                  </div>
-                )}
+                <div className="history-details">
+                  <span>{new Date(combat.date).toLocaleDateString()}</span>
+                  <span className="separator">|</span>
+                  <span>{combat.gym?.name || 'Gimnasio no disponible'}</span>
+                </div>
               </li>
             ))}
           </ul>
+        ) : (
+          <p className="no-data">Sin sparrings recientes.</p>
         )}
       </div>
     </UserProfileModal>

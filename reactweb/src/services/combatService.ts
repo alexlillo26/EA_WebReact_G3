@@ -84,3 +84,8 @@ export const fetchCombatHistory = async (
     });
     return response.data.data;
 };
+
+export const cancelCombatService = async (combatId: string, reason: string) => {
+  const response = await axiosInstance.post(`/api/combat/${combatId}/cancel`, { reason });
+  return response.data;
+};

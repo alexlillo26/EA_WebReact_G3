@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getCombats, respondCombat } from "../../services/combatService";
+import {
+  getCombats,
+  respondCombat,
+  cancelCombatService,
+} from "../../services/combatService";
 import { Combat } from "../../models/Combat";
 import { toast } from "react-toastify";
 import { useLanguage } from "../../context/LanguageContext";
@@ -8,6 +12,7 @@ import { createRating, getRatingFromTo } from "../../services/ratingService";
 import { Rating } from "../../models/Rating";
 import { updateCombatImage } from "../../services/combatService";
 import "./MyCombats.css";
+import { CancelCombatModal } from "../CancelCombatModal/CancelCombatModal";
 
 const MyCombats: React.FC = () => {
   const { t } = useLanguage();
@@ -24,6 +29,8 @@ const MyCombats: React.FC = () => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [combatToCancel, setCombatToCancel] = useState<Combat | null>(null);
 
   // Obtener el id y nombre del usuario actual
   const userData = (() => {
@@ -247,6 +254,14 @@ const MyCombats: React.FC = () => {
     }
   };
 
+  const handleCancelCombat = async (reason: string) => {
+    if (!combatToCancel || !combatToCancel._id) return;
+    await cancelCombatService(combatToCancel._id, reason); // Llama al backend
+    setCancelModalOpen(false);
+    setCombatToCancel(null);
+    refreshCombats(); // Refresca la lista
+  };
+
   const handleRateSubmit = async ({
     punctuality,
     attitude,
@@ -386,6 +401,17 @@ const MyCombats: React.FC = () => {
                   >
                     {c.image ? "Cambiar foto" : "Añadir foto"}
                   </label>
+                  {!canRateCombat(c) && (
+                    <button
+                      className="cancel-combat-btn"
+                      onClick={() => {
+                        setCombatToCancel(c);
+                        setCancelModalOpen(true);
+                      }}
+                    >
+                      Cancelar combate
+                    </button>
+                  )}
                 </li>
               ))}
           </ul>
@@ -412,14 +438,17 @@ const MyCombats: React.FC = () => {
       ) : (
         <p className="my-combats-empty">{t("noFutureCombats")}</p>
       )}
-
       <RatingModal
         open={ratingModalOpen}
         onClose={() => setRatingModalOpen(false)}
         onSubmit={handleRateSubmit}
         opponentName={combatToRate ? getOpponentForFuture(combatToRate) : ""}
       />
-
+      <CancelCombatModal
+        open={cancelModalOpen}
+        onClose={() => setCancelModalOpen(false)}
+        onConfirm={handleCancelCombat}
+      />
       <h2 className="my-combats-section-title">📩 {t("invitationsTitle")}</h2>
       {receivedInvitations.length > 0 ? (
         <ul className="my-combats-list">
@@ -457,7 +486,6 @@ const MyCombats: React.FC = () => {
       ) : (
         <p className="my-combats-empty">{t("noInvitations")}</p>
       )}
-
       <h2 className="my-combats-section-title">
         ⏳ {t("pendingCombatsSentTitle")}
       </h2>

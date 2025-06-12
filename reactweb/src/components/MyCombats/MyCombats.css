@@ -106,9 +106,9 @@
 }
 
 .rate-opponent-btn {
-  background-color: #d62828;
+  background-color: #24be06;
   color: white;
-  padding: 10px 20px;
+  padding: 8px 10px;
   border: none;
   border-radius: 5px;
   font-size: 16px;
@@ -116,9 +116,12 @@
   cursor: pointer;
   transition: background-color 0.3s;
   margin-top: 10px;
+  display: block;
+  margin: 8px auto 0 auto;
+  width: 50%;
 }
 .rate-opponent-btn:hover {
-  background-color: #a31f1f;
+  background-color: #0cae04;
 }
 
 .file-upload-btn2 {
@@ -171,4 +174,66 @@
   font-size: 15px;
   font-weight: 500;
   color: #222;
+}
+
+.cancel-combat-btn {
+  background-color: #d62828;
+  color: #fff;
+  border: none;
+  width: 50%;
+  border-radius: 6px;
+  padding: 4px 6px;    
+  font-size: 0.9em;       
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 8px;
+  margin-left: 6px;
+  min-width: 0;           
+  height: 32px;           
+  line-height: 1.2;
+  display: block;
+  margin: 8px auto 0 auto;
+}
+.cancel-combat-btn:hover {
+  background-color: #a31f1f;
+}
+
+.cancel-reason-select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1.5px solid #d62828;
+  font-size: 1em;
+  margin-top: 10px;
+  margin-bottom: 16px;
+  background: #f8f8f8;
+  color: #222;
+  appearance: none; /* Quita el estilo por defecto en la mayoría de navegadores */
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.cancel-reason-select:focus {
+  border-color: #a31f1f;
+  background: #fff0f0;
+}
+
+.cancel-reason-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1.5px solid #d62828;
+  font-size: 1em;
+  background: #f8f8f8;
+  color: #222;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.cancel-reason-input:focus {
+  border-color: #a31f1f;
+  outline: none;
+  background: #fff0f0;
 }
