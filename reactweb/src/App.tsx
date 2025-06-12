@@ -11,7 +11,6 @@ import CombatList from "./components/CombatList/CombatList";
 import "./App.css";
 import GymLogin from "./components/gyms/GymLogin";
 import GymToggleCard from "./components/gyms/GymToggleCard";
-import Statistics from "./components/Statistics/Statistics";
 import { getToken, handleGoogleOAuth } from "./services/authService";
 import SearchResults from "./components/SearchResults/SearchResults";
 import { LanguageProvider } from "./context/LanguageContext";
@@ -340,10 +339,7 @@ function App() {
             }
           />
           {/* Ruta legacy de estadísticas demo */}
-          <Route
-            path="/statistics-demo"
-            element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
-          />
+          
         </Routes>
         <div className="accessibility-button">
           <button onClick={() => setIsAccessibilityPanelOpen(true)}>

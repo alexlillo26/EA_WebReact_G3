@@ -4,33 +4,30 @@ import { Gym } from "../../models/Gym";
 import { searchUsers } from "../../services/userService";
 import { getToken } from "../../services/authService";
 import { StepsSection } from "../StepsSection/SteptsSection";
-import AboutSection from "../AboutSection/AboutSection"; // Importa el nuevo componente
-import GymMap from "../Geolocalization/GymMap"; // Importa el componente del mapa
+import AboutSection from "../AboutSection/AboutSection";
+import GymMap from "../Geolocalization/GymMap";
 import "./Home.css";
-import { AppPromoSection } from "../AppPromoSection/AppPromoSection"; // Importa el nuevo componente
+import { AppPromoSection } from "../AppPromoSection/AppPromoSection";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "../../context/LanguageContext"; // Importa el contexto de idioma
+import { useLanguage } from "../../context/LanguageContext";
+import { toast } from 'react-toastify';
 
 const Home: React.FC = () => {
   const { t } = useLanguage();
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [city, setCity] = useState("");
   const [weight, setWeight] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [error, setError] = useState("");
+  const [level, setLevel] = useState(""); // Añadimos estado para el nivel
+  const [showGyms, setShowGyms] = useState(false); // Estado para el mapa de gimnasios
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGyms = async () => {
       try {
-        const response = await getGyms(); // Explicitly typed response
+        const response = await getGyms();
         setGyms(response.gyms);
       } catch (error) {
-        if (error instanceof Error) {
-          console.error(t("searchErrorGeneral"), error.message);
-        } else {
-          console.error(t("searchErrorGeneral"), error);
-        }
+        console.error("Error al cargar los gimnasios:", error);
       }
     };
     fetchGyms();
@@ -38,45 +35,37 @@ const Home: React.FC = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
-    if (!city && !weight) {
-      setError(t("searchErrorEmpty"));
+    if (!city && !weight && !level) {
+      toast.error(t("searchErrorEmpty"));
       return;
     }
 
     try {
       const token = getToken();
       if (!token) {
-        setError(t("searchErrorLogin"));
+        toast.error(t("searchErrorLogin") as string);
+        navigate("/login"); // Redirige al login si no hay token
         return;
       }
 
-      const results = await searchUsers(city, weight);
+      const results = await searchUsers(city, weight, level); // Pasamos el nivel a la búsqueda
       if (results.length === 0) {
-        setError(t("searchErrorNoResults"));
+        toast.info(t("searchErrorNoResults") as string);
         return;
       }
+      
+      // Navegamos a la página de resultados con los usuarios encontrados
+      navigate("/search-results", { state: { users: results } });
 
-      const searchParams = `?city=${encodeURIComponent(
-        city
-      )}&weight=${encodeURIComponent(weight)}`;
-      navigate(`/search-results${searchParams}`, {
-        state: { results },
-      });
     } catch (err) {
       console.error(t("searchErrorGeneral"), err);
-      setError(t("searchErrorGeneral"));
-      setSearchResults([]);
+      toast.error(t("searchErrorGeneral") as string);
     }
   };
 
-  const handleContact = (userId: string) => {
-    console.log(t("contactButton"), userId);
-  };
-
   return (
-    <>
+    <div className="home-container">
       <section className="hero">
         <div className="hero-content">
           <h1>{t("homeHeroTitle")}</h1>
@@ -89,52 +78,36 @@ const Home: React.FC = () => {
               onChange={(e) => setCity(e.target.value)}
             />
             <select value={weight} onChange={(e) => setWeight(e.target.value)}>
-              <option value="">{t("searchWeightPlaceholder")}</option>
+              {/* CAMBIO: La primera opción ahora es "Cualquier peso" */}
+              <option value="">{t("anyWeight")}</option>
               <option value="Peso pluma">{t("featherweight")}</option>
               <option value="Peso medio">{t("middleweight")}</option>
               <option value="Peso pesado">{t("heavyweight")}</option>
+            </select>
+            {/* He mantenido el selector de nivel que tenías en una versión anterior */}
+            <select value={level} onChange={(e) => setLevel(e.target.value)}>
+              <option value="">{t("searchLevelPlaceholder")}</option>
+              <option value="professional">{t("professional")}</option>
+              <option value="amateur">{t("amateur")}</option>
+              <option value="sparring">{t("sparring")}</option>
             </select>
             <button type="submit" className="search-button">
               {t("searchButton")}
             </button>
           </form>
-
-          {error && <p className="error-message">{error}</p>}
-
-          {searchResults.length > 0 && (
-            <div className="search-results">
-              <h2>{t("searchResultsTitle")}</h2>
-              <div className="results-list">
-                {searchResults.map((user) => (
-                  <div key={user.id} className="user-result-item">
-                    <div className="user-info">
-                      <h3>{user.name}</h3>
-                      <p>
-                        {t("searchCityPlaceholder")}: {user.city}
-                      </p>
-                      <p>
-                        {t("searchWeightPlaceholder")}: {user.weight}
-                      </p>
-                    </div>
-                    <button
-                      className="contact-button"
-                      onClick={() => handleContact(user.id)}
-                    >
-                      {t("contactButton")}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
       <StepsSection />
       <AboutSection />
-      <GymMap gyms={gyms} />
+      <div className="gym-map-section">
+        <button className="gym-toggle-button" onClick={() => setShowGyms(!showGyms)}>
+            {showGyms ? t("hideGyms") : t("seeGyms")}
+        </button>
+        {showGyms && <GymMap gyms={gyms} />}
+      </div>
       <AppPromoSection />
-    </>
+    </div>
   );
 };
 
