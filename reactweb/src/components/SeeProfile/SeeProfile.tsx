@@ -7,7 +7,7 @@ import UserProfileModal from "../UserProfileModal/UserProfileModal";
 import {
   followUser,
   unfollowUser,
-  getFollowers,
+  checkFollowUser,
   getFollowCounts,
   FollowCounts,
   FollowerItem,
@@ -33,6 +33,7 @@ const SeeProfile: React.FC<Props> = ({
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [checkingFollow, setCheckingFollow] = useState(false);
+  const [togglingFollow, setTogglingFollow] = useState(false);
   const [counts, setCounts] = useState<FollowCounts>({ followers: 0, following: 0 });
 
   // Obtener el usuario actual desde localStorage
@@ -46,6 +47,21 @@ const SeeProfile: React.FC<Props> = ({
 
   const userId = user?._id || user?.id;
 
+  // Refresca el estado de follow usando el endpoint rápido
+  const refreshFollowState = async () => {
+    if (!userId) return;
+    setCheckingFollow(true);
+    try {
+      const res = await checkFollowUser(userId);
+      setIsFollowing(res.data.following);
+    } catch (err) {
+      setIsFollowing(false);
+    } finally {
+      setCheckingFollow(false);
+    }
+  };
+
+  // Comprobar la primera vez que se abra el modal o cambie user
   useEffect(() => {
     if (open && userId) {
       setLoading(true);
@@ -72,31 +88,9 @@ const SeeProfile: React.FC<Props> = ({
         .catch((err) => {
           console.error(err);
         });
+      refreshFollowState();
     }
   }, [open, userId]);
-
-  // Comprobar si el usuario actual ya sigue al usuario visto
-  useEffect(() => {
-    if (!open || !user || !currentUser) return;
-    let mounted = true;
-    setCheckingFollow(true);
-    getFollowers(user._id || user.id)
-      .then((result) => {
-        if (!mounted) return;
-        const ids = (result.data?.followers || []).map((rel: FollowerItem) =>
-          rel.follower?._id || rel.follower
-        );
-        setIsFollowing(ids.includes(currentUser.id));
-        setCheckingFollow(false);
-      })
-      .catch(() => {
-        if (mounted) setIsFollowing(false);
-        setCheckingFollow(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [open, user, currentUser]);
 
   if (!open || !user) return null;
 
@@ -112,18 +106,28 @@ const SeeProfile: React.FC<Props> = ({
   // Manejar seguir/dejar de seguir
   const handleFollowToggle = async () => {
     if (!currentUser || !user) return;
+    if (togglingFollow || checkingFollow) return;
+
+    setTogglingFollow(true);
     try {
       if (isFollowing) {
-        await unfollowUser(user._id || user.id);
-        setIsFollowing(false);
+        await unfollowUser(userId);
         toast.info("Has dejado de seguir a este usuario");
       } else {
-        await followUser(user._id || user.id);
-        setIsFollowing(true);
+        await followUser(userId);
         toast.success("Ahora sigues a este usuario");
       }
+      // Refresca contador y estado de botón
+      const countsRes = await getFollowCounts(userId);
+      setCounts({
+        followers: countsRes.data.followers,
+        following: countsRes.data.following,
+      });
+      await refreshFollowState();
     } catch (err) {
       toast.error("Error al actualizar el seguimiento");
+    } finally {
+      setTogglingFollow(false);
     }
   };
 
@@ -156,7 +160,7 @@ const SeeProfile: React.FC<Props> = ({
             <button
               className="follow-button"
               onClick={handleFollowToggle}
-              disabled={checkingFollow}
+              disabled={checkingFollow || togglingFollow}
               style={{
                 backgroundColor: "#d62828",
                 color: "white",
@@ -167,7 +171,11 @@ const SeeProfile: React.FC<Props> = ({
                 cursor: "pointer",
               }}
             >
-              {isFollowing ? "Dejar de seguir" : "Seguir"}
+              {checkingFollow
+                ? "..."
+                : isFollowing
+                ? "Dejar de seguir"
+                : "Seguir"}
             </button>
           )}
         <div className="profile-stats-grid">

@@ -230,6 +230,31 @@ function App() {
     registerPushNotifications();
   }, [user]);
 
+  // Nuevo useEffect: escucha mensajes push del Service Worker y muestra toast in-app
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+
+    // Handler para mensajes push in-app
+    const handler = (event: MessageEvent) => {
+      if (event.data?.type === "IN_APP_PUSH") {
+        const { title, body } = event.data.payload;
+        toast.info(
+          <div>
+            <strong>{title}</strong>
+            <div>{body}</div>
+          </div>,
+          { autoClose: 5000 }
+        );
+      }
+    };
+
+    navigator.serviceWorker.addEventListener("message", handler);
+
+    return () => {
+      navigator.serviceWorker.removeEventListener("message", handler);
+    };
+  }, []);
+
   const handleLogin = (user: { id: string; name: string }) => {
     setUser(user);
     localStorage.setItem("userData", JSON.stringify(user));

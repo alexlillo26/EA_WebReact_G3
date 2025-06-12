@@ -62,9 +62,14 @@ export const removeFollower = (followerId: string) =>
 export const storePushSubscription = (subscription: PushSubscription) =>
   axiosInstance.post(
     `${API_BASE_URL}/api/followers/save-subscription`,
-    { subscription }
-    // Si usas cookies para autenticación, descomenta la siguiente línea:
-    // , { withCredentials: true }
+    { subscription },
+    { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+  );
+
+// Comprueba si currentUser sigue al userId
+export const checkFollowUser = (userId: string) =>
+  axiosInstance.get<{ following: boolean }>(
+    `${API_BASE_URL}/api/followers/check/${userId}`
   );
 
 // No hay función explícita aquí, pero el endpoint se usa en App.tsx para enviar la suscripción push.
