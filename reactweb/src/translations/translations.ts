@@ -204,6 +204,7 @@ export const translations = {
     "userStats.noCombats": 'No sparring history yet.',
     "userStats.times": 'times',
     "userStats.combats": 'sparrings',
+    anyWeight: "Any weight",
 
   },
   es: {
@@ -411,6 +412,7 @@ export const translations = {
     "userStats.noCombats": 'Aún no tienes historial de sparrings.',
     "userStats.times": 'veces',
     "userStats.combats": 'sparrings',
+    anyWeight: "Cualquier peso",
   },
   ca: {
     languageCode: 'ca-ES',
@@ -617,6 +619,7 @@ export const translations = {
     "userStats.noCombats": 'Encara no tens historial de sparrings.',
     "userStats.times": 'vegades',
     "userStats.combats": 'sparrings',
+    anyWeight: "Qualsevol pes",
   },
   eu: {
     languageCode: 'eu-ES',
@@ -716,6 +719,7 @@ export const translations = {
     genderPlaceholder: "Hautatu zure generoa",
     weightPlaceholder: "Hautatu zure pisua",
     cityPlaceholder: "Hiria",
+    anyWeight: "Edozein pisu",
     confirmPasswordPlaceholder: "Pasahitza berretsi",
     googleRegisterButton: "Erregistratu Google-rekin",
     passwordRequirements:
@@ -823,5 +827,6 @@ export const translations = {
     "userStats.noCombats": 'Oraindik ez duzu sparring historialik.',
     "userStats.times": 'aldiz',
     "userStats.combats": 'sparring'
+    
   },
 };

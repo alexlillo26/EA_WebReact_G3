@@ -1,190 +1,111 @@
-.hero {
-    background-image: url('../../assets/backgroung.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .hero-content {
-    max-width: 800px;
-  }
-  
-  .hero h1 {
-    font-size: 48px;
+/* Contenedor principal de la sección 'hero' */
+.hero-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 100px 20px;
+  background: url('https://source.unsplash.com/random/1600x900/?boxing,gym') no-repeat center center/cover;
+  color: white;
+  height: 60vh;
+  position: relative;
+}
+
+/* Capa oscura sobre la imagen de fondo para mejorar la legibilidad */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Contenido dentro de la sección 'hero' */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.hero-content p {
+  font-size: 1.25rem;
+  margin-bottom: 30px;
+}
+
+/* === CAMBIO PRINCIPAL AQUÍ === */
+/* Contenedor del formulario de búsqueda */
+.search-form {
+  display: flex; /* Usamos Flexbox para alinear en línea */
+  flex-wrap: wrap; /* Permite que los elementos pasen abajo en pantallas pequeñas */
+  gap: 15px; /* Espacio entre los elementos */
+  align-items: center; /* Centra los elementos verticalmente */
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Estilo para los campos de entrada y los desplegables */
+.search-form input,
+.search-form select {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px 15px;
+  font-size: 1rem;
+  color: #333;
+  flex: 1; /* Permite que los campos crezcan y ocupen el espacio */
+  min-width: 180px; /* Ancho mínimo antes de que pasen a la siguiente línea */
+}
+
+/* Estilo para el botón de búsqueda */
+.search-form button {
+  background-color: #e50914; /* Rojo característico */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0; /* Evita que el botón se encoja */
+}
+
+.search-form button:hover {
+  background-color: #f40612;
+}
+
+/* Contenedor para el mapa de gimnasios */
+.gym-map-section {
+  padding: 50px 20px;
+  text-align: center;
+  background-color: #f4f4f4;
+}
+
+/* Botón para mostrar/ocultar el mapa */
+.gym-toggle-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
     font-weight: bold;
-    margin-bottom: 20px;
-    color: #fff;
-  }
-  
-  .hero p {
-    font-size: 18px;
+    cursor: pointer;
+    border-radius: 8px;
     margin-bottom: 30px;
-    color: #fff;
-  }
-  
-  .search-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-  }
-  
-  .search-form input,
-  .search-form select {
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    width: 250px;
-  }
-  
-  .search-form .search-button {
-    background-color: #FF3B30;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .search-form .search-button:hover {
-    background-color: #D32F2F;
-  }
-  
-  .search-form select:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-  @media (max-width: 768px) {
-    .hero h1 {
-      font-size: 32px;
-    }
-  
-    .search-form input,
-    .search-form select {
-      width: 100%;
-    }
-  }
-
-  .search-results {
-    margin-top: 30px;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .results-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 15px;
-  }
-  
-  .results-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .user-card {
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 15px;
-    border-radius: 8px;
-    transition: transform 0.3s ease;
-  }
-  
-  .user-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .user-card h3 {
-    color: #FF3B30;
-    margin-bottom: 10px;
-  }
-  
-  .user-card p {
-    color: white;
-    margin: 5px 0;
-  }
-  
-  .user-result-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 15px;
-    border-radius: 8px;
-    transition: transform 0.2s ease;
-  }
-  
-  .user-result-item:hover {
-    transform: translateY(-2px);
-  }
-  
-  .user-info {
-    flex: 1;
-  }
-  
-  .user-info h3 {
-    color: #FF3B30;
-    margin: 0 0 5px 0;
-  }
-  
-  .user-info p {
-    margin: 3px 0;
-    color: #fff;
-  }
-  
-  .contact-button {
-    background-color: #FF3B30;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
     transition: background-color 0.3s ease;
-    font-weight: bold;
-  }
-  
-  .contact-button:hover {
-    background-color: #D32F2F;
-  }
-  
-  .error-message {
-    color: #FF3B30;
-    background-color: rgba(255, 59, 48, 0.1);
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 15px;
-    text-align: center;
-  }
+}
 
-  .level-select {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    transition: all 0.3s ease;
-  }
-  
-  .level-select:not([disabled]):hover {
-    border-color: #FF3B30;
-    cursor: pointer;
-  }
-  
-  .level-select option {
-    background-color: #1f1f1f;
-    color: white;
-  }
+.gym-toggle-button:hover {
+    background-color: #e50914;
+}
