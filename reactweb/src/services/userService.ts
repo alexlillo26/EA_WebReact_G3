@@ -82,29 +82,36 @@ export const updateUser = async (id: string, updateData: Partial<Usuario> | Form
 };
 
 // Servicio para buscar usuarios
-export const searchUsers = async (email?: string, weight?: string, city?: string, boxingVideo?: string): Promise<any[]> => {
+export const searchUsers = async (
+  city?: string,
+  weight?: string
+): Promise<any[]> => {
   try {
     const params: Record<string, string> = {};
     if (city) params.city = city;
     if (weight) params.weight = weight;
-    if (email) params.email = email;
-    if (boxingVideo) params.boxingVideo = boxingVideo;
 
-    const response = await axiosInstance.get<{ users: any[] }>(`${API_BASE_URL}/api/users/search`, { params });
-    console.log('Search results:', response.data); // Debug log
+    const response = await axiosInstance.get<{ users: any[] }>(
+      `${API_BASE_URL}/api/users/search`,
+      { params }
+    );
+    console.log("Search results:", response.data.users);
     return response.data.users || [];
   } catch (error) {
-    console.error('Error en searchUsers:', error);
+    console.error("Error en searchUsers:", error);
     throw error;
   }
 };
 
 // Servicio explícito para subir avatar a Cloudinary vía backend
 export const uploadAvatar = async (file: File) => {
+  const userData = localStorage.getItem("userData");
+  if (!userData) throw new Error("No user data");
+  const { id } = JSON.parse(userData);
   const form = new FormData();
-  form.append("profilePicture", file);
+  form.append("avatar", file); // <-- el campo debe llamarse 'avatar'
   return axiosInstance.put(
-    `${API_BASE_URL}/api/users/me/avatar`,
+    `${API_BASE_URL}/api/users/${id}/avatar`,
     form
   );
 };
@@ -118,7 +125,7 @@ export const uploadBoxingVideo = (
   return new Promise<any>((resolve, reject) => {
     const token = localStorage.getItem('token');
     const formData = new FormData();
-    formData.append('video', file);
+    formData.append('file', file); // <-- el campo debe llamarse 'file'
 
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', `${API_BASE_URL}/api/users/${userId}/boxing-video`, true);

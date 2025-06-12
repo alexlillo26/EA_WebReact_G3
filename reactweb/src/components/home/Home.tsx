@@ -11,6 +11,7 @@ import { AppPromoSection } from "../AppPromoSection/AppPromoSection";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import { toast } from 'react-toastify';
+import queryString from "query-string";
 
 const Home: React.FC = () => {
   const { t } = useLanguage();
@@ -49,15 +50,13 @@ const Home: React.FC = () => {
         return;
       }
 
-      const results = await searchUsers(city, weight, level); // Pasamos el nivel a la búsqueda
-      if (results.length === 0) {
-        toast.info(t("searchErrorNoResults") as string);
-        return;
-      }
-      
-      // Navegamos a la página de resultados con los usuarios encontrados
-      navigate("/search-results", { state: { users: results } });
+      // No necesitas buscar aquí, solo navega con los parámetros
+      const params: Record<string, string> = {};
+      if (city) params.city = city;
+      if (weight) params.weight = weight;
+      // Si quieres incluir level, añade: if (level) params.level = level;
 
+      navigate(`/search-results?${queryString.stringify(params)}`);
     } catch (err) {
       console.error(t("searchErrorGeneral"), err);
       toast.error(t("searchErrorGeneral") as string);

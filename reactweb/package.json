@@ -18,6 +18,7 @@
     "cors": "^2.8.5",
     "jwt-decode": "^3.1.2",
     "leaflet": "^1.9.4",
+    "query-string": "^9.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-leaflet": "^5.0.0",

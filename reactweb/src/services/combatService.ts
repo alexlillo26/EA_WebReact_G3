@@ -86,6 +86,16 @@ export const fetchCombatHistory = async (
 };
 
 export const cancelCombatService = async (combatId: string, reason: string) => {
-  const response = await axiosInstance.post(`/api/combat/${combatId}/cancel`, { reason });
-  return response.data;
+  // Si tu backend espera DELETE y el motivo en el body, usa fetch (axios no soporta body en DELETE)
+  const token = localStorage.getItem('token');
+  const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || ''}/api/combat/${combatId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ reason }),
+  });
+  if (!response.ok) throw new Error('Error cancelling combat');
+  return response.json();
 };

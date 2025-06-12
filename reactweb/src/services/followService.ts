@@ -58,11 +58,13 @@ export const removeFollower = (followerId: string) =>
     `${API_BASE_URL}/api/followers/remove/${followerId}`
   );
 
-// Añadir: Guardar la suscripción push en el backend
+// Añadir: Guardar la suscripción push en el backend con la ruta correcta
 export const storePushSubscription = (subscription: PushSubscription) =>
   axiosInstance.post(
-    `${API_BASE_URL}/api/followers/push-subscription`,
+    `${API_BASE_URL}/api/followers/save-subscription`,
     { subscription }
+    // Si usas cookies para autenticación, descomenta la siguiente línea:
+    // , { withCredentials: true }
   );
 
 // No hay función explícita aquí, pero el endpoint se usa en App.tsx para enviar la suscripción push.

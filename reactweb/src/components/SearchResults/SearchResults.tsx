@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { searchUsers } from "../../services/userService";
 import { getCombats } from "../../services/combatService";
 import "./SearchResults.css";
@@ -10,17 +10,11 @@ import logo from "../../assets/logo.png";
 
 const SearchResults = () => {
   const { t } = useLanguage();
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalMsg, setModalMsg] = useState("");
-  const queryParams = new URLSearchParams(location.search);
-  const [city, setCity] = useState(queryParams.get("city") || "");
-  const [weight, setWeight] = useState(queryParams.get("weight") || "");
-  const [videoModalUrl, setVideoModalUrl] = useState<string | null>(null);
-  const [searchResults, setSearchResults] = useState(
-    location.state?.results || []
-  );
+  const [city, setCity] = useState(searchParams.get("city") || "");
+  const [weight, setWeight] = useState(searchParams.get("weight") || "");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<{
     id: string;
     name: string;
@@ -31,23 +25,36 @@ const SearchResults = () => {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [enlargedImage, setEnlargedImage] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMsg, setModalMsg] = useState("");
+  const [videoModalUrl, setVideoModalUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("Resultados de búsqueda:", searchResults);
-  }, [searchResults]);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("userData"); // <-- Cambia aquí
-    // Solo obtener el usuario logueado, nunca sobrescribirlo aquí
+    const storedUser = localStorage.getItem("userData");
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser));
-      // Cargar combates pendientes para filtrar posibles oponentes
       const { id } = JSON.parse(storedUser);
       getCombats({ status: "pending", user: id }).then((res) => {
         setPendingCombats(res.combats || []);
       });
     }
   }, []);
+
+  useEffect(() => {
+    const doSearch = async () => {
+      if (!city && !weight) {
+        setSearchResults([]);
+        return;
+      }
+      try {
+        const results = await searchUsers(city, weight);
+        setSearchResults(results);
+      } catch {
+        setSearchResults([]);
+      }
+    };
+    doSearch();
+  }, [city, weight]);
 
   const translateWeight = (weight: string) => {
     switch (weight) {
@@ -79,7 +86,6 @@ const SearchResults = () => {
       if (city) searchParams.set("city", city);
       if (weight) searchParams.set("weight", weight);
       navigate(`/search-results?${searchParams.toString()}`, {
-        state: { results },
         replace: true,
       });
     } catch (err) {
