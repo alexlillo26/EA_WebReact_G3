@@ -22,7 +22,6 @@ const GymProfile: React.FC = () => {
   });
   const [photos, setPhotos] = useState<string[]>([]);
   const [mainPhoto, setMainPhoto] = useState<string>("");
-  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [hoveredPhoto, setHoveredPhoto] = useState<string | null>(null);
 
   useEffect(() => {
@@ -142,7 +141,6 @@ const GymProfile: React.FC = () => {
           onChange={async (e) => {
             if (e.target.files) {
               const files = Array.from(e.target.files);
-              setPhotoFiles(files);
               const userData = localStorage.getItem("userData");
               if (!userData) return;
               const { id } = JSON.parse(userData);
@@ -151,7 +149,6 @@ const GymProfile: React.FC = () => {
               photos.forEach((url) => formData.append("oldPhotos", url));
               const res = await updateGymPhotos(id, formData);
               setPhotos(res.photos || []);
-              setPhotoFiles([]);
             }
           }}
         />

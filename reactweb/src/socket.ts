@@ -27,7 +27,6 @@ export function createSocket(): Socket {
   return socket;
 }
 
-// Instancia global (puedes usar esta en la app)
 export const socket = createSocket();
 
 // Si el usuario hace login más tarde (token nuevo), llama a:

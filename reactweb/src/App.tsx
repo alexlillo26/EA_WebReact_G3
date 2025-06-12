@@ -11,7 +11,6 @@ import CombatList from "./components/CombatList/CombatList";
 import "./App.css";
 import GymLogin from "./components/gyms/GymLogin";
 import GymToggleCard from "./components/gyms/GymToggleCard";
-import Statistics from "./components/Statistics/Statistics";
 import { getToken, handleGoogleOAuth } from "./services/authService";
 import SearchResults from "./components/SearchResults/SearchResults";
 import { LanguageProvider } from "./context/LanguageContext";
@@ -28,6 +27,7 @@ import MyCombats from "./components/MyCombats/MyCombats";
 import { getCombats } from "./services/combatService";
 import CombatHistoryPage from "./pages/CombatHistoryPage/CombatHistoryPage";
 import UserStatisticsPage from "./components/Statistics/UserStatisticsPage";
+import { storePushSubscription } from "./services/followService";
 
 interface User {
   id: string;
@@ -70,13 +70,34 @@ const ProtectedRoute = ({
   return children;
 };
 
+// Añade función para registrar push notifications
+async function registerPushNotifications() {
+  try {
+    const registration = await navigator.serviceWorker.register("/push-sw.js");
+
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return;
+
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+    });
+
+    // Usa el servicio centralizado para guardar la suscripción push
+    await storePushSubscription(subscription);
+
+    console.log("✅ Push subscription saved.");
+  } catch (err) {
+    console.error("Error registrando push notifications:", err);
+  }
+}
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [searchParams] = useSearchParams();
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] =
     useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
-  const [pendingInvitations, setPendingInvitations] = useState(0);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
@@ -91,7 +112,6 @@ function App() {
         const { id } = JSON.parse(userData);
         getCombats({ status: "pending", opponent: id }).then((res) => {
           const count = res.combats ? res.combats.length : 0;
-          setPendingInvitations(count);
           localStorage.setItem("pendingInvitations", String(count));
           if (count > 0) {
             toast.info(
@@ -170,71 +190,45 @@ function App() {
       initializeUser();
     }
 
-    if (isAccessibilityPanelOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
+    const handleSocketEvents = () => {
+      // Socket.IO listeners
+      socket.on("combat_invitation", (combat) => {
+        console.log("[Socket] combat_invitation recibido:", combat);
+        toast.info("¡Has recibido una nueva invitación de combate!");
+      });
+      socket.on("combat_response", ({ combatId, status }) => {
+        console.log("[Socket] combat_response recibido:", combatId, status);
+        toast.info(`Respuesta a tu combate: ${status}`);
+      });
 
-    // Socket.IO listeners
-    socket.on("combat_invitation", (combat) => {
-      console.log("[Socket] combat_invitation recibido:", combat);
-      toast.info("¡Has recibido una nueva invitación de combate!");
-    });
-    socket.on("combat_response", ({ combatId, status }) => {
-      console.log("[Socket] combat_response recibido:", combatId, status);
-      toast.info(`Respuesta a tu combate: ${status}`);
-    });
+      socket.on("newCombatInvitation", (combatData) => {
+        console.log("[Socket] newCombatInvitation recibido:", combatData);
+        toast.info("¡Nueva invitación de combate recibida!");
+      });
 
-    socket.on("newCombatInvitation", (combatData) => {
-      console.log("[Socket] newCombatInvitation recibido:", combatData);
-      toast.info("¡Nueva invitación de combate recibida!");
-    });
+      // Notificación cuando un usuario seguido crea o acepta un combate
+      socket.on("new_combat_from_followed", ({ combat, actor }) => {
+        const name = actor.name || "Usuario";
+        toast.info(`¡${name} tiene un nuevo combate programado!`);
+      });
+    };
 
-    // NUEVO: Notificación cuando un usuario seguido crea o acepta un combate
-    socket.on("new_combat_from_followed", ({ combat, actor }) => {
-      const name = actor.name || "Usuario";
-      toast.info(`¡${name} tiene un nuevo combate programado!`);
-    });
-
-    // REGISTRO SERVICE WORKER Y SUSCRIPCIÓN PUSH
-    if ("serviceWorker" in navigator && "PushManager" in window) {
-      navigator.serviceWorker
-        .register("/push-sw.js")
-        .then(async (registration) => {
-          // Solicita permiso al usuario
-          const permission = await Notification.requestPermission();
-          if (permission !== "granted") return;
-
-          // Suscribe al usuario
-          const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-          });
-
-          // Envía la suscripción al backend (endpoint correcto y formato correcto)
-          await fetch(`${process.env.REACT_APP_API_BASE_URL || "/api"}/followers/push-subscription`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-            },
-            body: JSON.stringify({ subscription }),
-          });
-        })
-        .catch((err) => {
-          console.error("Error registrando el Service Worker o suscribiendo a push:", err);
-        });
-    }
+    handleSocketEvents();
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
       socket.off("combat_invitation");
       socket.off("combat_response");
       socket.off("newCombatInvitation");
       socket.off("new_combat_from_followed");
     };
   }, [searchParams, isAccessibilityPanelOpen]);
+
+  // Nuevo useEffect: registra push notifications SOLO cuando user está listo
+  useEffect(() => {
+    if (!user) return;
+    if (!("serviceWorker" in navigator && "PushManager" in window)) return;
+    registerPushNotifications();
+  }, [user]);
 
   const handleLogin = (user: { id: string; name: string }) => {
     setUser(user);
@@ -340,10 +334,12 @@ function App() {
             }
           />
           {/* Ruta legacy de estadísticas demo */}
+          {/* 
           <Route
             path="/statistics-demo"
             element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
           />
+          */}
         </Routes>
         <div className="accessibility-button">
           <button onClick={() => setIsAccessibilityPanelOpen(true)}>

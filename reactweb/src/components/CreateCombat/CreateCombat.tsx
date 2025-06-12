@@ -6,7 +6,7 @@ import { Gym } from "../../models/Gym";
 import { createCombat, getCombats } from "../../services/combatService";
 import { socket } from "../../socket";
 import SimpleModal from "../SimpleModal/SimpleModal";
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // --- CAMBIO PRINCIPAL: Lee combatState de localStorage si no viene por location.state
 const CreateCombat: React.FC = () => {

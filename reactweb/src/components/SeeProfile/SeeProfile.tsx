@@ -4,13 +4,14 @@ import { fetchCombatHistory } from "../../services/combatService";
 import { Rating } from "../../models/Rating";
 import { CombatHistoryEntry } from "../../models/Combat";
 import UserProfileModal from "../UserProfileModal/UserProfileModal";
-import { useLanguage } from "../../context/LanguageContext";
 import {
   followUser,
   unfollowUser,
   getFollowers,
   getFollowCounts,
   FollowCounts,
+  FollowerItem,
+  FollowingItem,
 } from "../../services/followService";
 import { toast } from "react-toastify";
 
@@ -27,7 +28,6 @@ const SeeProfile: React.FC<Props> = ({
   user,
   currentUserCity,
 }) => {
-  const { t } = useLanguage();
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [history, setHistory] = useState<CombatHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +83,7 @@ const SeeProfile: React.FC<Props> = ({
     getFollowers(user._id || user.id)
       .then((result) => {
         if (!mounted) return;
-        const ids = (result.data?.followers || []).map((rel: any) =>
+        const ids = (result.data?.followers || []).map((rel: FollowerItem) =>
           rel.follower?._id || rel.follower
         );
         setIsFollowing(ids.includes(currentUser.id));
@@ -108,14 +108,6 @@ const SeeProfile: React.FC<Props> = ({
           ratings.length
         ).toFixed(1)
       : "-";
-
-  const getDirections = () => {
-    if (!currentUserCity || !user.city) return;
-    const origin = encodeURIComponent(currentUserCity);
-    const destination = encodeURIComponent(user.city);
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
-    window.open(url, "_blank");
-  };
 
   // Manejar seguir/dejar de seguir
   const handleFollowToggle = async () => {

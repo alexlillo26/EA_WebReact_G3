@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import { useLanguage } from "../../context/LanguageContext";
 import { RatingModal } from "../RatingModal/RatingModal";
 import { createRating, getRatingFromTo } from "../../services/ratingService";
-import { Rating } from "../../models/Rating";
 import { updateCombatImage } from "../../services/combatService";
 import "./MyCombats.css";
 import { CancelCombatModal } from "../CancelCombatModal/CancelCombatModal";
@@ -25,8 +24,6 @@ const MyCombats: React.FC = () => {
   const [ratedCombats, setRatedCombats] = useState<{ [key: string]: boolean }>(
     {}
   );
-  const [selectedCombatId, setSelectedCombatId] = useState<string | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);

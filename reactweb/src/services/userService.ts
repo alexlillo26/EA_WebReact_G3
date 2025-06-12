@@ -99,7 +99,18 @@ export const searchUsers = async (email?: string, weight?: string, city?: string
   }
 };
 
-export const updateUserBoxingVideoWithProgress = (
+// Servicio explícito para subir avatar a Cloudinary vía backend
+export const uploadAvatar = async (file: File) => {
+  const form = new FormData();
+  form.append("profilePicture", file);
+  return axiosInstance.put(
+    `${API_BASE_URL}/api/users/me/avatar`,
+    form
+  );
+};
+
+// Servicio explícito para subir vídeo de boxeo a Cloudinary vía backend
+export const uploadBoxingVideo = (
   userId: string,
   file: File,
   onProgress: (percent: number) => void
@@ -110,7 +121,7 @@ export const updateUserBoxingVideoWithProgress = (
     formData.append('video', file);
 
     const xhr = new XMLHttpRequest();
-    xhr.open('PUT', `${API_BASE_URL}/users/${userId}/boxing-video`, true);
+    xhr.open('PUT', `${API_BASE_URL}/api/users/${userId}/boxing-video`, true);
     if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
     xhr.upload.onprogress = (event) => {

@@ -3,7 +3,8 @@ import styled from "styled-components";
 import {
   getUserById,
   updateUser,
-  updateUserBoxingVideoWithProgress,
+  uploadAvatar,
+  uploadBoxingVideo,
 } from "../../services/userService";
 import { useLanguage } from "../../context/LanguageContext";
 import SimpleModal from "../SimpleModal/SimpleModal";
@@ -15,7 +16,8 @@ import {
   unfollowUser,
   removeFollower,
   FollowCounts,
-  FollowerDoc,
+  FollowerItem,
+  FollowingItem,
 } from "../../services/followService";
 
 interface ProfileProps {
@@ -50,8 +52,8 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     followers: 0,
     following: 0,
   });
-  const [followersList, setFollowersList] = useState<FollowerDoc[]>([]);
-  const [followingList, setFollowingList] = useState<FollowerDoc[]>([]);
+  const [followersList, setFollowersList] = useState<FollowerItem[]>([]);
+  const [followingList, setFollowingList] = useState<FollowingItem[]>([]);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
   const [loadingFollows, setLoadingFollows] = useState(false);
@@ -160,16 +162,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
       let result;
       if (profilePictureFile) {
-        const formDataToSend = new FormData();
-        formDataToSend.append("profilePicture", profilePictureFile);
-
-        Object.entries(updatedUser).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            formDataToSend.append(key, value.toString());
-          }
-        });
-
-        result = await updateUser(user.id, formDataToSend);
+        // Usa el servicio explícito para avatar
+        await uploadAvatar(profilePictureFile);
+        result = await getUserById(user.id); // Refresca datos tras subir avatar
       } else {
         result = await updateUser(user.id, updatedUser);
       }
@@ -197,12 +192,13 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     const { id } = JSON.parse(userData);
     setUploadProgress(0);
     try {
-      const res = await updateUserBoxingVideoWithProgress(
+      // Usa el servicio explícito para vídeo
+      const res = await uploadBoxingVideo(
         id,
         videoFile,
         setUploadProgress
       );
-      setUserVideoUrl(res.boxingVideo);
+      setUserVideoUrl(res.boxingVideoUrl || res.boxingVideo || "");
       setVideoFile(null);
       setUploadProgress(0);
     } catch (err) {

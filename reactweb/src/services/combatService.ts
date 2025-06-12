@@ -62,7 +62,7 @@ export const updateCombatImage = async (combatId: string, imageFile: File) => {
   const formData = new FormData();
   formData.append('image', imageFile);
 
-  const response = await axiosInstance.put<any>(
+  await axiosInstance.put<any>(
     `/api/combat/${combatId}/image`, // Asegúrate de tener este endpoint en el backend
     formData,
     {
