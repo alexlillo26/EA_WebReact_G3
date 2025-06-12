@@ -58,29 +58,30 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [loadingFollowAction, setLoadingFollowAction] = useState<string | null>(null);
 
   const fetchUserData = React.useCallback(async () => {
-    try {
-     const userData = user?.id ? await getUserById(user.id) : await getUserById(); // Siempre obtiene el usuario autenticado
-      if (userData) {
-        setFormData({
-          name: userData.name || "",
-          email: userData.email || "",
-          phone: userData.phone || "",
-          weight: userData.weight || "",
-          city: userData.city || "",
-          birthdate: userData.birthDate
-            ? new Date(userData.birthDate).toISOString().split("T")[0]
-            : "",
-          password: "",
-          profilePicture: userData.profilePicture || "",
-          gender: userData.gender || "",
-        });
-        setPreviewImage(userData.profilePicture || null);
-        setUserVideoUrl(userData.boxingVideo || "");
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
+  try {
+    if (!user?.id) return; // Si no hay usuario, no intentes llamar
+    const userData = await getUserById(user.id);
+    if (userData) {
+      setFormData({
+        name: userData.name || "",
+        email: userData.email || "",
+        phone: userData.phone || "",
+        weight: userData.weight || "",
+        city: userData.city || "",
+        birthdate: userData.birthDate
+          ? new Date(userData.birthDate).toISOString().split("T")[0]
+          : "",
+        password: "",
+        profilePicture: userData.profilePicture || "",
+        gender: userData.gender || "",
+      });
+      setPreviewImage(userData.profilePicture || null);
+      setUserVideoUrl(userData.boxingVideo || "");
     }
-  }, [user]);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+}, [user]);
 
   useEffect(() => {
     fetchUserData();
