@@ -52,7 +52,7 @@ export const registerUser = async (userData: Omit<Usuario, 'id' | 'isHidden'>): 
 };
 
 // Servicio para obtener un usuario por ID
-export const getUserById = async (): Promise<Usuario | null> => {
+export const getUserById = async (userId: string): Promise<Usuario | null> => {
   try {
     const token = getToken();
     if (!token) throw new Error("No token available");
