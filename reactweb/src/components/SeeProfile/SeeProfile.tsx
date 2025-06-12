@@ -6,6 +6,8 @@ import {
   followUser,
   unfollowUser,
   getFollowers,
+  getFollowCounts,
+  FollowCounts,
 } from "../../services/followService";
 import { toast } from "react-toastify";
 
@@ -26,6 +28,7 @@ const SeeProfile: React.FC<Props> = ({
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [checkingFollow, setCheckingFollow] = useState(false);
+  const [counts, setCounts] = useState<FollowCounts>({ followers: 0, following: 0 });
 
   // Obtener el usuario actual desde localStorage
   const currentUser = (() => {
@@ -44,6 +47,17 @@ const SeeProfile: React.FC<Props> = ({
         setRatings(res);
         setLoading(false);
       });
+      // Cargar contadores de seguidores/seguidos
+      getFollowCounts(userId)
+        .then((res) => {
+          setCounts({
+            followers: res.data.followers,
+            following: res.data.following,
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
   }, [open, user]);
 
@@ -52,10 +66,11 @@ const SeeProfile: React.FC<Props> = ({
     if (!open || !user || !currentUser) return;
     let mounted = true;
     setCheckingFollow(true);
-    Promise.resolve(getFollowers(user._id || user.id))
+    getFollowers(user._id || user.id)
       .then((result) => {
         if (!mounted) return;
-        const ids = result.followers.map((rel: any) =>
+        // Accede correctamente a result.data.followers
+        const ids = (result.data?.followers || []).map((rel: any) =>
           rel.follower?._id || rel.follower
         );
         setIsFollowing(ids.includes(currentUser.id));
@@ -93,7 +108,7 @@ const SeeProfile: React.FC<Props> = ({
     if (!currentUser || !user) return;
     try {
       if (isFollowing) {
-        await unfollowUser(user._id || user.id);
+        await unfollowUser(user._id || user.id); // Solo pasa el id del usuario a dejar de seguir
         setIsFollowing(false);
         toast.info("Has dejado de seguir a este usuario");
       } else {
@@ -110,6 +125,15 @@ const SeeProfile: React.FC<Props> = ({
     <UserProfileModal open={open} onClose={onClose}>
       <div style={{ color: "#222" }}>
         <h2 style={{ color: "#d62828" }}>{user.name}</h2>
+        {/* Mostrar contadores de seguidores/seguidos */}
+        <div style={{ marginBottom: 10 }}>
+          <span style={{ marginRight: 16 }}>
+            <b>Siguiendo:</b> {counts.following}
+          </span>
+          <span>
+            <b>Seguidores:</b> {counts.followers}
+          </span>
+        </div>
         {/* Botón de seguir/dejar de seguir */}
         {currentUser &&
           (user._id || user.id) !== currentUser.id && (

@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getUserById, updateUser } from "../../services/userService"; // Importa el servicio para actualizar el usuario
+import { getUserById, updateUser } from "../../services/userService";
 import { useLanguage } from "../../context/LanguageContext";
-import SimpleModal from "../SimpleModal/SimpleModal"; // Importa el componente modal
+import SimpleModal from "../SimpleModal/SimpleModal";
+import {
+  getFollowers,
+  getFollowing,
+  getFollowCounts,
+  followUser,
+  unfollowUser,
+  removeFollower,
+  FollowCounts,
+  FollowerDoc,
+} from "../../services/followService";
 
 interface ProfileProps {
-  user: { id: string; name: string } | null; // Include user ID
+  user: { id: string; name: string } | null;
 }
 
 const Profile: React.FC<ProfileProps> = ({ user }) => {
@@ -28,6 +38,18 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
     null
   );
+  // Estado para seguidores/seguidos
+  const [followCounts, setFollowCounts] = useState<FollowCounts>({
+    followers: 0,
+    following: 0,
+  });
+  const [followersList, setFollowersList] = useState<FollowerDoc[]>([]);
+  const [followingList, setFollowingList] = useState<FollowerDoc[]>([]);
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
+  const [loadingFollows, setLoadingFollows] = useState(false);
+  const [loadingFollowAction, setLoadingFollowAction] = useState<string | null>(null); // Para deshabilitar botones individuales
+
   const fetchUserData = React.useCallback(async () => {
     // No uses el id del usuario pasado por props, siempre usa el autenticado
     try {
@@ -56,6 +78,46 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   useEffect(() => {
     fetchUserData(); // Fetch user data when the component mounts
   }, [fetchUserData]); // Only fetch once when the component mounts
+
+  // Cargar contadores y listas de seguidores/seguidos
+  useEffect(() => {
+    if (!user) return;
+    getFollowCounts(user.id)
+      .then((res) => {
+        setFollowCounts({
+          followers: res.data.followers,
+          following: res.data.following,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [user]);
+
+  const fetchFollowersList = async () => {
+    if (!user) return;
+    setLoadingFollows(true);
+    try {
+      const res = await getFollowers(user.id);
+      setFollowersList(res.data?.followers || []);
+      // También refresca la lista de following para saber si ya sigues a alguien
+      const resFollowing = await getFollowing(user.id);
+      setFollowingList(resFollowing.data?.following || []);
+    } finally {
+      setLoadingFollows(false);
+    }
+  };
+
+  const fetchFollowingList = async () => {
+    if (!user) return;
+    setLoadingFollows(true);
+    try {
+      const res = await getFollowing(user.id);
+      setFollowingList(res.data?.following || []);
+    } finally {
+      setLoadingFollows(false);
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -114,8 +176,143 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     }
   };
 
+  // Mostrar lista de seguidores
+  const handleShowFollowers = () => {
+    setShowFollowers((prev) => !prev);
+    setShowFollowing(false);
+    if (!showFollowers) fetchFollowersList();
+  };
+
+  // Mostrar lista de seguidos
+  const handleShowFollowing = () => {
+    setShowFollowing((prev) => !prev);
+    setShowFollowers(false);
+    if (!showFollowing) fetchFollowingList();
+  };
+
+  // Seguir usuario desde lista de seguidores
+  const handleFollowBack = async (followerId: string) => {
+    setLoadingFollowAction(followerId);
+    await followUser(followerId);
+    await fetchFollowersList();
+    await fetchFollowingList();
+    const res = await getFollowCounts(user!.id);
+    const { followers, following } = res.data || {};
+    setFollowCounts({
+      following: following ?? 0,
+      followers: followers ?? 0,
+    });
+    setLoadingFollowAction(null);
+  };
+
+  // Dejar de seguir usuario desde lista de seguidos
+  const handleUnfollow = async (followingId: string) => {
+    setLoadingFollowAction(followingId);
+    await unfollowUser(followingId);
+    await fetchFollowingList();
+    const res = await getFollowCounts(user!.id);
+    const { followers, following } = res.data || {};
+    setFollowCounts({
+      following: following ?? 0,
+      followers: followers ?? 0,
+    });
+    setLoadingFollowAction(null);
+  };
+
+  // Eliminar seguidor
+  const handleRemoveFollower = async (followerId: string) => {
+    setLoadingFollowAction(followerId);
+    await removeFollower(followerId);
+    await fetchFollowersList();
+    const res = await getFollowCounts(user!.id);
+    const { followers, following } = res.data || {};
+    setFollowCounts({
+      following: following ?? 0,
+      followers: followers ?? 0,
+    });
+    setLoadingFollowAction(null);
+  };
+
   return (
     <StyledProfile>
+      {/* --- NUEVA SECCIÓN DE CONTADORES Y LISTAS --- */}
+      <FollowStatsBar>
+        <FollowStat onClick={handleShowFollowing}>
+          <span className="count">{followCounts.following}</span>
+          <span className="label">Siguiendo</span>
+        </FollowStat>
+        <FollowStat onClick={handleShowFollowers}>
+          <span className="count">{followCounts.followers}</span>
+          <span className="label">Seguidores</span>
+        </FollowStat>
+      </FollowStatsBar>
+      {/* Listas desplegables */}
+      {showFollowing && (
+        <FollowList>
+          <h4>Usuarios que sigues</h4>
+          {loadingFollows ? (
+            <p>Cargando...</p>
+          ) : followingList.length === 0 ? (
+            <p>No sigues a nadie aún.</p>
+          ) : (
+            <ul>
+              {followingList.map((rel) => (
+                <li key={rel._id}>
+                  <span>{rel.following.name}</span>
+                  <button
+                    className="unfollow-btn"
+                    onClick={() => handleUnfollow(rel.following._id)}
+                    disabled={loadingFollowAction === rel.following._id}
+                  >
+                    {loadingFollowAction === rel.following._id ? "..." : "Dejar de seguir"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </FollowList>
+      )}
+      {showFollowers && (
+        <FollowList>
+          <h4>Usuarios que te siguen</h4>
+          {loadingFollows ? (
+            <p>Cargando...</p>
+          ) : followersList.length === 0 ? (
+            <p>No tienes seguidores aún.</p>
+          ) : (
+            <ul>
+              {followersList.map((rel) => {
+                const follower = rel.follower;
+                const isFollowing = followingList.some(
+                  (f) => f.following._id === follower._id
+                );
+                return (
+                  <li key={follower._id}>
+                    <span>{follower.name}</span>
+                    {!isFollowing && (
+                      <button
+                        className="follow-btn"
+                        onClick={() => handleFollowBack(follower._id)}
+                        disabled={loadingFollowAction === follower._id}
+                      >
+                        {loadingFollowAction === follower._id ? "..." : "Seguir también"}
+                      </button>
+                    )}
+                    <button
+                      className="remove-follower-btn"
+                      onClick={() => handleRemoveFollower(follower._id)}
+                      disabled={loadingFollowAction === follower._id}
+                    >
+                      {loadingFollowAction === follower._id ? "..." : "Eliminar seguidor"}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </FollowList>
+      )}
+      {/* --- FIN NUEVA SECCIÓN --- */}
       <h2>{t("profileTitle")}</h2>
       <div className="profile-picture">
         {previewImage ? (
@@ -219,22 +416,23 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 };
 
 const StyledProfile = styled.div`
-  width: 100vw; /* Ocupa todo el ancho de la ventana */
-  height: 100vh; /* Ocupa todo el alto de la ventana */
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Alinea el contenido al inicio */
+  justify-content: flex-start;
   align-items: center;
-  background-color: rgba(26, 26, 26, 0.9); /* Fondo oscuro */
+  background-color: rgba(26, 26, 26, 0.9);
   color: white;
-  position: relative; /* Necesario para posicionar elementos hijos absolutamente */
+  position: relative;
+  margin-top: 60px; /* <-- Añadido para bajar todo el contenido y evitar que el header tape los contadores */
 
   h2 {
     text-align: center;
     margin-bottom: 20px;
     margin-top: 90px; /* Espacio desde la parte superior */
-    font-size: 24px; /* Tamaño de fuente más grande */
-    color: #d62828; /* Rojo principal */
+    font-size: 24px;
+    color: #d62828;
   }
 
   .tabs {
@@ -390,6 +588,97 @@ const StyledProfile = styled.div`
 
   .custom-file-upload.has-image:hover {
     background-color: #388e3c; /* Cambia el color al pasar el mouse si hay una imagen */
+  }
+`;
+
+const FollowStatsBar = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+  margin-bottom: 10px;
+`;
+
+const FollowStat = styled.div`
+  background: #222;
+  border-radius: 10px;
+  padding: 18px 32px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: background 0.2s;
+  &:hover {
+    background: #d62828;
+    color: #fff;
+  }
+  .count {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: #d62828;
+    display: block;
+  }
+  .label {
+    font-size: 1.1em;
+    color: #fff;
+    margin-top: 4px;
+  }
+`;
+
+const FollowList = styled.div`
+  background: #181818;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 20px 30px;
+  margin: 0 auto 20px auto;
+  max-width: 400px;
+  color: #fff;
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #333;
+      &:last-child {
+        border-bottom: none;
+      }
+      span {
+        font-size: 1.1em;
+      }
+      button {
+        margin-left: 10px;
+        padding: 5px 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.95em;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .follow-btn {
+        background: #388e3c;
+        color: #fff;
+      }
+      .unfollow-btn {
+        background: #d62828;
+        color: #fff;
+      }
+      .remove-follower-btn {
+        background: #444;
+        color: #fff;
+      }
+      .follow-btn:hover {
+        background: #2e7031;
+      }
+      .unfollow-btn:hover {
+        background: #a31f1f;
+      }
+      .remove-follower-btn:hover {
+        background: #222;
+      }
+    }
   }
 `;
 
