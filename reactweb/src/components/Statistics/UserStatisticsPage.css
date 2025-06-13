@@ -127,3 +127,21 @@
     border-radius: 4px;
     font-size: 0.9em;
 }
+
+.rating-averages-section {
+  margin-top: 2rem;
+}
+.rating-averages-list {
+  list-style: none;
+  padding: 0;
+}
+.rating-averages-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.rating-label {
+  width: 150px;
+  font-weight: bold;
+  margin-right: 1rem;
+}
