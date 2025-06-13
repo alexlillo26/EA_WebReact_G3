@@ -13,6 +13,6 @@
     "eslint": "^9.28.0"
   },
   "scripts": {
-    "prepare": "echo 'husky hooks only in reactweb'"
+    "prepare": "husky install reactweb/.husky"
   }
 }
