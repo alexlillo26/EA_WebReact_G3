@@ -8,14 +8,6 @@ export interface GymDetails { // <-- ¿Está exportada?
   name: string;
   location?: string;
 }
-
-// Interfaz para el objeto Opponent que esperas del backend
-export interface OpponentDetails { // <-- ¿Está exportada?
-  id?: string;
-  username: string;
-  profileImage?: string;
-}
-
 // Interfaz para un registro individual en el historial de combates
 // (Esta es una de las que da error si no se exporta o no existe)
 export interface CombatHistoryEntry { // <-- ¡ASEGÚRATE QUE ESTÉ EXPORTADA!
@@ -28,6 +20,14 @@ export interface CombatHistoryEntry { // <-- ¡ASEGÚRATE QUE ESTÉ EXPORTADA!
   result: 'Victoria' | 'Derrota' | 'Empate';
   status: 'completed';
 }
+
+// Interfaz para el objeto Opponent que esperas del backend
+export interface OpponentDetails { // <-- ¿Está exportada?
+  id?: string;
+  username: string;
+  profileImage?: string;
+}
+
 
 // Interfaz para la estructura completa de la respuesta de la API de historial
 // (Esta es la otra que da error si no se exporta o no existe)

@@ -58,6 +58,18 @@
     "@types/axios": "^0.9.36",
     "@types/leaflet": "^1.9.17",
     "@types/react": "^19.1.4",
-    "@types/react-toastify": "^4.0.2"
+    "@types/react-toastify": "^4.0.2",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.2.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ]
   }
 }
