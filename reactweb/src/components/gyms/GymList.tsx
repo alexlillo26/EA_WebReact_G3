@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { getGyms } from "../../services/gymService";
 import { Gym } from "../../models/Gym";
 import "./GymList.css";
+import { useLanguage } from "../../context/LanguageContext";
 
 const GymList: React.FC = () => {
+  const { t } = useLanguage();
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -23,7 +25,7 @@ const GymList: React.FC = () => {
 
   return (
     <div className="gym-list">
-      <h2>Lista de Gimnasios</h2>
+      <h2>{t("gymList.title")}</h2>
       <ul>
         {gyms.map((gym) => (
           <li key={gym._id}>
@@ -36,16 +38,16 @@ const GymList: React.FC = () => {
           disabled={currentPage === 1}
           onClick={() => setCurrentPage((prev) => prev - 1)}
         >
-          Anterior
+          {t("gymList.previous")}
         </button>
         <span>
-          Página {currentPage} de {totalPages}
+          {t("gymList.page")} {currentPage} {t("gymList.of")} {totalPages}
         </span>
         <button
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage((prev) => prev + 1)}
         >
-          Siguiente
+          {t("gymList.next")}
         </button>
       </div>
     </div>

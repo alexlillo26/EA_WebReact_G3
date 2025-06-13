@@ -131,7 +131,7 @@ const GymProfile: React.FC = () => {
           onChange={handleChange}
           required
         />
-        <label className="input-label">Fotos del gimnasio</label>
+        <label className="input-label">{t("gymPhotosLabel")}</label>
         <input
           ref={fileInputRef}
           type="file"
@@ -157,7 +157,7 @@ const GymProfile: React.FC = () => {
           style={{ marginBottom: "12px" }}
           onClick={() => fileInputRef.current?.click()}
         >
-          Subir fotos
+          {t("uploadPhotos")}
         </button>
         <div className="gym-photos-preview" style={{ marginBottom: "12px" }}>
           {photos.map((url) => (
@@ -174,7 +174,7 @@ const GymProfile: React.FC = () => {
             >
               <img
                 src={url}
-                alt="Foto del gimnasio"
+                alt={t("gymPhotoAlt")}
                 className={mainPhoto === url ? "main-photo" : ""}
                 style={{
                   width: 100,
@@ -199,7 +199,7 @@ const GymProfile: React.FC = () => {
                     left: 2,
                   }}
                 >
-                  Principal
+                  {t("mainPhoto")}
                 </span>
               )}
               {hoveredPhoto === url && (
@@ -239,7 +239,7 @@ const GymProfile: React.FC = () => {
                     setPhotos(newPhotos);
                     if (mainPhoto === url) setMainPhoto(newPhotos[0] || "");
                   }}
-                  title="Eliminar foto"
+                  title={t("deletePhoto")}
                 >
                   🗑️
                 </button>
@@ -257,10 +257,10 @@ const GymProfile: React.FC = () => {
               if (!userData) return;
               const { id } = JSON.parse(userData);
               await updateGymProfile(id, { mainPhoto });
-              alert("Foto principal actualizada");
+              alert(t("mainPhotoUpdated"));
             }}
           >
-            Guardar foto principal
+            {t("saveMainPhoto")}
           </button>
         )}
         <button type="submit">{t("saveButton")}</button>

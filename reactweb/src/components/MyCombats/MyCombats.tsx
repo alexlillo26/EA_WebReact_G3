@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getCombats,
   respondCombat,
@@ -28,6 +29,7 @@ const MyCombats: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [combatToCancel, setCombatToCancel] = useState<Combat | null>(null);
+  const navigate = useNavigate();
 
   // Obtener el id y nombre del usuario actual
   const userData = (() => {
@@ -36,7 +38,9 @@ const MyCombats: React.FC = () => {
       if (userData) {
         return JSON.parse(userData);
       }
-    } catch {}
+    } catch {
+      console.error("Error parsing userData from localStorage");
+    }
     return null;
   })();
   const userId = userData?.id;
@@ -300,7 +304,8 @@ const MyCombats: React.FC = () => {
     console.log("Rating result:", result);
     setRatingModalOpen(false);
     setCombatToRate(null);
-    setFutureCombats((prev) => prev.filter((c) => c._id !== combatToRate._id));
+    refreshCombats();
+    navigate("/estadisticas");
   };
 
   if (loading)
@@ -396,7 +401,7 @@ const MyCombats: React.FC = () => {
                     htmlFor={`file-input-${c._id}`}
                     className="file-upload-btn2"
                   >
-                    {c.image ? "Cambiar foto" : "Añadir foto"}
+                    {c.image ? t("changePhoto") : t("addPhoto")}
                   </label>
                   {!canRateCombat(c) && (
                     <button
@@ -406,7 +411,7 @@ const MyCombats: React.FC = () => {
                         setCancelModalOpen(true);
                       }}
                     >
-                      Cancelar combate
+                      {t("cancelCombat")}
                     </button>
                   )}
                 </li>
@@ -417,10 +422,10 @@ const MyCombats: React.FC = () => {
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             >
-              Anterior
+              {t("previous")}
             </button>
             <span>
-              Página {currentPage} de {totalPages}
+              {t("page")} {currentPage} {t("of")} {totalPages}
             </span>
             <button
               disabled={currentPage === totalPages}
@@ -428,7 +433,7 @@ const MyCombats: React.FC = () => {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
             >
-              Siguiente
+              {t("next")}
             </button>
           </div>
         </>

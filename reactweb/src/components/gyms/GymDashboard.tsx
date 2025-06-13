@@ -1,27 +1,31 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './GymDashboard.css'; // Import your CSS file for styling
+import React from "react";
+import { Link } from "react-router-dom";
+import "./GymDashboard.css"; // Import your CSS file for styling
+import { useLanguage } from "../../context/LanguageContext"; // Import the language context
 
 const GymDashboard: React.FC = () => {
-    return (
-        <div>
-            <h1>Panel del Gimnasio</h1>
-            <div>
-                <h2>Categorías</h2>
-                <ul>
-                    <li>
-                        <Link to="/gym/edit-profile">Editar Perfil</Link>
-                    </li>
-                    <li>
-                        <Link to="/gym/pending-combats">Combates Pendientes</Link>
-                    </li>
-                    <li>
-                        <Link to="/gym/calendar">Calendario de Combates</Link>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    );
+  const { t } = useLanguage();
+  return (
+    <div>
+      <h1>{t("gymDashboard.title")}</h1>
+      <div>
+        <h2>{t("gymDashboard.categories")}</h2>
+        <ul>
+          <li>
+            <Link to="/gym/edit-profile">{t("gymDashboard.editProfile")}</Link>
+          </li>
+          <li>
+            <Link to="/gym/pending-combats">
+              {t("gymDashboard.pendingCombats")}
+            </Link>
+          </li>
+          <li>
+            <Link to="/gym/calendar">{t("gymDashboard.combatCalendar")}</Link>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
 };
 
 export default GymDashboard;

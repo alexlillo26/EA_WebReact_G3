@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { getCombats } from "../../services/combatService";
 import { Combat } from "../../models/Combat";
 import "./CombatList.css";
+import { useLanguage } from "../../context/LanguageContext";
 
 const CombatList: React.FC = () => {
+  const { t } = useLanguage();
   const [combats, setCombats] = useState<Combat[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -23,42 +25,69 @@ const CombatList: React.FC = () => {
 
   return (
     <div className="combat-list">
-      <h2>Lista de Combates</h2>
+      <h2>{t("combatList.title")}</h2>
       <ul>
         {combats.map((combat) => (
           <li key={combat._id}>
             <div className="combat-detail-row">
-              <span className="combat-detail-label">Fecha:</span>
-              <span className="combat-detail-value">{combat.date instanceof Date ? combat.date.toLocaleString() : String(combat.date)}</span>
-            </div>
-            <div className="combat-detail-row">
-              <span className="combat-detail-label">Hora:</span>
-              <span className="combat-detail-value">{combat.time || '-'}</span>
-            </div>
-            <div className="combat-detail-row">
-              <span className="combat-detail-label">Boxeadores:</span>
+              <span className="combat-detail-label">
+                {t("combatList.date")}:
+              </span>
               <span className="combat-detail-value">
-                {Array.isArray((combat as any).boxers) && (combat as any).boxers.length > 0 ?
-                  (combat as any).boxers.map((boxer: any) =>
-                    typeof boxer === 'string' ? boxer : (boxer.name || boxer._id || '-')
-                  ).join(' vs ') : '-'}
+                {combat.date instanceof Date
+                  ? combat.date.toLocaleString()
+                  : String(combat.date)}
               </span>
             </div>
             <div className="combat-detail-row">
-              <span className="combat-detail-label">Gimnasio:</span>
+              <span className="combat-detail-label">
+                {t("combatList.time")}:
+              </span>
+              <span className="combat-detail-value">{combat.time || "-"}</span>
+            </div>
+            <div className="combat-detail-row">
+              <span className="combat-detail-label">
+                {t("combatList.boxers")}:
+              </span>
               <span className="combat-detail-value">
-                {typeof (combat as any).gym === 'object' && (combat as any).gym !== null
-                  ? ((combat as any).gym.name || (combat as any).gym._id)
+                {Array.isArray((combat as any).boxers) &&
+                (combat as any).boxers.length > 0
+                  ? (combat as any).boxers
+                      .map((boxer: any) =>
+                        typeof boxer === "string"
+                          ? boxer
+                          : boxer.name || boxer._id || "-"
+                      )
+                      .join(" vs ")
+                  : "-"}
+              </span>
+            </div>
+            <div className="combat-detail-row">
+              <span className="combat-detail-label">
+                {t("combatList.gym")}:
+              </span>
+              <span className="combat-detail-value">
+                {typeof (combat as any).gym === "object" &&
+                (combat as any).gym !== null
+                  ? (combat as any).gym.name || (combat as any).gym._id
                   : (combat as any).gym}
               </span>
             </div>
             <div className="combat-detail-row">
-              <span className="combat-detail-label">Nivel:</span>
-              <span className="combat-detail-value">{combat.level || '-'}</span>
+              <span className="combat-detail-label">
+                {t("combatList.level")}:
+              </span>
+              <span className="combat-detail-value">{combat.level || "-"}</span>
             </div>
             <div className="combat-detail-row">
-              <span className="combat-detail-label">Visible:</span>
-              <span className="combat-detail-value">{(combat as any).isHidden ? 'No' : 'Sí'}</span>
+              <span className="combat-detail-label">
+                {t("combatList.visible")}:
+              </span>
+              <span className="combat-detail-value">
+                {(combat as any).isHidden
+                  ? t("combatList.no")
+                  : t("combatList.yes")}
+              </span>
             </div>
           </li>
         ))}
@@ -68,16 +97,16 @@ const CombatList: React.FC = () => {
           disabled={currentPage === 1}
           onClick={() => setCurrentPage((prev) => prev - 1)}
         >
-          Anterior
+          {t("combatList.previous")}
         </button>
         <span>
-          Página {currentPage} de {totalPages}
+          {t("combatList.page")} {currentPage} {t("combatList.of")} {totalPages}
         </span>
         <button
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage((prev) => prev + 1)}
         >
-          Siguiente
+          {t("combatList.next")}
         </button>
       </div>
     </div>

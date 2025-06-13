@@ -221,7 +221,7 @@ const SearchResults = () => {
                       }
                     }}
                   >
-                    Ver video
+                    {t("seeVideoButton")}
                   </button>
                 </div>
               </div>

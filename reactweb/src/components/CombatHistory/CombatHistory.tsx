@@ -1,9 +1,12 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from "react";
 // Se elimina la importación de 'setCombatResult'
-import { fetchCombatHistory, FetchCombatHistoryReturn } from '../../services/combatService';
-import { CombatHistoryEntry } from '../../models/Combat';
-import { useLanguage } from '../../context/LanguageContext';
-import './CombatHistory.css';
+import {
+  fetchCombatHistory,
+  FetchCombatHistoryReturn,
+} from "../../services/combatService";
+import { CombatHistoryEntry } from "../../models/Combat";
+import { useLanguage } from "../../context/LanguageContext";
+import "./CombatHistory.css";
 
 interface CombatHistoryProps {
   boxerId: string | null;
@@ -21,32 +24,39 @@ const CombatHistory: React.FC<CombatHistoryProps> = ({ boxerId }) => {
   const [error, setError] = useState<string | null>(null);
   const PAGE_SIZE = 10;
 
-  const loadCombatHistory = useCallback(async (pageToFetch: number) => {
-    if (!boxerId) {
-      setCombats([]);
-      setTotalPages(1);
-      setCurrentPage(1);
-      setTotalCombats(0);
-      setIsLoading(false);
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data: FetchCombatHistoryReturn = await fetchCombatHistory(boxerId, pageToFetch, PAGE_SIZE);
-      setCombats(data.combats);
-      setTotalPages(data.totalPages > 0 ? data.totalPages : 1);
-      setCurrentPage(data.currentPage);
-      setTotalCombats(data.totalCombats);
-    } catch (err: any) {
-      setError(t('combatHistory.errorLoading'));
-      setCombats([]);
-      setTotalPages(1);
-      setTotalCombats(0);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [boxerId, t, PAGE_SIZE]);
+  const loadCombatHistory = useCallback(
+    async (pageToFetch: number) => {
+      if (!boxerId) {
+        setCombats([]);
+        setTotalPages(1);
+        setCurrentPage(1);
+        setTotalCombats(0);
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data: FetchCombatHistoryReturn = await fetchCombatHistory(
+          boxerId,
+          pageToFetch,
+          PAGE_SIZE
+        );
+        setCombats(data.combats);
+        setTotalPages(data.totalPages > 0 ? data.totalPages : 1);
+        setCurrentPage(data.currentPage);
+        setTotalCombats(data.totalCombats);
+      } catch (err: any) {
+        setError(t("combatHistory.errorLoading"));
+        setCombats([]);
+        setTotalPages(1);
+        setTotalCombats(0);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [boxerId, t, PAGE_SIZE]
+  );
 
   useEffect(() => {
     loadCombatHistory(currentPage);
@@ -55,13 +65,13 @@ const CombatHistory: React.FC<CombatHistoryProps> = ({ boxerId }) => {
   // Ya no necesitamos la función handleSetResult
 
   if (!boxerId) {
-    return <p>{t('combatHistory.noUserSelected')}</p>;
+    return <p>{t("combatHistory.noUserSelected")}</p>;
   }
   if (isLoading) {
-    return <p>{t('combatHistory.loading')}</p>;
+    return <p>{t("combatHistory.loading")}</p>;
   }
   if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
+    return <p style={{ color: "red" }}>{error}</p>;
   }
 
   const handlePreviousPage = () => {
@@ -74,53 +84,68 @@ const CombatHistory: React.FC<CombatHistoryProps> = ({ boxerId }) => {
 
   return (
     <div className="combat-history-container">
-      <h3>{t('combatHistory.title')}</h3>
+      <h3>{t("combatHistory.title")}</h3>
       {combats.length === 0 && !isLoading && (
-        <p>{t('combatHistory.noCombats')}</p>
+        <p>{t("combatHistory.noCombats")}</p>
       )}
       {combats.length > 0 && (
         <>
           <ul>
-            {combats.map((combat) => (
-              <li key={combat._id} className="combat-history-item">
-                <p>
-                  <strong>{t('combatHistory.date')}:</strong> {new Date(combat.date).toLocaleDateString()} - {combat.time}
-                </p>
-                {combat.opponent && (
+            {combats.map((combat) => {
+              const isCreator = (combat as any).creator?._id === boxerId;
+              const other = isCreator
+                ? combat.opponent
+                : (combat as any).creator;
+              const opponentName =
+                (other as any)?.username || (other as any)?.name || "N/A";
+
+              return (
+                <li key={combat._id} className="combat-history-item">
                   <p>
-                    <strong>{t('combatHistory.opponent')}:</strong> {combat.opponent.username}
+                    <strong>{t("combatHistory.date")}:</strong>{" "}
+                    {new Date(combat.date).toLocaleDateString()} - {combat.time}
                   </p>
-                )}
-                {/* Se elimina el párrafo que mostraba el resultado */}
-                {combat.gym && combat.gym.name && (
                   <p>
-                    <strong>{t('combatHistory.gym')}:</strong> {combat.gym.name}
+                    <strong>{t("combatHistory.opponent")}:</strong>{" "}
+                    {opponentName}
                   </p>
-                )}
-                {combat.level && (
-                  <p>
-                    <strong>{t('combatHistory.level')}:</strong> {combat.level}
-                  </p>
-                )}
-                {/* Se elimina la sección de botones para asignar resultado */}
-              </li>
-            ))}
+                  {combat.gym && combat.gym.name && (
+                    <p>
+                      <strong>{t("combatHistory.gym")}:</strong>{" "}
+                      {combat.gym.name}
+                    </p>
+                  )}
+                  {combat.level && (
+                    <p>
+                      <strong>{t("combatHistory.level")}:</strong>{" "}
+                      {combat.level}
+                    </p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
 
           {totalPages > 1 && (
             <div className="pagination-controls">
               <button onClick={handlePreviousPage} disabled={currentPage === 1}>
-                {t('combatHistory.previousPage')}
+                {t("combatHistory.previousPage")}
               </button>
               <span>
-                {t('combatHistory.page')} {currentPage} {t('combatHistory.of')} {totalPages}
+                {t("combatHistory.page")} {currentPage} {t("combatHistory.of")}{" "}
+                {totalPages}
               </span>
-              <button onClick={handleNextPage} disabled={currentPage === totalPages}>
-                {t('combatHistory.nextPage')}
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                {t("combatHistory.nextPage")}
               </button>
             </div>
           )}
-          <p>{t('combatHistory.totalCombatsLabel')} {totalCombats}</p>
+          <p>
+            {t("combatHistory.totalCombatsLabel")} {totalCombats}
+          </p>
         </>
       )}
     </div>

@@ -10,7 +10,7 @@ import "./Home.css";
 import { AppPromoSection } from "../AppPromoSection/AppPromoSection";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import queryString from "query-string";
 
 const Home: React.FC = () => {
@@ -83,13 +83,6 @@ const Home: React.FC = () => {
               <option value="Peso medio">{t("middleweight")}</option>
               <option value="Peso pesado">{t("heavyweight")}</option>
             </select>
-            {/* He mantenido el selector de nivel que tenías en una versión anterior */}
-            <select value={level} onChange={(e) => setLevel(e.target.value)}>
-              <option value="">{t("searchLevelPlaceholder")}</option>
-              <option value="professional">{t("professional")}</option>
-              <option value="amateur">{t("amateur")}</option>
-              <option value="sparring">{t("sparring")}</option>
-            </select>
             <button type="submit" className="search-button">
               {t("searchButton")}
             </button>
@@ -100,8 +93,11 @@ const Home: React.FC = () => {
       <StepsSection />
       <AboutSection />
       <div className="gym-map-section">
-        <button className="gym-toggle-button" onClick={() => setShowGyms(!showGyms)}>
-            {showGyms ? t("hideGyms") : t("seeGyms")}
+        <button
+          className="gym-toggle-button"
+          onClick={() => setShowGyms(!showGyms)}
+        >
+          {showGyms ? t("hideGyms") : t("seeGyms")}
         </button>
         {showGyms && <GymMap gyms={gyms} />}
       </div>

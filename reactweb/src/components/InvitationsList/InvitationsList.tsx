@@ -4,11 +4,13 @@ import { toast } from "react-toastify";
 import { respondCombat, fetchInvitations } from "../../services/combatService";
 import { socket } from "../../socket";
 import { Combat } from "../../models/Combat";
+import { useLanguage } from "../../context/LanguageContext";
 
 // Si ves el error "Cannot find module 'react-toastify'", instala con:
 // npm install react-toastify
 
 const InvitationsList: React.FC = () => {
+  const { t } = useLanguage();
   const [invitations, setInvitations] = useState<Combat[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +25,7 @@ const InvitationsList: React.FC = () => {
           );
         }
       } catch (error) {
-        toast.error("Error carregant invitacions");
+        toast.error(t("invitationsList.errorLoading"));
       } finally {
         setLoading(false);
       }
@@ -41,7 +43,7 @@ const InvitationsList: React.FC = () => {
     const handleNewInvitation = (combat: Combat) => {
       console.log("[Socket] Nueva invitación recibida:", combat);
       setInvitations((prev) => [combat, ...prev]);
-      toast.info("¡Nueva invitación de combate recibida!");
+      toast.info(t("invitationsList.newInvitationToast"));
     };
     socket.on("newCombatInvitation", handleNewInvitation);
 
@@ -59,39 +61,37 @@ const InvitationsList: React.FC = () => {
       });
       setInvitations((prev) => prev.filter((c) => c._id !== combatId));
       toast(
-        accepted
-          ? "✅ Has acceptat la invitació"
-          : "❌ Has rebutjat la invitació"
+        accepted ? t("invitationsList.accepted") : t("invitationsList.rejected")
       );
     } catch {
-      toast.error("Error al respondre la invitació");
+      toast.error(t("invitationsList.errorResponding"));
     }
   };
 
-  if (loading) return <div>Carregant invitacions...</div>;
+  if (loading) return <div>{t("invitationsList.loading")}</div>;
 
   return (
     <div className="invitations-container">
-      <h2 className="invitations-title">📨 Invitacions de combat</h2>
+      <h2 className="invitations-title">📨 {t("invitationsList.title")}</h2>
       {invitations.length === 0 ? (
-        <p className="no-invitations">No tens invitacions pendents.</p>
+        <p className="no-invitations">{t("invitationsList.noInvitations")}</p>
       ) : (
         <ul className="invitations-list">
           {invitations.map((combat: any) => (
             <li key={combat._id} className="invitation-item">
               <div className="combat-info">
-                <strong>Gimnàs:</strong>{" "}
+                <strong>{t("invitationsList.gym")}:</strong>{" "}
                 {combat.gym && typeof combat.gym === "object"
                   ? combat.gym.name || combat.gym._id
                   : typeof combat.gym === "string"
                   ? combat.gym
                   : "-"}{" "}
                 <br />
-                <strong>Data:</strong>{" "}
+                <strong>{t("invitationsList.date")}:</strong>{" "}
                 {new Date(combat.date).toLocaleDateString()} <br />
-                <strong>Hora:</strong>{" "}
+                <strong>{t("invitationsList.time")}:</strong>{" "}
                 {combat.time ? combat.time : "-"} <br />
-                <strong>Nivell:</strong> {combat.level}
+                <strong>{t("invitationsList.level")}:</strong> {combat.level}
               </div>
               <div className="combat-actions">
                 <button
@@ -99,7 +99,7 @@ const InvitationsList: React.FC = () => {
                   className="accept-btn"
                   disabled={!combat._id}
                 >
-                  ✅ Acceptar
+                  ✅ {t("invitationsList.accept")}
                 </button>
                 <button
                   onClick={() =>
@@ -108,7 +108,7 @@ const InvitationsList: React.FC = () => {
                   className="reject-btn"
                   disabled={!combat._id}
                 >
-                  ❌ Rebutjar
+                  ❌ {t("invitationsList.reject")}
                 </button>
               </div>
             </li>

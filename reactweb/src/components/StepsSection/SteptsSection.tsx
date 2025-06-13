@@ -29,35 +29,25 @@ const StepsSection: React.FC = () => {
 };
 
 const StepsSectionGym: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <section className="steps-section">
-      <h2 className="steps-title">
-        Con Face2Face tu gimnasio crece así de fácil
-      </h2>
+      <h2 className="steps-title">{t("gymSteps.title")}</h2>
       <div className="steps-container">
         <div className="step-card">
           <div className="step-number">1</div>
-          <h3>Publica tus eventos</h3>
-          <p>
-            Promociona tus torneos, clases o actividades y llega a más
-            boxeadores de tu zona.
-          </p>
+          <h3>{t("gymSteps.step1Title")}</h3>
+          <p>{t("gymSteps.step1Desc")}</p>
         </div>
         <div className="step-card">
           <div className="step-number">2</div>
-          <h3>Gestiona inscripciones</h3>
-          <p>
-            Recibe y organiza inscripciones de participantes de forma sencilla y
-            centralizada.
-          </p>
+          <h3>{t("gymSteps.step2Title")}</h3>
+          <p>{t("gymSteps.step2Desc")}</p>
         </div>
         <div className="step-card">
           <div className="step-number">3</div>
-          <h3>Analiza tu impacto</h3>
-          <p>
-            Consulta estadísticas de asistencia, combates y mejora la
-            visibilidad de tu gimnasio.
-          </p>
+          <h3>{t("gymSteps.step3Title")}</h3>
+          <p>{t("gymSteps.step3Desc")}</p>
         </div>
       </div>
     </section>

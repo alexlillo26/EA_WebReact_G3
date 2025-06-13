@@ -28,11 +28,8 @@ const HomeGym: React.FC = () => {
     <>
       <section className="hero">
         <div className="hero-content">
-          <h1>Bienvenido a tu panel de gimnasio</h1>
-          <p>
-            Gestiona tus combates, consulta estadísticas y mantén tu información
-            actualizada.
-          </p>
+          <h1>{t("homeGym.welcomeTitle")}</h1>
+          <p>{t("homeGym.welcomeDescription")}</p>
         </div>
       </section>
       <StepsSectionGym />

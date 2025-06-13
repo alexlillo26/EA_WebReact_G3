@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { RatingStars } from "../RatingStars/RatingStars";
 import "./RatingModal.css";
+import { useLanguage } from "../../context/LanguageContext";
 
 export const RatingModal = ({
   open,
@@ -20,6 +21,7 @@ export const RatingModal = ({
   }) => void;
   opponentName: string;
 }) => {
+  const { t } = useLanguage();
   const [punctuality, setPunctuality] = useState(0);
   const [attitude, setAttitude] = useState(0);
   const [intensity, setIntensity] = useState(0);
@@ -42,29 +44,31 @@ export const RatingModal = ({
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="modal-content">
-        <h3>Califica a {opponentName}</h3>
+        <h3>
+          {t("rateOpponent")} {opponentName}
+        </h3>
         <div>
-          <label>Puntualidad:</label>
+          <label>{t("punctuality")}:</label>
           <RatingStars value={punctuality} onChange={setPunctuality} />
         </div>
         <div>
-          <label>Actitud:</label>
+          <label>{t("attitude")}:</label>
           <RatingStars value={attitude} onChange={setAttitude} />
         </div>
         <div>
-          <label>Intensidad:</label>
+          <label>{t("intensity")}:</label>
           <RatingStars value={intensity} onChange={setIntensity} />
         </div>
         <div>
-          <label>Deportividad:</label>
+          <label>{t("sportmanship")}:</label>
           <RatingStars value={sportmanship} onChange={setSportmanship} />
         </div>
         <div>
-          <label>Técnica:</label>
+          <label>{t("technique")}:</label>
           <RatingStars value={technique} onChange={setTechnique} />
         </div>
         <textarea
-          placeholder="Deja un comentario (opcional)"
+          placeholder={t("commentPlaceholder")}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           rows={3}
@@ -84,10 +88,10 @@ export const RatingModal = ({
           }
           disabled={!canSubmit}
         >
-          Enviar
+          {t("sendButton")}
         </button>
         <button onClick={onClose} style={{ marginLeft: 10 }}>
-          Cancelar
+          {t("cancelButton")}
         </button>
       </div>
     </div>

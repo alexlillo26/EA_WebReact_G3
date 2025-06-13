@@ -39,7 +39,10 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
 
   // Estados para follow
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [counts, setCounts] = useState<FollowCounts>({ followers: 0, following: 0 });
+  const [counts, setCounts] = useState<FollowCounts>({
+    followers: 0,
+    following: 0,
+  });
   const [loadingFollow, setLoadingFollow] = useState<boolean>(false);
 
   // Usuario actual
@@ -47,7 +50,9 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
     try {
       const userData = localStorage.getItem("userData");
       if (userData) return JSON.parse(userData);
-    } catch {}
+    } catch {
+      console.error("Error parsing user data from localStorage");
+    }
     return null;
   })();
 
@@ -70,11 +75,13 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
 
     // Consultar follow y contadores
     checkFollowUser(userId)
-      .then(res => setIsFollowing(res.data.following))
+      .then((res) => setIsFollowing(res.data.following))
       .catch(() => setIsFollowing(false));
     getFollowCounts(userId)
-      .then(res => setCounts(res.data))
-      .catch(() => {});
+      .then((res) => setCounts(res.data))
+      .catch(() => {
+        setCounts({ followers: 0, following: 0 });
+      });
   }, [open, userId]);
 
   // Toggle seguir/dejar de seguir
@@ -106,7 +113,10 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
 
   return (
     <UserProfileModal open onClose={onClose}>
-      <div className="see-profile-content" style={{ maxWidth: 420, margin: "0 auto" }}>
+      <div
+        className="see-profile-content"
+        style={{ maxWidth: 420, margin: "0 auto" }}
+      >
         <div
           className="profile-header"
           style={{
@@ -117,7 +127,11 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
           }}
         >
           <img
-            src={profile.profilePicture || "/default-avatar.png"}
+            src={
+              profile.profilePicture && profile.profilePicture.trim() !== ""
+                ? profile.profilePicture
+                : "/logo.png" /* Cambia aquí por la ruta de tu logo */
+            }
             alt={profile.name}
             className="profile-avatar"
             style={{
@@ -132,20 +146,20 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
             <h2 style={{ margin: 0, color: "#d62828" }}>{profile.name}</h2>
             <div style={{ display: "flex", gap: 16, margin: "8px 0" }}>
               <span>
-                <b>Sexo:</b> {profile.gender || "-"}
+                <b>{t("profile.gender")}:</b> {profile.gender || "-"}
               </span>
               <span>
-                <b>Categoría:</b> {profile.weight || "-"}
+                <b>{t("profile.category")}:</b> {profile.weight || "-"}
               </span>
             </div>
             <div style={{ marginBottom: 4 }}>
               <span>
-                <b>Ciudad:</b> {profile.city || "-"}
+                <b>{t("profile.city")}:</b> {profile.city || "-"}
               </span>
             </div>
             <div>
               <span>
-                <b>Email:</b> {profile.email}
+                <b>{t("profile.email")}:</b> {profile.email}
               </span>
             </div>
           </div>
@@ -170,26 +184,32 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
               {loadingFollow
                 ? "…"
                 : isFollowing
-                ? "Dejar de seguir"
-                : "Seguir"}
+                ? t("profile.unfollow")
+                : t("profile.follow")}
             </button>
-            <span><b>Siguiendo:</b> {counts.following}</span>
-            <span style={{ marginLeft: 12 }}><b>Seguidores:</b> {counts.followers}</span>
+            <span>
+              <b>{t("profile.following")}:</b> {counts.following}
+            </span>
+            <span style={{ marginLeft: 12 }}>
+              <b>{t("profile.followers")}:</b> {counts.followers}
+            </span>
           </div>
         )}
 
         <hr />
 
         {/* Media de ratings - diseño destacado */}
-        <h4 style={{
-          marginBottom: 12,
-          marginTop: 24,
-          color: "#d62828",
-          fontWeight: 700,
-          fontSize: 20,
-          letterSpacing: 1
-        }}>
-          Media de ratings
+        <h4
+          style={{
+            marginBottom: 12,
+            marginTop: 24,
+            color: "#d62828",
+            fontWeight: 700,
+            fontSize: 20,
+            letterSpacing: 1,
+          }}
+        >
+          {t("profile.ratingsAverage")}
         </h4>
         {stats?.ratingAverages ? (
           <div
@@ -229,14 +249,16 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
                 </span>
                 <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <RatingStars value={Number(val)} readOnly />
-                  <span style={{
-                    fontWeight: 700,
-                    fontSize: 16,
-                    color: "#d62828",
-                    marginLeft: 2,
-                    minWidth: 32,
-                    textAlign: "right"
-                  }}>
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 16,
+                      color: "#d62828",
+                      marginLeft: 2,
+                      minWidth: 32,
+                      textAlign: "right",
+                    }}
+                  >
                     {Number(val).toFixed(1)}
                   </span>
                 </span>
@@ -244,21 +266,25 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
             ))}
           </div>
         ) : (
-          <p style={{ color: "#888", fontStyle: "italic" }}>{t("profile.noRatings")}</p>
+          <p style={{ color: "#888", fontStyle: "italic" }}>
+            {t("profile.noRatings")}
+          </p>
         )}
 
         <hr />
 
         {/* Sparrings recientes - resalta el vs y muestra info secundaria */}
-        <h4 style={{
-          marginBottom: 12,
-          marginTop: 24,
-          color: "#d62828",
-          fontWeight: 700,
-          fontSize: 20,
-          letterSpacing: 1
-        }}>
-          Sparrings recientes
+        <h4
+          style={{
+            marginBottom: 12,
+            marginTop: 24,
+            color: "#d62828",
+            fontWeight: 700,
+            fontSize: 20,
+            letterSpacing: 1,
+          }}
+        >
+          {t("profile.recentSparrings")}
         </h4>
         {history.length > 0 ? (
           <div
@@ -274,9 +300,7 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
               const isCreator = (c as any).creator?._id === userId;
               const other = isCreator ? c.opponent : (c as any).creator;
               const opponentName =
-                (other as any)?.username ||
-                (other as any)?.name ||
-                "N/A";
+                (other as any)?.username || (other as any)?.name || "N/A";
               return (
                 <div
                   key={c._id}
@@ -291,36 +315,45 @@ const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
                     borderLeft: "4px solid #d62828",
                   }}
                 >
-                  <span style={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    fontSize: 18,
-                    marginBottom: 2,
-                    letterSpacing: 0.5,
-                  }}>
+                  <span
+                    style={{
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: 18,
+                      marginBottom: 2,
+                      letterSpacing: 0.5,
+                    }}
+                  >
                     <span style={{ color: "#d62828" }}>vs</span> {opponentName}
                   </span>
-                  <span style={{
-                    color: "#bbb",
-                    fontWeight: 500,
-                    fontSize: 15,
-                    marginBottom: 2,
-                  }}>
-                    <b>Fecha:</b> {new Date(c.date).toLocaleDateString()}
+                  <span
+                    style={{
+                      color: "#bbb",
+                      fontWeight: 500,
+                      fontSize: 15,
+                      marginBottom: 2,
+                    }}
+                  >
+                    <b>{t("profile.date")}:</b>{" "}
+                    {new Date(c.date).toLocaleDateString()}
                   </span>
-                  <span style={{
-                    color: "#bbb",
-                    fontWeight: 500,
-                    fontSize: 15,
-                  }}>
-                    <b>Gimnasio:</b> {c.gym?.name || "—"}
+                  <span
+                    style={{
+                      color: "#bbb",
+                      fontWeight: 500,
+                      fontSize: 15,
+                    }}
+                  >
+                    <b>{t("profile.gym")}:</b> {c.gym?.name || "—"}
                   </span>
                 </div>
               );
             })}
           </div>
         ) : (
-          <p style={{ color: "#888", fontStyle: "italic" }}>{t("profile.noSparrings")}</p>
+          <p style={{ color: "#888", fontStyle: "italic" }}>
+            {t("profile.noSparrings")}
+          </p>
         )}
       </div>
     </UserProfileModal>

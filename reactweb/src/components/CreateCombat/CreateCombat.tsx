@@ -6,7 +6,7 @@ import { Gym } from "../../models/Gym";
 import { createCombat, getCombats } from "../../services/combatService";
 import { socket } from "../../socket";
 import SimpleModal from "../SimpleModal/SimpleModal";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 // --- CAMBIO PRINCIPAL: Lee combatState de localStorage si no viene por location.state
 const CreateCombat: React.FC = () => {
@@ -173,7 +173,7 @@ const CreateCombat: React.FC = () => {
       {/* Advertencia visual si falta oponente */}
       {!opponent && (
         <div style={{ color: "red", marginTop: "10px" }}>
-          ⚠️ No se ha definido un oponente. No podrás crear el combate.
+          ⚠️ {t("noOpponentWarning")}
         </div>
       )}
       <form className="combat-form" onSubmit={(e) => e.preventDefault()}>
@@ -239,7 +239,7 @@ const CreateCombat: React.FC = () => {
             />
             {gymName && !gym && (
               <div style={{ color: "red", fontSize: "0.9em" }}>
-                {"Selecciona un gimnasio de la lista"}
+                {t("selectGymFromList")}
               </div>
             )}
             <button
@@ -287,9 +287,7 @@ const CreateCombat: React.FC = () => {
                   className="gym-img"
                 />
                 <div className="gym-name">{g.name}</div>
-                <div className="gym-location">
-                  {g.place || "Ubicación no disponible"}
-                </div>
+                <div className="gym-location">{g.place || t("noLocation")}</div>
               </div>
             ))}
           </div>
@@ -308,16 +306,16 @@ const CreateCombat: React.FC = () => {
             onClick={() => fileInputRef.current?.click()}
             style={{ marginBottom: "8px" }}
           >
-            Añadir imagen
+            {t("addImage")}
           </button>
         </div>
         {imageFile && (
           <div style={{ margin: "10px 0" }}>
-            <strong>Previsualización</strong>
+            <strong>{t("preview")}</strong>
             <br />
             <img
               src={URL.createObjectURL(imageFile)}
-              alt="Previsualización"
+              alt={t("preview")}
               style={{
                 maxWidth: "200px",
                 maxHeight: "120px",

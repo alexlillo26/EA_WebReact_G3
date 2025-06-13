@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useLanguage } from "../../context/LanguageContext";
 
 const CANCEL_REASONS = [
-  "Lesión",
-  "Problemas personales",
-  "No puedo asistir",
-  "Otro",
+  "cancelReason.injury",
+  "cancelReason.personal",
+  "cancelReason.cannotAttend",
+  "cancelReason.other",
 ];
 
 export const CancelCombatModal = ({
@@ -16,24 +17,25 @@ export const CancelCombatModal = ({
   onClose: () => void;
   onConfirm: (reason: string) => void;
 }) => {
+  const { t } = useLanguage();
   const [reason, setReason] = useState("");
   const [customReason, setCustomReason] = useState("");
 
   if (!open) return null;
 
-  const isOther = reason === "Otro";
+  const isOther = reason === t("cancelReason.other");
   const canConfirm = isOther ? customReason.trim().length > 0 : !!reason;
 
   return (
     <div className="modal-backdrop">
       <div className="modal-content">
-        <h3>¿Por qué quieres cancelar el combate?</h3>
+        <h3>{t("cancelReason.title")}</h3>
         <select
           className="cancel-reason-select"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
         >
-          <option value="">Selecciona un motivo</option>
+          <option value="">{t("cancelReason.select")}</option>
           {CANCEL_REASONS.map((r) => (
             <option key={r} value={r}>
               {r}
@@ -44,7 +46,7 @@ export const CancelCombatModal = ({
           <input
             className="cancel-reason-input"
             type="text"
-            placeholder="Escribe el motivo"
+            placeholder={t("cancelReason.write")}
             value={customReason}
             onChange={(e) => setCustomReason(e.target.value)}
             style={{
@@ -65,10 +67,10 @@ export const CancelCombatModal = ({
               setCustomReason("");
             }}
           >
-            Confirmar cancelación
+            {t("cancelReason.confirm")}
           </button>
           <button onClick={onClose} style={{ marginLeft: 8 }}>
-            Cancelar
+            {t("cancelReason.cancel")}
           </button>
         </div>
       </div>

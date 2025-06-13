@@ -17,12 +17,14 @@ export interface CombatHistoryEntry { // <-- ¡ASEGÚRATE QUE ESTÉ EXPORTADA!
   level?: string;
   gym: GymDetails | null;
   opponent: OpponentDetails | null;
+  creator: OpponentDetails | null;
   result: 'Victoria' | 'Derrota' | 'Empate';
   status: 'completed';
 }
 
 // Interfaz para el objeto Opponent que esperas del backend
 export interface OpponentDetails { // <-- ¿Está exportada?
+  _id?: string;
   id?: string;
   username: string;
   profileImage?: string;

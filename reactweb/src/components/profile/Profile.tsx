@@ -44,7 +44,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [modalMsg, setModalMsg] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [userVideoUrl, setUserVideoUrl] = useState<string>("");
-  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
+    null
+  );
   const [hovered, setHovered] = useState<"photo" | "video" | null>(null);
 
   // Seguidores/seguidos
@@ -57,7 +59,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
   const [loadingFollows, setLoadingFollows] = useState(false);
-  const [loadingFollowAction, setLoadingFollowAction] = useState<string | null>(null);
+  const [loadingFollowAction, setLoadingFollowAction] = useState<string | null>(
+    null
+  );
 
   const fetchUserData = React.useCallback(async () => {
     // No uses el id del usuario pasado por props, siempre usa el autenticado
@@ -194,11 +198,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     setUploadProgress(0);
     try {
       // Usa el servicio explícito para vídeo
-      const res = await uploadBoxingVideo(
-        id,
-        videoFile,
-        setUploadProgress
-      );
+      const res = await uploadBoxingVideo(id, videoFile, setUploadProgress);
       setUserVideoUrl(res.boxingVideoUrl || res.boxingVideo || "");
       setVideoFile(null);
       setUploadProgress(0);
@@ -268,25 +268,26 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
   return (
     <StyledProfile>
+      <h2>{t("profileTitle")}</h2>
       {/* --- NUEVA SECCIÓN DE CONTADORES Y LISTAS --- */}
       <FollowStatsBar>
         <FollowStat onClick={handleShowFollowing}>
           <span className="count">{followCounts.following}</span>
-          <span className="label">Siguiendo</span>
+          <span className="label">{t("following")}</span>
         </FollowStat>
         <FollowStat onClick={handleShowFollowers}>
           <span className="count">{followCounts.followers}</span>
-          <span className="label">Seguidores</span>
+          <span className="label">{t("followers")}</span>
         </FollowStat>
       </FollowStatsBar>
       {/* Listas desplegables */}
       {showFollowing && (
         <FollowList>
-          <h4>Usuarios que sigues</h4>
+          <h4>{t("usersYouFollow")}</h4>
           {loadingFollows ? (
-            <p>Cargando...</p>
+            <p>{t("loading")}</p>
           ) : followingList.length === 0 ? (
-            <p>No sigues a nadie aún.</p>
+            <p>{t("notFollowingAnyone")}</p>
           ) : (
             <ul>
               {followingList.map((rel) => (
@@ -297,7 +298,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
                     onClick={() => handleUnfollow(rel.following._id)}
                     disabled={loadingFollowAction === rel.following._id}
                   >
-                    {loadingFollowAction === rel.following._id ? "..." : "Dejar de seguir"}
+                    {loadingFollowAction === rel.following._id
+                      ? "..."
+                      : t("unfollow")}
                   </button>
                 </li>
               ))}
@@ -307,11 +310,11 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
       )}
       {showFollowers && (
         <FollowList>
-          <h4>Usuarios que te siguen</h4>
+          <h4>{t("usersFollowingYou")}</h4>
           {loadingFollows ? (
-            <p>Cargando...</p>
+            <p>{t("loading")}</p>
           ) : followersList.length === 0 ? (
-            <p>No tienes seguidores aún.</p>
+            <p>{t("noFollowersYet")}</p>
           ) : (
             <ul>
               {followersList.map((rel) => {
@@ -328,7 +331,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
                         onClick={() => handleFollowBack(follower._id)}
                         disabled={loadingFollowAction === follower._id}
                       >
-                        {loadingFollowAction === follower._id ? "..." : "Seguir también"}
+                        {loadingFollowAction === follower._id
+                          ? "..."
+                          : t("followBack")}
                       </button>
                     )}
                     <button
@@ -336,7 +341,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
                       onClick={() => handleRemoveFollower(follower._id)}
                       disabled={loadingFollowAction === follower._id}
                     >
-                      {loadingFollowAction === follower._id ? "..." : "Eliminar seguidor"}
+                      {loadingFollowAction === follower._id
+                        ? "..."
+                        : t("removeFollower")}
                     </button>
                   </li>
                 );
@@ -346,198 +353,212 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         </FollowList>
       )}
       {/* --- FIN NUEVA SECCIÓN --- */}
-      <h2>{t("profileTitle")}</h2>
-      <div
-        className="profile-picture"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "18px",
-          marginBottom: "20px",
-          position: "relative",
-          textAlign: "center",
-        }}
-      >
-        {previewImage ? (
+
+      {/* Nuevo contenedor flex para foto y video */}
+      <MediaRow>
+        {/* FOTO DE PERFIL */}
+        <div className="media-block">
           <div
+            className="profile-picture"
             style={{
               display: "flex",
-              flexDirection: "row",
+              flexDirection: "column",
               alignItems: "center",
-              gap: "16px",
-            }}
-          >
-            <img
-              src={previewImage}
-              alt={t("profilePictureLabel")}
-              className="profile-img"
-            />
-            <button
-              type="button"
-              className="delete-photo-btn"
-              style={{
-                position: "static",
-                background: "#d62828",
-                color: "#fff",
-                border: "none",
-                borderRadius: "50%",
-                width: 40,
-                height: 40,
-                cursor: "pointer",
-                fontWeight: "bold",
-                fontSize: 22,
-                zIndex: 2,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 0,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                transition: "background 0.2s",
-              }}
-              onClick={async () => {
-                const userData = localStorage.getItem("userData");
-                if (!userData) return;
-                const { id } = JSON.parse(userData);
-                await updateUser(id, { profilePicture: "" });
-                setPreviewImage("");
-                setProfilePictureFile(null);
-              }}
-              title="Eliminar foto"
-            >
-              🗑️
-            </button>
-          </div>
-        ) : (
-          <p>{t("noProfilePicture")}</p>
-        )}
-        <label
-          htmlFor="file-upload"
-          className={`custom-file-upload ${previewImage ? "has-image" : ""}`}
-        >
-          {previewImage ? t("changeProfilePicture") : t("chooseProfilePicture")}
-        </label>
-        <input
-          id="file-upload"
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          style={{ display: "none" }}
-        />
-      </div>
-      {/* VIDEO */}
-      <div
-        className="profile-video-upload"
-        style={{ textAlign: "center", marginTop: 20 }}
-      >
-        <input
-          id="video-upload"
-          type="file"
-          accept="video/*"
-          style={{ display: "none" }}
-          onChange={(e) => {
-            if (e.target.files && e.target.files[0]) {
-              setVideoFile(e.target.files[0]);
-            }
-          }}
-        />
-        <button
-          type="button"
-          className="custom-file-upload"
-          onClick={() => document.getElementById("video-upload")?.click()}
-          style={{ marginTop: 10 }}
-        >
-          {userVideoUrl ? t("changeBoxingVideo") : t("uploadBoxingVideo")}
-        </button>
-        {videoFile && (
-          <>
-            <button
-              type="button"
-              className="save-button"
-              style={{ marginLeft: 10 }}
-              onClick={handleVideoUpload}
-            >
-              {t("saveButton")}
-            </button>
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <div style={{ width: 320, margin: "10px auto" }}>
-                <div
-                  style={{
-                    width: `${uploadProgress}%`,
-                    height: 8,
-                    background: "#2ecc40",
-                    borderRadius: 4,
-                    transition: "width 0.3s",
-                  }}
-                />
-                <span style={{ color: "#fff", fontSize: 12 }}>
-                  {uploadProgress}%
-                </span>
-              </div>
-            )}
-          </>
-        )}
-        {userVideoUrl && (
-          <div
-            style={{
-              marginTop: 12,
+              gap: "18px",
+              marginBottom: "20px",
               position: "relative",
-              display: "inline-block",
               textAlign: "center",
             }}
-            onMouseEnter={() => setHovered("video")}
-            onMouseLeave={() => setHovered(null)}
           >
-            <video src={userVideoUrl} controls width={320} />
-            {hovered === "video" && (
-              <button
-                type="button"
-                className="delete-photo-btn"
+            {previewImage ? (
+              <img
+                src={previewImage}
+                alt={t("profilePictureLabel")}
+                className="profile-img"
+              />
+            ) : (
+              <p>{t("noProfilePicture")}</p>
+            )}
+            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+              <label
+                htmlFor="file-upload"
+                className={`custom-file-upload ${
+                  previewImage ? "has-image" : ""
+                }`}
+                style={{ marginBottom: 0 }}
+              >
+                {previewImage
+                  ? t("changeProfilePicture")
+                  : t("chooseProfilePicture")}
+              </label>
+              {previewImage && (
+                <button
+                  type="button"
+                  className="delete-photo-btn"
+                  style={{
+                    position: "static",
+                    background: "#d62828",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "50%",
+                    width: 40,
+                    height: 40,
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    fontSize: 22,
+                    zIndex: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 0,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                    transition: "background 0.2s",
+                  }}
+                  onClick={async () => {
+                    const userData = localStorage.getItem("userData");
+                    if (!userData) return;
+                    const { id } = JSON.parse(userData);
+                    await updateUser(id, { profilePicture: "" });
+                    setPreviewImage("");
+                    setProfilePictureFile(null);
+                  }}
+                  title="Eliminar foto"
+                >
+                  🗑️
+                </button>
+              )}
+            </div>
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ display: "none" }}
+            />
+          </div>
+        </div>
+        {/* VIDEO */}
+        <div className="media-block">
+          <div
+            className="profile-video-upload"
+            style={{ textAlign: "center", marginTop: 0 }}
+          >
+            {userVideoUrl ? (
+              <video
+                src={userVideoUrl}
+                controls
+                width={320}
+                style={{ borderRadius: 10 }}
+              />
+            ) : (
+              <div
                 style={{
-                  position: "absolute",
-                  top: 8,
-                  right: 8,
-                  background: "#d62828",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "50%",
-                  width: 28,
-                  height: 28,
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                  fontSize: 16,
-                  zIndex: 2,
+                  width: 320,
+                  height: 180,
+                  background: "#222",
+                  borderRadius: 10,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: 0,
+                  color: "#888",
                 }}
-                onClick={async () => {
-                  const userData = localStorage.getItem("userData");
-                  if (!userData) return;
-                  const { id } = JSON.parse(userData);
-                  await updateUser(id, { boxingVideo: "" });
-                  setUserVideoUrl("");
-                  setVideoFile(null);
-                }}
-                title="Eliminar video"
               >
-                🗑️
-              </button>
+                {t("noBoxingVideo")}
+              </div>
             )}
-            {!userVideoUrl && (
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                marginTop: 8,
+                justifyContent: "center",
+              }}
+            >
               <button
                 type="button"
                 className="custom-file-upload"
                 onClick={() => document.getElementById("video-upload")?.click()}
-                style={{ marginTop: 32, display: "block", width: 320 }}
+                style={{ marginTop: 0 }}
               >
-                {t("uploadBoxingVideo")}
+                {userVideoUrl ? t("changeBoxingVideo") : t("uploadBoxingVideo")}
               </button>
+              {userVideoUrl && (
+                <button
+                  type="button"
+                  className="delete-photo-btn"
+                  style={{
+                    position: "static",
+                    background: "#d62828",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "50%",
+                    width: 40,
+                    height: 40,
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    fontSize: 18,
+                    zIndex: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 0,
+                  }}
+                  onClick={async () => {
+                    const userData = localStorage.getItem("userData");
+                    if (!userData) return;
+                    const { id } = JSON.parse(userData);
+                    await updateUser(id, { boxingVideo: "" });
+                    setUserVideoUrl("");
+                    setVideoFile(null);
+                  }}
+                  title="Eliminar video"
+                >
+                  🗑️
+                </button>
+              )}
+            </div>
+            <input
+              id="video-upload"
+              type="file"
+              accept="video/*"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setVideoFile(e.target.files[0]);
+                }
+              }}
+            />
+            {videoFile && (
+              <>
+                <button
+                  type="button"
+                  className="save-button"
+                  style={{ marginLeft: 10, marginTop: 10 }}
+                  onClick={handleVideoUpload}
+                >
+                  {t("saveButton")}
+                </button>
+                {uploadProgress > 0 && uploadProgress < 100 && (
+                  <div style={{ width: 320, margin: "10px auto" }}>
+                    <div
+                      style={{
+                        width: `${uploadProgress}%`,
+                        height: 8,
+                        background: "#2ecc40",
+                        borderRadius: 4,
+                        transition: "width 0.3s",
+                      }}
+                    />
+                    <span style={{ color: "#fff", fontSize: 12 }}>
+                      {uploadProgress}%
+                    </span>
+                  </div>
+                )}
+              </>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      </MediaRow>
       <div className="profile-details">
         <div className="detail">
           <label>{t("nameLabel")}</label>
@@ -630,8 +651,8 @@ const StyledProfile = styled.div`
     text-align: center;
     margin-bottom: 20px;
     margin-top: 90px;
-    font-size: 24px;
-    color: #d62828;
+    font-size: 40px;
+    color: rgb(253, 252, 252);
   }
 
   .tabs {
@@ -826,7 +847,7 @@ const FollowStatsBar = styled.div`
 const FollowStat = styled.div`
   background: #222;
   border-radius: 10px;
-  padding: 18px 32px;
+  padding: 16px 24px;
   text-align: center;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -835,14 +856,18 @@ const FollowStat = styled.div`
     background: #d62828;
     color: #fff;
   }
+  &:hover .count {
+    color: #fff;
+  }
   .count {
-    font-size: 2.2em;
+    font-size: 1.8em;
     font-weight: bold;
     color: #d62828;
     display: block;
+    transition: color 0.2s;
   }
   .label {
-    font-size: 1.1em;
+    font-size: 1em;
     color: #fff;
     margin-top: 4px;
   }
@@ -902,6 +927,34 @@ const FollowList = styled.div`
       .remove-follower-btn:hover {
         background: #222;
       }
+    }
+  }
+`;
+
+// Nuevo styled-component para el layout horizontal de foto y video
+const MediaRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 48px;
+  width: 100%;
+  margin-bottom: 30px;
+  margin-top: 40px;
+
+  .media-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 220px;
+    max-width: 340px;
+    flex: 1;
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    gap: 24px;
+    .media-block {
+      max-width: 100%;
     }
   }
 `;
