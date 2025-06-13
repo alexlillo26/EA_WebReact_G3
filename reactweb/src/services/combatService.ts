@@ -2,6 +2,7 @@
 import { Combat } from '../models/Combat';
 import axiosInstance from './axiosInstance';
 import { CombatHistoryEntry, CombatHistoryApiResponse } from '../models/Combat';
+import { API_BASE_URL } from './apiConfig';
 
 export interface FetchCombatHistoryReturn {
   combats: CombatHistoryEntry[];
@@ -86,16 +87,20 @@ export const fetchCombatHistory = async (
 };
 
 export const cancelCombatService = async (combatId: string, reason: string) => {
-  // Si tu backend espera DELETE y el motivo en el body, usa fetch (axios no soporta body en DELETE)
   const token = localStorage.getItem('token');
-  const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || ''}/api/combat/${combatId}`, {
-    method: 'DELETE',
+  const url = `${API_BASE_URL}/api/combat/${combatId}/cancel`;
+  console.log('🧪 cancelCombatService -> PATCH', url, { reason });
+  const response = await fetch(url, {
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({ reason }),
   });
-  if (!response.ok) throw new Error('Error cancelling combat');
+  if (!response.ok) {
+    console.error('Cancel error status:', response.status);
+    throw new Error(`Error cancelling combat: ${response.status}`);
+  }
   return response.json();
 };
