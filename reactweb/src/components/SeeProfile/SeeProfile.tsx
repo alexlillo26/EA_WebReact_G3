@@ -1,42 +1,48 @@
 import React, { useEffect, useState } from "react";
-import { getRatingsByUser } from "../../services/ratingService";
-import { fetchCombatHistory } from "../../services/combatService";
-import { Rating } from "../../models/Rating";
-import { CombatHistoryEntry } from "../../models/Combat";
 import UserProfileModal from "../UserProfileModal/UserProfileModal";
+import { getUserById } from "../../services/userService";
+import { fetchUserStatistics } from "../../services/statisticsService";
+import { fetchCombatHistory } from "../../services/combatService";
+import { RatingStars } from "../RatingStars/RatingStars";
+import { CombatHistoryEntry, IUserStatistics } from "../../models/Combat";
+import { useLanguage } from "../../context/LanguageContext";
 import {
   followUser,
   unfollowUser,
   checkFollowUser,
   getFollowCounts,
   FollowCounts,
-  FollowerItem,
-  FollowingItem,
 } from "../../services/followService";
-import { toast } from "react-toastify";
+import "./SeeProfile.css";
+
+// Etiquetas profesionales para las valoraciones
+const ratingLabels: Record<string, string> = {
+  punctuality: "Puntualidad",
+  attitude: "Actitud",
+  intensity: "Intensidad",
+  sportmanship: "Deportividad",
+  technique: "Técnica",
+};
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  user: any;
-  currentUserCity?: string;
+  userId: string;
 }
 
-const SeeProfile: React.FC<Props> = ({
-  open,
-  onClose,
-  user,
-  currentUserCity,
-}) => {
-  const [ratings, setRatings] = useState<Rating[]>([]);
+const SeeProfile: React.FC<Props> = ({ open, onClose, userId }) => {
+  const { t } = useLanguage();
+  const [profile, setProfile] = useState<any>(null);
+  const [stats, setStats] = useState<IUserStatistics | null>(null);
   const [history, setHistory] = useState<CombatHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [checkingFollow, setCheckingFollow] = useState(false);
-  const [togglingFollow, setTogglingFollow] = useState(false);
-  const [counts, setCounts] = useState<FollowCounts>({ followers: 0, following: 0 });
 
-  // Obtener el usuario actual desde localStorage
+  // Estados para follow
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [counts, setCounts] = useState<FollowCounts>({ followers: 0, following: 0 });
+  const [loadingFollow, setLoadingFollow] = useState<boolean>(false);
+
+  // Usuario actual
   const currentUser = (() => {
     try {
       const userData = localStorage.getItem("userData");
@@ -45,194 +51,276 @@ const SeeProfile: React.FC<Props> = ({
     return null;
   })();
 
-  const userId = user?._id || user?.id;
-
-  // Refresca el estado de follow usando el endpoint rápido
-  const refreshFollowState = async () => {
-    if (!userId) return;
-    setCheckingFollow(true);
-    try {
-      const res = await checkFollowUser(userId);
-      setIsFollowing(res.data.following);
-    } catch (err) {
-      setIsFollowing(false);
-    } finally {
-      setCheckingFollow(false);
-    }
-  };
-
-  // Comprobar la primera vez que se abra el modal o cambie user
   useEffect(() => {
-    if (open && userId) {
-      setLoading(true);
-      // Pedimos valoraciones y combates en paralelo
-      Promise.all([
-        getRatingsByUser(userId),
-        fetchCombatHistory(userId, 1, 3)
-      ]).then(([ratingsResponse, historyResponse]) => {
-        setRatings(Array.isArray(ratingsResponse) ? ratingsResponse : []);
-        setHistory(historyResponse.combats || []);
-      }).catch(err => {
-        console.error("Error fetching profile data:", err);
-      }).finally(() => {
-        setLoading(false);
-      });
-      // Cargar contadores de seguidores/seguidos
-      getFollowCounts(userId)
-        .then((res) => {
-          setCounts({
-            followers: res.data.followers,
-            following: res.data.following,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-      refreshFollowState();
-    }
+    if (!open || !userId) return;
+    setLoading(true);
+
+    Promise.all([
+      getUserById(userId),
+      fetchUserStatistics(userId),
+      fetchCombatHistory(userId, 1, 3),
+    ])
+      .then(([userRes, statsRes, historyRes]) => {
+        setProfile(userRes);
+        setStats(statsRes);
+        setHistory(historyRes.combats);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+
+    // Consultar follow y contadores
+    checkFollowUser(userId)
+      .then(res => setIsFollowing(res.data.following))
+      .catch(() => setIsFollowing(false));
+    getFollowCounts(userId)
+      .then(res => setCounts(res.data))
+      .catch(() => {});
   }, [open, userId]);
 
-  if (!open || !user) return null;
-
-  // Calcular promedios de cada campo
-  const avgField = (field: keyof Rating) =>
-    ratings.length > 0
-      ? (
-          ratings.reduce((acc, r) => acc + Number(r[field] ?? 0), 0) /
-          ratings.length
-        ).toFixed(1)
-      : "-";
-
-  // Manejar seguir/dejar de seguir
+  // Toggle seguir/dejar de seguir
   const handleFollowToggle = async () => {
-    if (!currentUser || !user) return;
-    if (togglingFollow || checkingFollow) return;
-
-    setTogglingFollow(true);
+    if (loadingFollow || !currentUser || currentUser.id === userId) return;
+    setLoadingFollow(true);
     try {
       if (isFollowing) {
         await unfollowUser(userId);
-        toast.info("Has dejado de seguir a este usuario");
       } else {
         await followUser(userId);
-        toast.success("Ahora sigues a este usuario");
       }
-      // Refresca contador y estado de botón
-      const countsRes = await getFollowCounts(userId);
-      setCounts({
-        followers: countsRes.data.followers,
-        following: countsRes.data.following,
-      });
-      await refreshFollowState();
-    } catch (err) {
-      toast.error("Error al actualizar el seguimiento");
+      // Refresca estado y contadores
+      const [{ data: followRes }, { data: countsRes }] = await Promise.all([
+        checkFollowUser(userId),
+        getFollowCounts(userId),
+      ]);
+      setIsFollowing(followRes.following);
+      setCounts(countsRes);
+    } catch {
+      // Silenciar error
     } finally {
-      setTogglingFollow(false);
+      setLoadingFollow(false);
     }
   };
 
+  if (!open) return null;
+  if (loading) return <p>Cargando perfil…</p>;
+
   return (
-    <UserProfileModal open={open} onClose={onClose}>
-      <div className="see-profile-content">
-        <div className="profile-header">
+    <UserProfileModal open onClose={onClose}>
+      <div className="see-profile-content" style={{ maxWidth: 420, margin: "0 auto" }}>
+        <div
+          className="profile-header"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 24,
+            marginBottom: 18,
+          }}
+        >
           <img
-            src={user.profilePicture || '/default-avatar.png'}
-            alt={user.name}
+            src={profile.profilePicture || "/default-avatar.png"}
+            alt={profile.name}
             className="profile-avatar"
+            style={{
+              width: 110,
+              height: 110,
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "3px solid #d62828",
+            }}
           />
-          <div className="profile-header-info">
-            <h2>{user.name}</h2>
-            <p>{user.city}</p>
+          <div>
+            <h2 style={{ margin: 0, color: "#d62828" }}>{profile.name}</h2>
+            <div style={{ display: "flex", gap: 16, margin: "8px 0" }}>
+              <span>
+                <b>Sexo:</b> {profile.gender || "-"}
+              </span>
+              <span>
+                <b>Categoría:</b> {profile.weight || "-"}
+              </span>
+            </div>
+            <div style={{ marginBottom: 4 }}>
+              <span>
+                <b>Ciudad:</b> {profile.city || "-"}
+              </span>
+            </div>
+            <div>
+              <span>
+                <b>Email:</b> {profile.email}
+              </span>
+            </div>
           </div>
         </div>
-        {/* Mostrar contadores de seguidores/seguidos */}
-        <div style={{ marginBottom: 10 }}>
-          <span style={{ marginRight: 16 }}>
-            <b>Siguiendo:</b> {counts.following}
-          </span>
-          <span>
-            <b>Seguidores:</b> {counts.followers}
-          </span>
-        </div>
-        {/* Botón de seguir/dejar de seguir */}
-        {currentUser &&
-          (user._id || user.id) !== currentUser.id && (
+
+        {/* Botón seguir/dejar de seguir y contadores */}
+        {currentUser && currentUser.id !== userId && (
+          <div style={{ marginBottom: 16 }}>
             <button
-              className="follow-button"
               onClick={handleFollowToggle}
-              disabled={checkingFollow || togglingFollow}
+              disabled={loadingFollow}
               style={{
                 backgroundColor: "#d62828",
                 color: "white",
                 padding: "8px 16px",
                 border: "none",
-                marginTop: "10px",
-                borderRadius: "5px",
+                borderRadius: 4,
                 cursor: "pointer",
+                marginRight: 16,
               }}
             >
-              {checkingFollow
-                ? "..."
+              {loadingFollow
+                ? "…"
                 : isFollowing
                 ? "Dejar de seguir"
                 : "Seguir"}
             </button>
-          )}
-        <div className="profile-stats-grid">
-          <div className="stat-item">
-            <span>Peso</span>
-            <b>{user.weight}</b>
+            <span><b>Siguiendo:</b> {counts.following}</span>
+            <span style={{ marginLeft: 12 }}><b>Seguidores:</b> {counts.followers}</span>
           </div>
-          <div className="stat-item">
-            <span>Email</span>
-            <b>{user.email}</b>
-          </div>
-        </div>
+        )}
+
         <hr />
-        <h4>Valoraciones Medias ({ratings.length})</h4>
-        <div className="ratings-grid">
-          <div className="rating-item">
-            Puntualidad<br />
-            <b>{avgField("punctuality")} ⭐</b>
-          </div>
-          <div className="rating-item">
-            Actitud<br />
-            <b>{avgField("attitude")} ⭐</b>
-          </div>
-          <div className="rating-item">
-            Intensidad<br />
-            <b>{avgField("intensity")} ⭐</b>
-          </div>
-          <div className="rating-item">
-            Deportividad<br />
-            <b>{avgField("sportmanship")} ⭐</b>
-          </div>
-          <div className="rating-item">
-            Técnica<br />
-            <b>{avgField("technique")} ⭐</b>
-          </div>
-        </div>
-        <hr />
-        <h4>Últimos Sparrings</h4>
-        {loading ? (
-          <p>Cargando historial...</p>
-        ) : history.length > 0 ? (
-          <ul className="history-summary-list">
-            {history.map((combat) => (
-              <li key={combat._id}>
-                <div className="history-opponent">
-                  vs {combat.opponent?.username || 'N/A'}
-                </div>
-                <div className="history-details">
-                  <span>{new Date(combat.date).toLocaleDateString()}</span>
-                  <span className="separator">|</span>
-                  <span>{combat.gym?.name || 'Gimnasio no disponible'}</span>
-                </div>
-              </li>
+
+        {/* Media de ratings - diseño destacado */}
+        <h4 style={{
+          marginBottom: 12,
+          marginTop: 24,
+          color: "#d62828",
+          fontWeight: 700,
+          fontSize: 20,
+          letterSpacing: 1
+        }}>
+          Media de ratings
+        </h4>
+        {stats?.ratingAverages ? (
+          <div
+            style={{
+              background: "#1f1f1f",
+              borderRadius: 12,
+              padding: "18px 20px",
+              marginBottom: 18,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 14,
+              border: "1.5px solid #d62828",
+            }}
+          >
+            {Object.entries(stats.ratingAverages).map(([key, val]) => (
+              <div
+                key={key}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  minWidth: 80,
+                  gap: 10,
+                  padding: "2px 0",
+                }}
+              >
+                <span
+                  style={{
+                    fontWeight: 600,
+                    color: "#fff",
+                    fontSize: 16,
+                    minWidth: 110,
+                  }}
+                >
+                  {ratingLabels[key] || key}
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <RatingStars value={Number(val)} readOnly />
+                  <span style={{
+                    fontWeight: 700,
+                    fontSize: 16,
+                    color: "#d62828",
+                    marginLeft: 2,
+                    minWidth: 32,
+                    textAlign: "right"
+                  }}>
+                    {Number(val).toFixed(1)}
+                  </span>
+                </span>
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
-          <p className="no-data">Sin sparrings recientes.</p>
+          <p style={{ color: "#888", fontStyle: "italic" }}>{t("profile.noRatings")}</p>
+        )}
+
+        <hr />
+
+        {/* Sparrings recientes - resalta el vs y muestra info secundaria */}
+        <h4 style={{
+          marginBottom: 12,
+          marginTop: 24,
+          color: "#d62828",
+          fontWeight: 700,
+          fontSize: 20,
+          letterSpacing: 1
+        }}>
+          Sparrings recientes
+        </h4>
+        {history.length > 0 ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 18,
+              marginBottom: 12,
+            }}
+          >
+            {history.map((c) => {
+              // Determina el "otro" participante
+              const isCreator = (c as any).creator?._id === userId;
+              const other = isCreator ? c.opponent : (c as any).creator;
+              const opponentName =
+                (other as any)?.username ||
+                (other as any)?.name ||
+                "N/A";
+              return (
+                <div
+                  key={c._id}
+                  style={{
+                    background: "#232323",
+                    borderRadius: 8,
+                    padding: "14px 18px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.10)",
+                    borderLeft: "4px solid #d62828",
+                  }}
+                >
+                  <span style={{
+                    color: "#fff",
+                    fontWeight: 700,
+                    fontSize: 18,
+                    marginBottom: 2,
+                    letterSpacing: 0.5,
+                  }}>
+                    <span style={{ color: "#d62828" }}>vs</span> {opponentName}
+                  </span>
+                  <span style={{
+                    color: "#bbb",
+                    fontWeight: 500,
+                    fontSize: 15,
+                    marginBottom: 2,
+                  }}>
+                    <b>Fecha:</b> {new Date(c.date).toLocaleDateString()}
+                  </span>
+                  <span style={{
+                    color: "#bbb",
+                    fontWeight: 500,
+                    fontSize: 15,
+                  }}>
+                    <b>Gimnasio:</b> {c.gym?.name || "—"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p style={{ color: "#888", fontStyle: "italic" }}>{t("profile.noSparrings")}</p>
         )}
       </div>
     </UserProfileModal>

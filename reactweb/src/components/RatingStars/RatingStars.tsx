@@ -9,22 +9,24 @@ export const RatingStars = ({
   onChange?: (val: number) => void;
   readOnly?: boolean;
 }) => (
-  <div
-    style={{
-      fontSize: "2em",
-      color: "#d62828",
-      cursor: readOnly ? "default" : "pointer",
-    }}
-  >
+  <span>
     {[1, 2, 3, 4, 5].map((star) => (
       <span
         key={star}
-        onClick={() => !readOnly && onChange && onChange(star)}
-        style={{ opacity: value >= star ? 1 : 0.3, marginRight: 2 }}
+        style={{
+          color: star <= value ? "#FFD700" : "#ccc",
+          cursor: readOnly ? "default" : "pointer",
+          fontSize: "1.3em",
+        }}
+        onClick={
+          readOnly || !onChange
+            ? undefined
+            : () => onChange(Number(star))
+        }
         data-testid={`star-${star}`}
       >
         ★
       </span>
     ))}
-  </div>
+  </span>
 );

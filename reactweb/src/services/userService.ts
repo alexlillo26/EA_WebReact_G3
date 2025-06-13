@@ -57,8 +57,7 @@ export const getUserById = async (userId: string): Promise<Usuario | null> => {
     const token = getToken();
     if (!token) throw new Error("No token available");
 
-    const { id } = JSON.parse(atob(token.split(".")[1])); // Decode token payload
-    const response = await axiosInstance.get<Usuario>(GET_USER_BY_ID_URL(id));
+    const response = await axiosInstance.get<Usuario>(GET_USER_BY_ID_URL(userId));
     return response.data;
   } catch (error) {
     console.error("Error en getUserById:", error);

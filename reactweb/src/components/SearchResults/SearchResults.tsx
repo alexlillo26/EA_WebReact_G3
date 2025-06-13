@@ -305,8 +305,7 @@ const SearchResults = () => {
       <SeeProfile
         open={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
-        user={selectedUser}
-        currentUserCity={currentUser?.city}
+        userId={selectedUser?._id || selectedUser?.id}
       />
       <SimpleModal
         open={modalOpen}

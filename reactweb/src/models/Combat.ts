@@ -89,4 +89,12 @@ export interface IUserStatistics {
   mostFrequentOpponent: FrequentOpponent | null;
   frequentGyms: FrequentGym[];
   combatsPerMonth: CombatsPerMonth[];
+  // NUEVO: medias de valoraciones
+  ratingAverages?: {
+    punctuality: number;
+    attitude: number;
+    intensity: number;
+    sportmanship: number;
+    technique: number;
+  };
 }
