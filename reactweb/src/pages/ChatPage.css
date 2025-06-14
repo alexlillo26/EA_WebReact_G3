@@ -1,0 +1,223 @@
+/* En: src/pages/ChatPage.css */
+
+/* --- Paleta de Colores (Variables CSS para fácil modificación) --- */
+:root {
+  --chat-bg-color: #f0f2f5;
+  --panel-bg-color: #ffffff;
+  --primary-accent-color: #005c4b; /* Un verde oscuro tipo WhatsApp */
+  --my-message-bg-color: #d9fdd3;  /* Verde claro para mis mensajes */
+  --other-message-bg-color: #ffffff;
+  --text-primary-color: #111b21;
+  --text-secondary-color: #667781;
+  --border-color: #e9edef;
+  --hover-color: #f5f5f5;
+  --active-color: #f0f2f5;
+}
+
+/* --- Estructura Principal --- */
+.chat-page-container {
+  display: flex;
+  height: calc(100vh - 70px); /* Restamos la altura del header */
+  background-color: var(--panel-bg-color);
+  padding-top: 70px; /* <-- Añade esto para dejar espacio al header */
+  box-sizing: border-box;
+}
+
+.conversation-list-panel {
+  width: 30%;
+  max-width: 400px;
+  min-width: 300px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-window-panel {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--chat-bg-color);
+}
+
+/* --- Lista de Conversaciones (Izquierda) --- */
+.conversation-list-header {
+  padding: 16px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.conversation-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.conversation-item:hover {
+  background-color: var(--hover-color);
+}
+
+.conversation-item.active {
+  background-color: var(--active-color);
+}
+
+.conversation-item .avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px;
+  object-fit: cover;
+}
+
+.conversation-details {
+  overflow: hidden;
+}
+
+.conversation-details strong {
+  font-size: 16px;
+  color: var(--text-primary-color);
+}
+
+.conversation-details p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--text-secondary-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- Ventana de Chat (Derecha) --- */
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: var(--panel-bg-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.chat-header .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary-color);
+}
+
+.messages-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Espacio entre burbujas */
+}
+
+/* --- Burbujas de Mensaje --- */
+.message-item {
+  display: flex;
+  max-width: 65%;
+}
+
+.message-bubble {
+  padding: 8px 12px;
+  border-radius: 8px;
+  word-wrap: break-word; /* Para que el texto largo no rompa el layout */
+}
+
+.message-text {
+  margin: 0;
+  padding: 0;
+  font-size: 15px;
+}
+
+.message-timestamp {
+  font-size: 11px;
+  color: var(--text-secondary-color);
+  margin-top: 5px;
+  text-align: right;
+  display: block; /* Para que ocupe su propia línea dentro de la burbuja */
+}
+
+.my-message .message-timestamp {
+  color: #669a63; /* Un color ligeramente diferente para la hora en mis mensajes */
+}
+
+/* Mensajes del otro (izquierda) */
+.message-item.other-message {
+  align-self: flex-start;
+}
+.other-message .message-bubble {
+  background-color: var(--other-message-bg-color);
+  color: var(--text-primary-color);
+  border-top-left-radius: 0;
+}
+
+/* Mis mensajes (derecha) */
+.message-item.my-message {
+  align-self: flex-end;
+}
+.my-message .message-bubble {
+  background-color: var(--my-message-bg-color);
+  color: var(--text-primary-color);
+  border-top-right-radius: 0;
+}
+
+/* --- Input para escribir mensaje --- */
+.message-input-form {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: var(--panel-bg-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.message-input-field {
+  flex-grow: 1;
+  border: 1px solid var(--border-color);
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-size: 15px;
+  outline: none;
+  margin-right: 10px;
+}
+
+.send-message-button {
+  background-color: var(--primary-accent-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.send-message-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

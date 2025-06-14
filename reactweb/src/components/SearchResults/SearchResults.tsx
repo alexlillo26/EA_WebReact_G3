@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { searchUsers } from "../../services/userService";
 import { getCombats } from "../../services/combatService";
+import { initiateChat } from "../../services/chatApi"; // <-- Se añade esto
 import "./SearchResults.css";
 import { useLanguage } from "../../context/LanguageContext";
 import SimpleModal from "../SimpleModal/SimpleModal";
@@ -28,6 +29,9 @@ const SearchResults = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMsg, setModalMsg] = useState("");
   const [videoModalUrl, setVideoModalUrl] = useState<string | null>(null);
+
+  // Estado de carga para el botón "Contactar"
+  const [isContacting, setIsContacting] = useState<string | null>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userData");
@@ -65,7 +69,7 @@ const SearchResults = () => {
       case "Peso pesado":
         return t("heavyweight");
       default:
-        return weight; // Devuelve el valor original si no coincide
+        return weight;
     }
   };
 
@@ -95,7 +99,6 @@ const SearchResults = () => {
     }
   };
 
-  // Helper: comprobar si ya hay combate pendiente con ese usuario
   function hasPendingCombatWith(userId: string) {
     return pendingCombats.some(
       (c) =>
@@ -103,6 +106,23 @@ const SearchResults = () => {
         (c.creator === userId && c.opponent === currentUser?.id)
     );
   }
+
+  // Función para manejar el clic en el botón "Contactar"
+  const handleContactClick = async (opponentId: string) => {
+    if (!opponentId) return;
+    setIsContacting(opponentId);
+
+    try {
+      const conversationId = await initiateChat(opponentId);
+      navigate('/chat', { state: { newConversationId: conversationId } });
+    } catch (error) {
+      console.error("Error al iniciar el chat:", error);
+      setModalMsg("No se pudo iniciar el chat. Inténtalo de nuevo.");
+      setModalOpen(true);
+    } finally {
+      setIsContacting(null);
+    }
+  };
 
   return (
     <div className="search-results-container">
@@ -156,8 +176,12 @@ const SearchResults = () => {
                   </p>
                 </div>
                 <div className="result-card-buttons">
-                  <button className="contact-button">
-                    {t("contactButton")}
+                  <button 
+                    className="contact-button"
+                    onClick={() => handleContactClick(user.id || user._id)}
+                    disabled={isContacting === (user.id || user._id)}
+                  >
+                    {isContacting === (user.id || user._id) ? t('loading') : t("contactButton")}
                   </button>
                   <button
                     className="view-profile-button"

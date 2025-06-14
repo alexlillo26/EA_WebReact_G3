@@ -28,6 +28,9 @@ import { getCombats } from "./services/combatService";
 import CombatHistoryPage from "./pages/CombatHistoryPage/CombatHistoryPage";
 import UserStatisticsPage from "./components/Statistics/UserStatisticsPage";
 import { storePushSubscription } from "./services/followService";
+import ChatPage from "./pages/ChatPage"; // <-- IMPORTAMOS LA PÁGINA DE CHAT
+import { AuthProvider } from "./context/AuthContext";
+import { SocketProvider } from "./context/SocketContext";
 
 interface User {
   id: string;
@@ -268,117 +271,137 @@ function App() {
     window.location.href = "/login";
   };
 
-  return (
-    <LanguageProvider>
-      <div className="landing-page">
-        <Header user={user} onLogout={handleLogout} />
-        <Routes>
-          {/* Rutas Públicas */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/gym-registration" element={<GymRegistration />} />
-          <Route path="/gym-login" element={<GymLogin />} />
-          <Route path="/gym-toggle" element={<GymToggleCard />} />
-          <Route path="/gyms" element={<GymList />} />
-          <Route path="/combats" element={<CombatList />} />
+ return (
+    // CAMBIO 1: Envolvemos todo en los Providers para que el chat funcione.
+    // El AuthProvider no recibe props aquí.
+    <AuthProvider>
+      <SocketProvider>
+        {/* El LanguageProvider de tus compañeros se queda donde estaba */}
+        <LanguageProvider>
+          <div className="landing-page">
+            {/* El Header no cambia, sigue recibiendo sus props como siempre */}
+            <Header user={user} onLogout={handleLogout} />
+            
+            <Routes>
+              {/* --- Rutas Públicas (Sin cambios) --- */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/gym-registration" element={<GymRegistration />} />
+              <Route path="/gym-login" element={<GymLogin />} />
+              <Route path="/gym-toggle" element={<GymToggleCard />} />
+              <Route path="/gyms" element={<GymList />} />
+              <Route path="/combats" element={<CombatList />} />
 
-          {/* Rutas Protegidas */}
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute user={user}>
-                <Profile user={user} />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/combates"
-            element={
-              <ProtectedRoute user={user}>
-                <MyCombats />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/estadisticas"
-            element={
-              <ProtectedRoute user={user}>
-                <CombatHistoryPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/search-results"
-            element={
-              <ProtectedRoute user={user}>
-                <SearchResults />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/create-combat"
-            element={
-              <ProtectedRoute user={user}>
-                <CreateCombat />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/gym-combats"
-            element={
-              <ProtectedRoute user={user}>
-                <GymCombats />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/gym-profile"
-            element={
-              <ProtectedRoute user={user}>
-                <GymProfile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/gym-home"
-            element={
-              <ProtectedRoute user={user}>
-                <HomeGym />
-              </ProtectedRoute>
-            }
-          />
+              {/* --- Rutas Protegidas (Sin cambios en cómo funcionan) --- */}
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute user={user}>
+                    <Profile user={user} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/combates"
+                element={
+                  <ProtectedRoute user={user}>
+                    <MyCombats />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/estadisticas"
+                element={
+                  <ProtectedRoute user={user}>
+                    <CombatHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/search-results"
+                element={
+                  <ProtectedRoute user={user}>
+                    <SearchResults />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/create-combat"
+                element={
+                  <ProtectedRoute user={user}>
+                    <CreateCombat />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gym-combats"
+                element={
+                  <ProtectedRoute user={user}>
+                    <GymCombats />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gym-profile"
+                element={
+                  <ProtectedRoute user={user}>
+                    <GymProfile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gym-home"
+                element={
+                  <ProtectedRoute user={user}>
+                    <HomeGym />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-statistics"
+                element={
+                  <ProtectedRoute user={user}>
+                    <UserStatisticsPage />
+                  </ProtectedRoute>
+                }
+              />
 
-          {/* Nueva ruta para estadísticas de usuario */}
-          <Route
-            path="/my-statistics"
-            element={
-              <ProtectedRoute user={user}>
-                <UserStatisticsPage />
-              </ProtectedRoute>
-            }
-          />
-          {/* Ruta legacy de estadísticas demo */}
-          {/* 
-          <Route
-            path="/statistics-demo"
-            element={<Statistics boxerId="6802ab47458bfd82550849ed" />}
-          />
-          */}
-        </Routes>
-        <div className="accessibility-button">
-          <button onClick={() => setIsAccessibilityPanelOpen(true)}>
-            <i className="fas fa-universal-access"></i>
-          </button>
-        </div>
-        <AccessibilityMenu
-          isOpen={isAccessibilityPanelOpen}
-          onClose={() => setIsAccessibilityPanelOpen(false)}
-        />
-        <ToastContainer position="top-right" autoClose={4000} />
-      </div>
-    </LanguageProvider>
+              {/* CAMBIO 2: AÑADIMOS LAS RUTAS PARA EL CHAT */}
+              <Route 
+                path="/chat" 
+                element={
+                  <ProtectedRoute user={user}>
+                    <ChatPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route 
+                path="/chat/:conversationId" 
+                element={
+                  <ProtectedRoute user={user}>
+                    <ChatPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+            
+            {/* --- Resto de la UI (Sin cambios) --- */}
+            <div className="accessibility-button">
+              <button onClick={() => setIsAccessibilityPanelOpen(true)}>
+                <i className="fas fa-universal-access"></i>
+              </button>
+            </div>
+            <AccessibilityMenu
+              isOpen={isAccessibilityPanelOpen}
+              onClose={() => setIsAccessibilityPanelOpen(false)}
+            />
+            <ToastContainer position="top-right" autoClose={4000} />
+          </div>
+        </LanguageProvider>
+      </SocketProvider>
+    </AuthProvider>
   );
-}
+  }
 
 export default App;
