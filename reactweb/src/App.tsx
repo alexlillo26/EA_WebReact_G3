@@ -17,7 +17,7 @@ import { LanguageProvider } from "./context/LanguageContext";
 import AccessibilityMenu from "./components/AccessibilityMenu/AccessibilityMenu";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import CreateCombat from "./components/CreateCombat/CreateCombat";
-import GymCombats from "./components/GymCombats/GymCombats";
+import GymCombatHistory from "./components/CombatHistory/GymCombatHistory";
 import GymProfile from "./components/GymProfile/GymProfile";
 import HomeGym from "./components/home/HomeGym";
 import { socket } from "./socket";
@@ -146,7 +146,8 @@ function App() {
               name: decoded.name || "Usuario",
             };
             setUser(userData);
-            localStorage.setItem("userData", JSON.stringify(userData));
+            const oldUserData = JSON.parse(localStorage.getItem("userData") || "{}");
+            localStorage.setItem("userData", JSON.stringify({ ...oldUserData, ...userData }));
           } catch (error) {
             console.error("Error decoding token:", error);
             setUser(null);
@@ -171,7 +172,8 @@ function App() {
         console.log("Decoded token from URL:", decoded);
         const userData = { id: decoded.id, name: decoded.name || "Usuario" };
         setUser(userData);
-        localStorage.setItem("userData", JSON.stringify(userData));
+        const oldUserData = JSON.parse(localStorage.getItem("userData") || "{}");
+        localStorage.setItem("userData", JSON.stringify({ ...oldUserData, ...userData }));
         // Redirige para limpiar los tokens de la URL
         window.history.replaceState(
           {},
@@ -186,7 +188,8 @@ function App() {
         .then((userData) => {
           console.log("User data from Google OAuth:", userData);
           setUser(userData);
-          localStorage.setItem("userData", JSON.stringify(userData));
+          const oldUserData = JSON.parse(localStorage.getItem("userData") || "{}");
+          localStorage.setItem("userData", JSON.stringify({ ...oldUserData, ...userData }));
         })
         .catch((error) => console.error("Google OAuth error:", error));
     } else {
@@ -260,7 +263,8 @@ function App() {
 
   const handleLogin = (user: { id: string; name: string }) => {
     setUser(user);
-    localStorage.setItem("userData", JSON.stringify(user));
+    const oldUserData = JSON.parse(localStorage.getItem("userData") || "{}");
+    localStorage.setItem("userData", JSON.stringify({ ...oldUserData, ...user }));
   };
 
   const handleLogout = () => {
@@ -338,7 +342,7 @@ function App() {
                 path="/gym-combats"
                 element={
                   <ProtectedRoute user={user}>
-                    <GymCombats />
+                    <GymCombatHistory />
                   </ProtectedRoute>
                 }
               />

@@ -62,7 +62,7 @@ const UserProfileDetails: React.FC<UserProfileDetailsProps> = ({ userId }) => {
 
       <div className="profile-combat-history">
         <h3>{t("combatHistory.title")}</h3>
-        {userId && <CombatHistory boxerId={userId} />}
+        {userId && <CombatHistory />}
       </div>
     </div>
   );

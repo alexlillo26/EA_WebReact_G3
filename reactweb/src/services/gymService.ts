@@ -10,7 +10,7 @@ interface GetGymsResponse {
 }
 
 // Obtener todos los gimnasios con paginación
-export const getGyms = async (page: number = 1, pageSize: number = 10): Promise<GetGymsResponse> => {
+export const getGyms = async (page = 1, pageSize = 10): Promise<GetGymsResponse> => {
   const response = await axiosInstance.get<GetGymsResponse>(`${API_BASE_URL}/api/gym`, {
     params: { page, pageSize },
   });
@@ -87,7 +87,7 @@ export const updateGymProfile = async (gymId: string, updateData: Partial<Gym>):
   });
 
   if (!response.ok) {
-    throw new Error('Failed to update gym data');
+    throw new Error('Failed to update gym profile');
   }
 
   return response.json();

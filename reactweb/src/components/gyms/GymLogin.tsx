@@ -20,7 +20,7 @@ const GymLogin: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_BASE_URL}/gym/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/gym/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

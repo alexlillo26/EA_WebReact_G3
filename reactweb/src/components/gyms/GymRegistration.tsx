@@ -26,7 +26,7 @@ const GymRegistration: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_BASE_URL}/gym`, {
+      const response = await fetch(`${API_BASE_URL}/api/gym`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

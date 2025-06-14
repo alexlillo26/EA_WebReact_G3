@@ -53,7 +53,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const decodedUser = decodeToken(googleToken);
         if (decodedUser) {
           setUser(decodedUser);
-          localStorage.setItem("userData", JSON.stringify(decodedUser));
+          const oldUserData = JSON.parse(localStorage.getItem("userData") || "{}");
+          localStorage.setItem("userData", JSON.stringify({ ...oldUserData, ...decodedUser }));
         }
         // Limpia los parámetros de la URL
         searchParams.delete('token');
@@ -83,7 +84,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const decodedUser = decodeToken(storedToken);
         if (decodedUser) {
           setUser(decodedUser);
-          localStorage.setItem("userData", JSON.stringify(decodedUser)); // Asegura que userData esté sincronizado
+          const oldUserData = JSON.parse(localStorage.getItem("userData") || "{}");
+          localStorage.setItem("userData", JSON.stringify({ ...oldUserData, ...decodedUser }));
         } else {
           // Si el token es inválido/expirado, limpia todo
           authService.clearTokens();

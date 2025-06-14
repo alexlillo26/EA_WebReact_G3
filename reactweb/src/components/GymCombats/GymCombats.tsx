@@ -43,39 +43,36 @@ const GymCombats: React.FC = () => {
       <h2>{t('gymCombats')}</h2>
       {combats.length > 0 ? (
         <div className="combats-list">
-          {combats.map((combat) => (
-            <div key={combat._id} className="combat-card">
-              <div className="combat-detail-row">
-                <span className="combat-detail-label">Fecha:</span>
-                <span className="combat-detail-value">{new Date(combat.date as string).toLocaleString()}</span>
+          {combats.map((combat) => {
+            // Boxer names
+            let boxerNames = '-';
+            if (Array.isArray((combat as any).boxers) && (combat as any).boxers.length > 0) {
+              boxerNames = (combat as any).boxers.map((boxer: any) =>
+                typeof boxer === 'string' ? boxer : (boxer.name || boxer._id || '-')
+              ).join(' vs ');
+            }
+            // Date/time
+            const dateObj = combat.date ? new Date(combat.date as string) : null;
+            const dateStr = dateObj ? dateObj.toLocaleDateString() : '-';
+            const timeStr = dateObj ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+            // Estado
+            const estado = combat.status ? (combat.status.charAt(0).toUpperCase() + combat.status.slice(1)) : '-';
+            // Nivel
+            const nivel = combat.level || '-';
+            return (
+              <div key={combat._id} className="combat-card" style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '18px 20px', marginBottom: 22 }}>
+                <div style={{ fontSize: 38, color: '#d62828', marginRight: 18 }}>
+                  <i className="fas fa-drum-steelpan" style={{ fontSize: 38 }}></i>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 20, color: '#fff', marginBottom: 6 }}>{boxerNames}</div>
+                  <div style={{ color: '#e0e0e0', fontSize: 15, marginBottom: 2 }}>Nivel: <span style={{ color: '#fff', fontWeight: 500 }}>{nivel}</span></div>
+                  <div style={{ color: '#e0e0e0', fontSize: 15, marginBottom: 2 }}>Fecha: <span style={{ color: '#fff', fontWeight: 500 }}>{dateStr} {timeStr}</span></div>
+                  <div style={{ color: '#e0e0e0', fontSize: 15 }}>Estado: <span style={{ color: '#fff', fontWeight: 500 }}>{estado}</span></div>
+                </div>
               </div>
-              <div className="combat-detail-row">
-                <span className="combat-detail-label">Boxeadores:</span>
-                <span className="combat-detail-value">
-                  {Array.isArray((combat as any).boxers) && (combat as any).boxers.length > 0 ?
-                    (combat as any).boxers.map((boxer: any) =>
-                      typeof boxer === 'string' ? boxer : (boxer.name || boxer._id || '-')
-                    ).join(' vs ') : '-'}
-                </span>
-              </div>
-              <div className="combat-detail-row">
-                <span className="combat-detail-label">Gimnasio:</span>
-                <span className="combat-detail-value">
-                  {(combat as any).gym && typeof (combat as any).gym === 'object'
-                    ? ((combat as any).gym.name || (combat as any).gym._id)
-                    : (typeof (combat as any).gym === 'string' ? (combat as any).gym : '-')}
-                </span>
-              </div>
-              <div className="combat-detail-row">
-                <span className="combat-detail-label">Nivel:</span>
-                <span className="combat-detail-value">{combat.level || '-'}</span>
-              </div>
-              <div className="combat-detail-row">
-                <span className="combat-detail-label">Visible:</span>
-                <span className="combat-detail-value">{(combat as any).isHidden ? 'No' : 'Sí'}</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <p>{t('noCombatsAvailable')}</p>

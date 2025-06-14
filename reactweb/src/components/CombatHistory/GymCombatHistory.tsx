@@ -1,53 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { getGymCombats, getCombats } from "../../services/combatService";
+import { getGymCombats } from "../../services/combatService";
 import { Combat } from "../../models/Combat";
 import { useLanguage } from "../../context/LanguageContext";
 import "./CombatHistory.css";
 
-const CombatHistory: React.FC = () => {
+const GymCombatHistory: React.FC = () => {
   const { t } = useLanguage();
   const [combats, setCombats] = useState<Combat[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Auto get current user info
-  const userData = (() => {
+  // Get current gymId
+  const gymId = (() => {
     try {
-      const data = localStorage.getItem("userData");
-      return data ? JSON.parse(data) : null;
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const parsed = JSON.parse(userData);
+        return parsed.id;
+      }
     } catch (e) { /* intentionally empty */ }
     return null;
   })();
-  const isGym = !!userData?.isGym;
-  const userId = userData?.id;
 
   useEffect(() => {
-    if (!userId) return;
+    if (!gymId) return;
     setIsLoading(true);
     setError(null);
-    if (isGym) {
-      getGymCombats(userId)
-        .then(res => setCombats(res.combats || []))
-        .catch(() => setError(t("combatHistory.errorLoading")))
-        .finally(() => setIsLoading(false));
-    } else {
-      Promise.all([
-        getCombats({ creator: userId }),
-        getCombats({ opponent: userId })
-      ])
-        .then(([asCreator, asOpponent]) => {
-          const all = [...(asCreator.combats || []), ...(asOpponent.combats || [])];
-          // Merge and deduplicate
-          const unique = Array.from(new Map(all.map(c => [c._id, c])).values());
-          setCombats(unique);
-        })
-        .catch(() => setError(t("combatHistory.errorLoading")))
-        .finally(() => setIsLoading(false));
-    }
-  }, [userId, isGym, t]);
+    getGymCombats(gymId)
+      .then((res) => {
+        setCombats(res.combats || []);
+      })
+      .catch(() => setError(t("combatHistory.errorLoading")))
+      .finally(() => setIsLoading(false));
+  }, [gymId, t]);
 
-  if (!userId) {
-    return <p style={{color:'red'}}>No userId found in userData</p>;
+  if (!gymId) {
+    return <p style={{color:'red'}}>No gymId found in userData</p>;
   }
   if (isLoading) {
     return <p>{t("combatHistory.loading")}</p>;
@@ -122,4 +110,4 @@ const CombatHistory: React.FC = () => {
   );
 };
 
-export default CombatHistory;
+export default GymCombatHistory; 

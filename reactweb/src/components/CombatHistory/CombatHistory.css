@@ -170,3 +170,52 @@
   background-color: var(--color-accent-red); /* Asumiendo que tienes esta variable */
   color: #fff;
 }
+
+/* --- 新增：自定义卡片风格 --- */
+.custom-combat-card {
+  display: flex;
+  align-items: center;
+  background: #232323;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.7);
+  padding: 24px 32px;
+  margin-bottom: 32px;
+  min-height: 110px;
+  position: relative;
+}
+.combat-card-icon {
+  flex: 0 0 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin-right: 28px;
+}
+.combat-card-icon span {
+  font-size: 2.8rem;
+  color: var(--color-accent-red);
+  filter: drop-shadow(0 2px 8px #e50914cc);
+}
+.combat-card-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.combat-card-title {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+.combat-card-row {
+  font-size: 1.05rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 2px;
+}
+.combat-card-row strong {
+  color: var(--color-accent-red);
+  font-weight: 600;
+  margin-right: 6px;
+}

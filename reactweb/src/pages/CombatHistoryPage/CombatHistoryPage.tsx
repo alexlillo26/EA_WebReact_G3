@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CombatHistory from '../../components/CombatHistory/CombatHistory';
+import GymCombatHistory from '../../components/CombatHistory/GymCombatHistory';
 import { useLanguage } from '../../context/LanguageContext';
 import { getToken } from '../../services/authService'; // Importa tu función getToken
 
@@ -7,6 +8,26 @@ const CombatHistoryPage: React.FC = () => {
   const { t } = useLanguage();
   const [loggedInUserBoxerId, setLoggedInUserBoxerId] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isGym, setIsGym] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Check if the user is a gym
+    try {
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const parsed = JSON.parse(userData);
+        if (parsed.isGym) {
+          setIsGym(true);
+        } else {
+          setIsGym(false);
+        }
+      } else {
+        setIsGym(false);
+      }
+    } catch {
+      setIsGym(false);
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -47,15 +68,8 @@ const CombatHistoryPage: React.FC = () => {
       </header>
       <main>
         {authError && <p style={{ color: 'red' }}>{authError}</p>}
-        
-        {!authError && loggedInUserBoxerId && (
-          <CombatHistory boxerId={loggedInUserBoxerId} />
-        )}
-        
-        {/* Si no hay authError pero loggedInUserBoxerId sigue siendo null después del useEffect (y no hubo error de token),
-            podría ser que el token no tuviera ID. El mensaje de authError ya cubriría esto.
-            Si quieres un mensaje específico para cuando no hay token y no es un error de decodificación:
-        */}
+        {!authError && isGym && <GymCombatHistory />}
+        {!authError && !isGym && loggedInUserBoxerId && <CombatHistory />}
         {!loggedInUserBoxerId && !authError && getToken() === null && (
              <p>{t('combatHistory.errorUserNotLoggedIn')}</p>
         )}

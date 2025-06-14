@@ -53,8 +53,8 @@ export const fetchSentInvitations = async () => {
   return axiosInstance.get<any>('/api/combat/sent-invitations');
 };
 
-export const getGymCombats = async (gymId: string, page: number = 1, pageSize: number = 10): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
-  const response = await axiosInstance.get<any>(`/api/combat/gym/${gymId}`, { params: { page, pageSize } });
+export const getGymCombats = async (gymId: string, page = 1, pageSize = 10): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
+  const response = await axiosInstance.get<any>(`/api/combat/gym/search/${gymId}`, { params: { page, pageSize } });
   return response.data as { combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number };
 };
 
@@ -76,8 +76,8 @@ export const updateCombatImage = async (combatId: string, imageFile: File) => {
 
 export const fetchCombatHistory = async (
     boxerId: string,
-    page: number = 1,
-    pageSize: number = 10
+    page = 1,
+    pageSize = 10
 ): Promise<FetchCombatHistoryReturn> => {
     const url = `/api/combat/history/user/${boxerId}`;
     const response = await axiosInstance.get<CombatHistoryApiResponse>(url, {

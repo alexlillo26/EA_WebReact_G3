@@ -6,11 +6,45 @@
 }
 
 .combat-card {
-  background-color: #2a2a2a;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #232323;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 22px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.combat-card i {
+  color: #d62828;
+  font-size: 38px;
+  margin-right: 18px;
+}
+
+.combat-card .combat-main-info {
+  flex: 1;
+}
+
+.combat-card .combat-main-info div {
+  margin-bottom: 2px;
+}
+
+.combat-card .combat-main-info .combat-title {
+  font-weight: 700;
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.combat-card .combat-main-info .combat-label {
+  color: #e0e0e0;
+  font-size: 15px;
+}
+
+.combat-card .combat-main-info .combat-value {
+  color: #fff;
+  font-weight: 500;
 }
 
 .combat-info {
