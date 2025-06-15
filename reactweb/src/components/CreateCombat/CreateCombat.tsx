@@ -1,14 +1,14 @@
+import React, { useEffect, useState, useRef, ChangeEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CreateCombat.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { getGyms } from "../../services/gymService";
 import { Gym } from "../../models/Gym";
 import { createCombat, getCombats } from "../../services/combatService";
+import { Combat } from "../../models/Combat"; // Assegura't que la ruta sigui correcta
 import { socket } from "../../socket";
 import SimpleModal from "../SimpleModal/SimpleModal";
-import React, { useEffect, useState } from "react";
 
-// --- CAMBIO PRINCIPAL: Lee combatState de localStorage si no viene por location.state
 const CreateCombat: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -21,24 +21,24 @@ const CreateCombat: React.FC = () => {
   const [time, setTime] = useState("");
   const [gym, setGym] = useState("");
   const [gymName, setGymName] = useState("");
-  const [level, setLevel] = useState("");
+  const [level, setLevel] = useState<"amateur" | "professional" | "">(""); // Tipat més estricte
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [showAllGyms, setShowAllGyms] = useState(false);
-  const [userCombats, setUserCombats] = useState<any[]>([]);
+  const [userCombats, setUserCombats] = useState<Combat[]>([]); // Tipat com array de Combat
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMsg, setModalMsg] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchGyms = async () => {
       try {
-        const { gyms } = await getGyms(1, 50); // Trae hasta 100 gimnasios
+        const { gyms } = await getGyms(1, 50); // Trae fins a 50 gimnasos
         setGyms(gyms);
         console.log("Gyms fetched:", gyms);
       } catch (error) {
-        console.error("Error al obtener los gimnasios:", error);
+        console.error("Error en obtenir els gimnasos:", error);
       }
     };
     fetchGyms();
@@ -47,15 +47,17 @@ const CreateCombat: React.FC = () => {
   useEffect(() => {
     if (!opponent) {
       console.warn(
-        "⚠️ No se recibió un ID de oponente. No se podrá crear combate."
+        "⚠️ No s'ha rebut un ID d'oponent. No es podrà crear el combat."
       );
     }
   }, [opponent]);
 
   useEffect(() => {
-    // Cargar combates del usuario para validar fecha
+    // Carregar combats de l'usuari per validar la data
     if (creator) {
-      getCombats({ user: creator }).then((res) => {
+      // Asumint que getCombats pot filtrar per usuari
+      // getCombats({ user: creator }).then((res) => { // Aquesta línia semblava incorrecta, la canvio per una que busca per boxerId
+      getCombatsByBoxer(creator).then((res: { combats: any; }) => {
         setUserCombats(res.combats || []);
       });
     }
@@ -65,7 +67,7 @@ const CreateCombat: React.FC = () => {
     g.name.toLowerCase().includes(gymName.toLowerCase())
   );
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImageFile(e.target.files[0]);
     }
@@ -82,14 +84,14 @@ const CreateCombat: React.FC = () => {
       setModalOpen(true);
       return;
     }
-    // Validar fecha futura
+    
     const selectedDateTime = new Date(`${date}T${time}`);
     if (selectedDateTime <= new Date()) {
       setModalMsg(t("futureDateAlert"));
       setModalOpen(true);
       return;
     }
-    // Validar que no haya otro combate el mismo día
+    
     const hasCombatSameDay = userCombats.some(
       (c) => new Date(c.date).toDateString() === new Date(date).toDateString()
     );
@@ -98,7 +100,7 @@ const CreateCombat: React.FC = () => {
       setModalOpen(true);
       return;
     }
-    // Validar que no exista ya una invitación pendiente con ese oponente
+
     const hasPendingWithOpponent = userCombats.some(
       (c) =>
         c.status === "pending" &&
@@ -110,41 +112,51 @@ const CreateCombat: React.FC = () => {
       setModalOpen(true);
       return;
     }
-    // Debug logs para verificar los valores
-    console.log("creator", creator); // debe ser un ObjectId como string
+    
+    console.log("creator", creator);
     console.log("opponent", opponent);
-    console.log("gym", gym); // también
+    console.log("gym", gym);
 
     try {
-      const combatData = {
+      // --- CANVI PRINCIPAL AQUÍ ---
+      // 1. Combinem date i time en un sol camp 'date' de tipus Date.
+      // 2. Tipem explícitament l'objecte com a Partial<Combat> perquè TypeScript validi els tipus.
+      const combatData: Partial<Combat> = {
         creator,
         opponent,
-        date,
-        time,
+        date: selectedDateTime, // <-- S'utilitza l'objecte Date combinat
         gym,
         level,
-        status: "pending" as "pending",
+        status: "pending", // <-- Ara TypeScript sap que "pending" és un valor vàlid per al tipus de 'status'
       };
+      // --- FI DEL CANVI ---
+
       let combat;
       if (imageFile) {
         const formData = new FormData();
-        Object.entries(combatData).forEach(([key, value]) =>
-          formData.append(key, value)
-        );
+        // Cal convertir combatData a string per a que funcioni amb FormData si el backend no ho gestiona
+        // O afegir cada camp individualment.
+        Object.entries(combatData).forEach(([key, value]) => {
+          if (value instanceof Date) {
+            formData.append(key, value.toISOString());
+          } else if (value !== undefined) {
+             formData.append(key, Array.isArray(value) ? value.join(",") : value);
+          }
+        });
         formData.append("image", imageFile);
         combat = await createCombat(formData);
       } else {
         combat = await createCombat(combatData);
       }
-      // Emitir evento de invitación al oponente
+
       socket.emit("sendCombatInvitation", { opponentId: opponent, combat });
-      socket.emit("create_combat", combat); // Notifica por socket (legacy)
-      localStorage.removeItem("combatState"); // Limpia el estado temporal tras crear el combate
+      socket.emit("create_combat", combat);
+      localStorage.removeItem("combatState");
       setModalMsg(t("combatCreated"));
       setModalOpen(true);
       navigate("/");
     } catch (error) {
-      console.error("Error al crear el combate:", error);
+      console.error("Error en crear el combat:", error);
       setModalMsg(t("combatCreateError"));
       setModalOpen(true);
     }
@@ -170,7 +182,6 @@ const CreateCombat: React.FC = () => {
           <strong>{t("opponentLabel")}:</strong> {opponentName}
         </p>
       </div>
-      {/* Advertencia visual si falta oponente */}
       {!opponent && (
         <div style={{ color: "red", marginTop: "10px" }}>
           ⚠️ {t("noOpponentWarning")}
@@ -179,7 +190,7 @@ const CreateCombat: React.FC = () => {
       <form className="combat-form" onSubmit={(e) => e.preventDefault()}>
         <label>
           {t("levelLabel")}
-          <select value={level} onChange={(e) => setLevel(e.target.value)}>
+          <select value={level} onChange={(e) => setLevel(e.target.value as "amateur" | "professional")}>
             <option value="">{t("searchLevelPlaceholder")}</option>
             <option value="amateur">{t("amateur")}</option>
             <option value="professional">{t("professional")}</option>
@@ -197,18 +208,8 @@ const CreateCombat: React.FC = () => {
           {t("timeLabel")}
           <div className="hours-grid">
             {[
-              "09:00",
-              "10:00",
-              "11:00",
-              "12:00",
-              "13:00",
-              "14:00",
-              "15:00",
-              "16:00",
-              "17:00",
-              "18:00",
-              "19:00",
-              "20:00",
+              "09:00", "10:00", "11:00", "12:00", "13:00", "14:00",
+              "15:00", "16:00", "17:00", "18:00", "19:00", "20:00",
             ].map((h) => (
               <button
                 type="button"
@@ -350,3 +351,15 @@ const CreateCombat: React.FC = () => {
 };
 
 export default CreateCombat;
+// Mock implementation of getCombatsByBoxer
+
+async function getCombatsByBoxer(creator: string): Promise<{ combats: Combat[] }> {
+  try {
+    const response = await getCombats({ boxerId: creator });
+    return { combats: response.combats || [] };
+  } catch (error) {
+    console.error("Error fetching combats by boxer:", error);
+    return { combats: [] };
+  }
+}
+
