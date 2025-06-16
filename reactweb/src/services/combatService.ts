@@ -55,7 +55,7 @@ export const fetchSentInvitations = async () => {
 
 export const getGymCombats = async (gymId: string, page = 1, pageSize = 10): Promise<{ combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number }> => {
 
-  const response = await axiosInstance.get<any>(`/api/combat/gym/${gymId}`, { params: { page, pageSize } });
+  const response = await axiosInstance.get<any>(`/api/combat/gym/search/${gymId}`, { params: { page, pageSize } });
 
   return response.data as { combats: Combat[]; totalCombats: number; totalPages: number; currentPage: number };
 };

@@ -100,7 +100,7 @@ export const updateGymPhotos = async (
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
 
-  const response = await fetch(`${API_BASE_URL}/gym/${gymId}/photos`, {
+  const response = await fetch(`${API_BASE_URL}/api/gym/${gymId}/photos`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`

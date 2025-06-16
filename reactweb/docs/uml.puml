@@ -1,0 +1,83 @@
+@startuml
+' Component Diagram
+skinparam componentStyle uml2
+skinparam backgroundColor white
+skinparam handwritten false
+
+package "Frontend Components" {
+    [App] as App
+    [Header] as Header
+    [Home] as Home
+    [HomeGym] as HomeGym
+    [Login] as Login
+    [Register] as Register
+    [Profile] as Profile
+    [GymProfile] as GymProfile
+    [GymRegistration] as GymRegistration
+    [GymList] as GymList
+    [GymMap] as GymMap
+    [CombatHistory] as CombatHistory
+    [GymCombatHistory] as GymCombatHistory
+    [CreateCombat] as CreateCombat
+}
+
+package "Context" {
+    [AuthContext] as AuthContext
+    [SocketContext] as SocketContext
+}
+
+package "Services" {
+    [api] as api
+    [socket] as socket
+}
+
+App --> Header
+App --> Home
+App --> HomeGym
+App --> Login
+App --> Register
+App --> Profile
+App --> GymProfile
+App --> GymRegistration
+App --> GymList
+App --> GymMap
+App --> CombatHistory
+App --> GymCombatHistory
+App --> CreateCombat
+
+App --> AuthContext
+App --> SocketContext
+
+AuthContext --> api
+SocketContext --> socket
+@enduml
+
+@startuml
+' Class Diagram
+class User {
+    +id: string
+    +name: string
+    +email: string
+    +isGym: boolean
+}
+
+class Gym {
+    +id: string
+    +name: string
+    +location: Location
+    +combats: Combat[]
+}
+
+class Combat {
+    +id: string
+    +creator: User
+    +opponent: User
+    +date: Date
+    +status: string
+}
+
+Profile --> User
+GymProfile --> Gym
+CombatHistory --> Combat
+GymCombatHistory --> Combat
+@enduml 
