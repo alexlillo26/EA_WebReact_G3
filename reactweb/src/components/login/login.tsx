@@ -13,7 +13,7 @@ const Login: React.FC<{
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +64,9 @@ const Login: React.FC<{
     const frontendOrigin = "https://ea3-back.upc.edu";
 
     // Construïm la URL final
-    window.location.href = `<span class="math-inline">backendGoogleAuthUrl?origin</span>{encodeURIComponent(frontendOrigin)}`;
+    window.location.href = `${backendGoogleAuthUrl}?origin=${encodeURIComponent(
+      frontendOrigin
+    )}`;
   };
 
   return (
