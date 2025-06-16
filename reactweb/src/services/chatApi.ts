@@ -1,6 +1,6 @@
 import { ConversationsResponse, MessagesResponse } from '../models/chat';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:9000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://ea3-api.upc.edu';
 
 // Función auxiliar para obtener el token
 const getToken = (): string | null => {

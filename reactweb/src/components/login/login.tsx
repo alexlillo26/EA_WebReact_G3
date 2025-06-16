@@ -56,10 +56,15 @@ const Login: React.FC<{
   };
 
   const handleGoogleLogin = () => {
-    const webReactOrigin = "https://ea3-back.upc.edu"; // O window.location.origin si siempre es el mismo
-    window.location.href = `https://ea3-api.upc.edu/api/auth/google?origin=${encodeURIComponent(
-      webReactOrigin
-    )}`;
+    // La URL pública del teu backend amb HTTPS
+    const backendGoogleAuthUrl = 'https://ea3-api.upc.edu/api/auth/google';
+  
+    // L'origen del teu frontend WebReact. El backend el necessita per saber on
+    // redirigir l'usuari després del callback de Google.
+    const frontendOrigin = 'https://ea3-back.upc.edu'; 
+  
+    // Construïm la URL final
+    window.location.href = `<span class="math-inline">\{backendGoogleAuthUrl\}?origin\=</span>{encodeURIComponent(frontendOrigin)}`;
   };
 
   return (
