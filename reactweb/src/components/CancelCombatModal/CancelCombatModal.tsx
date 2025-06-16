@@ -23,7 +23,7 @@ export const CancelCombatModal = ({
 
   if (!open) return null;
 
-  const isOther = reason === t("cancelReason.other");
+  const isOther = reason === "cancelReason.other";
   const canConfirm = isOther ? customReason.trim().length > 0 : !!reason;
 
   return (
@@ -38,7 +38,7 @@ export const CancelCombatModal = ({
           <option value="">{t("cancelReason.select")}</option>
           {CANCEL_REASONS.map((r) => (
             <option key={r} value={r}>
-              {r}
+              {t(r)}
             </option>
           ))}
         </select>
