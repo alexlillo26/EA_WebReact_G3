@@ -8,4 +8,5 @@ export interface Gym {
     password: string; 
     photos?: string[]; 
     mainPhoto?: string; 
+    isHidden?: boolean; // <-- Añadido para filtrar gimnasios ocultos
   }

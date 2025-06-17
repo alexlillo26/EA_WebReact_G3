@@ -15,7 +15,9 @@ export const getGyms = async (page = 1, pageSize = 10): Promise<GetGymsResponse>
     params: { page, pageSize },
   });
 
-  return response.data;
+  // Filtra gimnasios ocultos
+  const gyms = (response.data.gyms || []).filter(g => !g.isHidden);
+  return { ...response.data, gyms };
 };
 
 // Registrar un gimnasio

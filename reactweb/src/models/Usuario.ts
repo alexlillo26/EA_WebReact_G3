@@ -11,4 +11,5 @@ export interface Usuario {
     profilePicture?: string; // URL de la imagen de perfil
     confirmPassword?: string; 
     boxingVideo?: string; 
+    isHidden?: boolean; // <-- Añadido para filtrar usuarios ocultos
 }

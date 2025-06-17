@@ -95,7 +95,8 @@ export const searchUsers = async (
       { params }
     );
     console.log("Search results:", response.data.users);
-    return response.data.users || [];
+    // Filtra usuarios ocultos
+    return (response.data.users || []).filter(u => !u.isHidden);
   } catch (error) {
     console.error("Error en searchUsers:", error);
     throw error;

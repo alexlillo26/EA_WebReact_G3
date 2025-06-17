@@ -52,7 +52,8 @@ const SearchResults = () => {
       }
       try {
         const results = await searchUsers(city, weight);
-        setSearchResults(results);
+        // FILTRA usuarios ocultos SIEMPRE aquí, aunque el backend los devuelva
+        setSearchResults((results || []).filter((u: any) => !u.isHidden));
       } catch {
         setSearchResults([]);
       }
@@ -85,7 +86,8 @@ const SearchResults = () => {
 
     try {
       const results = await searchUsers(city, weight);
-      setSearchResults(results);
+      // FILTRA usuarios ocultos SIEMPRE aquí también
+      setSearchResults((results || []).filter((u: any) => !u.isHidden));
       const searchParams = new URLSearchParams();
       if (city) searchParams.set("city", city);
       if (weight) searchParams.set("weight", weight);
@@ -147,10 +149,12 @@ const SearchResults = () => {
 
       <div className="results-container">
         {searchResults.length > 0 ? (
+          // FILTRA usuarios ocultos justo antes de renderizar (por seguridad extra)
           searchResults
             .filter(
               (user: any) =>
-                user.id !== currentUser?.id && user._id !== currentUser?.id
+                (user.id !== currentUser?.id && user._id !== currentUser?.id) &&
+                !user.isHidden
             )
             .map((user: any) => (
               <div key={user.id || user._id} className="result-card">

@@ -27,11 +27,13 @@ const GymList: React.FC = () => {
     <div className="gym-list">
       <h2>{t("gymList.title")}</h2>
       <ul>
-        {gyms.map((gym) => (
-          <li key={gym._id}>
-            <strong>{gym.name}</strong> - {gym.place} (${gym.price})
-          </li>
-        ))}
+        {gyms
+          .filter((gym) => !gym.isHidden)
+          .map((gym) => (
+            <li key={gym._id}>
+              <strong>{gym.name}</strong> - {gym.place} (${gym.price})
+            </li>
+          ))}
       </ul>
       <div className="pagination">
         <button

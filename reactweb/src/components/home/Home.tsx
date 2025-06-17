@@ -26,7 +26,8 @@ const Home: React.FC = () => {
     const fetchGyms = async () => {
       try {
         const response = await getGyms();
-        setGyms(response.gyms);
+        // Filtra gimnasios ocultos
+        setGyms(response.gyms.filter((g: any) => !g.isHidden));
       } catch (error) {
         console.error("Error al cargar los gimnasios:", error);
       }

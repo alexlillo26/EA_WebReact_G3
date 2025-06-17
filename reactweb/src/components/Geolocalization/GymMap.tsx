@@ -48,14 +48,16 @@ const GymMap: React.FC<GymMapProps> = ({ gyms }) => {
   useEffect(() => {
     const fetchGymLocations = async () => {
       const locations = await Promise.all(
-        gyms.map(async (gym) => {
-          if (!gym._id) return null; 
-          const position = await geocodeAddress(gym.place);
-          if (position) {
-            return { id: gym._id, name: gym.name, place: gym.place, position };
-          }
-          return null;
-        })
+        gyms
+          .filter((gym) => !gym.isHidden) // Filtra ocultos
+          .map(async (gym) => {
+            if (!gym._id) return null; 
+            const position = await geocodeAddress(gym.place);
+            if (position) {
+              return { id: gym._id, name: gym.name, place: gym.place, position };
+            }
+            return null;
+          })
       );
       const validLocations = locations.filter(
         (location) => location !== null

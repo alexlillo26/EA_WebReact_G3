@@ -27,6 +27,15 @@ const Login: React.FC<{
       if (token) {
         const decoded = JSON.parse(atob(token.split(".")[1]));
         console.log("Decoded token payload:", decoded);
+        // Si el usuario está oculto, no permitir login
+        if (decoded.isHidden) {
+          setErrorMessage("Tu cuenta está oculta. Contacta con el administrador.");
+          // Limpia cualquier token que se haya guardado
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("userData");
+          return;
+        }
         const userData = {
           id: decoded.id,
           name: decoded.username,

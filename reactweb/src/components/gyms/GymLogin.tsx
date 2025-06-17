@@ -31,6 +31,16 @@ const GymLogin: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
 
+        // Si el gimnasio está oculto, no permitir login
+        if (data.gym && data.gym.isHidden) {
+          setErrorMessage(t("loginError") + ": Este gimnasio está oculto. Contacta con el administrador.");
+          // Limpia cualquier token que se haya guardado
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("userData");
+          return;
+        }
+
         localStorage.setItem("token", data.token);
         localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("userData", JSON.stringify({
